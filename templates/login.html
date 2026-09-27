@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Calendar — Kantor SAR Surabaya</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/login.css') }}"
+    >
+</head>
+
+<body>
+
+<div class="page-shell">
+
+    <div class="login-card">
+
+        <!-- LEFT PANEL -->
+        <section class="brand-panel">
+
+            <div class="brand-header">
+
+                <div class="brand-logo">
+                    <img
+                        src="{{ url_for('static', filename='img/logo-basarnas.png') }}"
+                        alt="Basarnas"
+                    >
+                </div>
+
+                <div class="brand-title">
+                    <div class="brand-name">CALENDAR</div>
+                    <div class="brand-office">
+                        Kantor SAR Surabaya
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="brand-content">
+
+                <span class="portal-badge">
+                    ◉ &nbsp; PORTAL INTERNAL
+                </span>
+
+                <h1>
+                    Satu Jiwa,<br>
+                    Satu Rasa.
+                </h1>
+
+                <p>
+                    Bersama Basarnas Surabaya, kita hadir untuk
+                    memberikan pelayanan terbaik bagi masyarakat.
+                </p>
+
+                <div class="orange-line"></div>
+
+                <div class="institution">
+                    Badan Nasional Pencarian dan Pertolongan<br>
+                    Kantor Pencarian dan Pertolongan Surabaya
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- RIGHT PANEL -->
+        <section class="form-panel">
+
+            <button
+                class="close-button"
+                type="button"
+                aria-label="Tutup"
+            >
+                ×
+            </button>
+
+            <div class="form-header">
+
+                <div class="kicker">
+                    CALENDAR INTERNAL
+                </div>
+
+                <h2>
+                    Basarnas Surabaya
+                </h2>
+
+                <p>
+                    Masuk menggunakan akun BDIP Anda.
+                </p>
+
+            </div>
+
+
+            <form id="loginForm">
+
+                <div class="field">
+
+                    <label for="username">
+                        Username
+                    </label>
+
+                    <div class="input-wrap">
+
+                        <span class="input-icon">
+                            ▣
+                        </span>
+
+                        <input
+                            id="username"
+                            name="username"
+                            type="text"
+                            autocomplete="username"
+                            placeholder="Masukkan Username"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <div class="input-wrap">
+
+                        <span class="input-icon">
+                            ♙
+                        </span>
+
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            autocomplete="current-password"
+                            placeholder="Masukkan password BDIP"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            onclick="togglePassword()"
+                            aria-label="Tampilkan password"
+                        >
+                            ◉
+                        </button>
+
+                    </div>
+
+                    <div class="field-hint">
+                        ◇ &nbsp;
+                        Gunakan username dan password BDIP Anda.
+                    </div>
+
+                </div>
+
+
+                <label class="remember">
+
+                    <input
+                        type="checkbox"
+                        name="remember"
+                    >
+
+                    <span>
+                        Ingat saya
+                    </span>
+
+                </label>
+
+
+                <button
+                    class="login-button"
+                    type="submit"
+                >
+                    <span>↪</span>
+                    Masuk
+                </button>
+
+            </form>
+
+
+            <div class="footer">
+
+                <div>
+                    © 2026 Kantor Pencarian dan Pertolongan Surabaya
+                </div>
+
+                <div>
+                    Badan Nasional Pencarian dan Pertolongan
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<script>
+const loginForm = document.getElementById("loginForm");
+
+if (loginForm) {
+    loginForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const username =
+            document.getElementById("username").value.trim();
+
+        const password =
+            document.getElementById("password").value;
+
+        const remember =
+            document.querySelector(
+                'input[name="remember"]'
+            ).checked;
+
+        if (!username || !password) {
+            alert("Username dan Password wajib diisi.");
+            return;
+        }
+
+        const button =
+            loginForm.querySelector(".login-button");
+
+        const originalText = button.innerHTML;
+
+        button.disabled = true;
+        button.innerHTML = "Memproses login...";
+
+        try {
+            const response = await fetch("/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username,
+                    password,
+                    remember
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                alert(
+                    result.message ||
+                    "Login gagal."
+                );
+                return;
+            }
+
+            window.location.href = "/dashboard";
+
+        } catch (error) {
+            alert(
+                "Tidak dapat terhubung ke server Calendar."
+            );
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }
+    });
+}
+
+function togglePassword() {
+
+    const input = document.getElementById("password");
+
+    input.type =
+        input.type === "password"
+            ? "text"
+            : "password";
+}
+</script>
+
+</body>
+</html>

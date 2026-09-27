@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar — Dashboard Pribadi</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <img src="{{ url_for('static', filename='img/logo-basarnas.png') }}"
+                 alt="Basarnas">
+
+            <div class="brand-text">
+                <div class="brand-name">CALENDAR</div>
+                <div class="brand-office">Kantor SAR Surabaya</div>
+            </div>
+
+            <button type="button"
+                    id="sidebarToggle"
+                    class="sidebar-toggle"
+                    title="Minimize sidebar"
+                    aria-label="Minimize sidebar">
+                ‹
+            </button>
+        </div>
+
+        <nav class="sidebar-menu">
+
+            <a href="/dashboard" class="active">
+                <span class="menu-icon">⌂</span>
+                <span>DASHBOARD</span>
+            </a>
+
+            <a href="/calendar">
+                <span class="menu-icon">▦</span>
+                <span>KALENDER SAYA</span>
+            </a>
+
+            <a href="/phone-calendar">
+                <span class="menu-icon">▣</span>
+                <span>KALENDER HANDPHONE</span>
+            </a>
+
+            <a href="/agenda">
+                <span class="menu-icon">◆</span>
+                <span>AGENDAKU</span>
+            </a>
+
+            <a href="/plans">
+                <span class="menu-icon">◇</span>
+                <span>RENCANAKU</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="user-card">
+                <div class="user-avatar">
+                    {{ nama[:1]|upper if nama else "?" }}
+                </div>
+
+                <div class="user-info">
+                    <div class="user-name">{{ nama or "Pegawai" }}</div>
+                    <div class="user-nip">{{ nip or "-" }}</div>
+                </div>
+            </div>
+
+
+        </div>
+
+    </aside>
+
+    <div id="mobileMenuOverlay"
+         class="mobile-menu-overlay"></div>
+
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <button type="button"
+                    id="mobileMenuToggle"
+                    class="mobile-menu-toggle"
+                    aria-label="Buka menu">
+                ☰
+            </button>
+
+            <div class="topbar-title">
+                <div class="page-kicker">CALENDAR INTERNAL</div>
+                <h1>Dashboard</h1>
+            </div>
+
+            <div class="topbar-actions">
+                <div class="account-menu">
+                    <button type="button"
+                            id="accountMenuToggle"
+                            class="account-menu-toggle"
+                            aria-expanded="false"
+                            aria-label="Buka menu akun">
+                        <span class="account-avatar">
+                            {{ (nama or "Pegawai")[:1]|upper }}
+                        </span>
+
+                        <span class="account-name">
+                            {{ nama or "Pegawai" }}
+                        </span>
+
+                        <span class="account-chevron">▾</span>
+                    </button>
+
+                    <div id="accountMenuDropdown"
+                         class="account-menu-dropdown">
+                        <div class="account-menu-info">
+                            <div class="account-menu-name">
+                                {{ nama or "Pegawai" }}
+                            </div>
+                            <div class="account-menu-nip">
+                                {{ session.get("nip") or "" }}
+                            </div>
+                        </div>
+
+                        <button type="button"
+                                class="account-menu-logout"
+                                onclick="logout()">
+                            <span>↪</span>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </header>
+
+
+        <section class="dashboard-content">
+
+            {% if active_menu == "phone" %}
+
+            <div class="breadcrumb-card">
+                <strong>Kalender Handphone</strong>
+            </div>
+
+            <section class="phone-calendar-card" id="phoneCalendarView">
+
+                <div class="phone-calendar-header">
+                    <div>
+                        <div class="phone-calendar-kicker">PERSONAL CALENDAR</div>
+                        <h2>Sinkronkan Kalender</h2>
+                        <p>
+                            Tambahkan kalender pribadi Basarnas ke perangkat
+                            handphone Anda.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="phoneCalendarLoading"
+                     class="phone-calendar-loading">
+                    Menyiapkan kalender...
+                </div>
+
+                <div id="phoneCalendarError"
+                     class="phone-calendar-error"
+                     hidden>
+                </div>
+
+                <div id="phoneCalendarContent" hidden>
+
+                    <div class="phone-device-title">
+                        <strong>Pilih perangkat</strong>
+                        <span>Pilih cara yang sesuai dengan perangkat Anda.</span>
+                    </div>
+
+                    <div class="phone-device-grid">
+
+                        <button type="button"
+                                id="iphoneCalendarBtn"
+                                class="phone-device-button"
+                                disabled>
+
+                            <span class="phone-device-icon"></span>
+
+                            <span class="phone-device-text">
+                                <strong>iPhone / iPad</strong>
+                                <small>Tambahkan ke iPhone</small>
+                            </span>
+
+                            <span class="phone-device-arrow">›</span>
+
+                        </button>
+
+
+                        <button type="button"
+                                id="androidCalendarBtn"
+                                class="phone-device-button"
+                                disabled>
+
+                            <span class="phone-device-icon android">🤖</span>
+
+                            <span class="phone-device-text">
+                                <strong>Android</strong>
+                                <small>Tambahkan ke Google Calendar</small>
+                            </span>
+
+                            <span class="phone-device-arrow">›</span>
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="phone-feed-card">
+
+                        <div class="phone-feed-header">
+                            <div>
+                                <strong>URL Kalender</strong>
+                                <span>
+                                    Gunakan URL ini untuk berlangganan kalender.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="phone-feed-row">
+
+                            <input type="text"
+                                   id="phoneFeedUrl"
+                                   readonly
+                                   value="">
+
+                            <button type="button"
+                                    id="copyCalendarUrlBtn"
+                                    class="phone-copy-button">
+                                Salin URL
+                            </button>
+
+                        </div>
+
+                        <div id="copyCalendarMessage"
+                             class="phone-copy-message"
+                             hidden>
+                            URL kalender berhasil disalin.
+                        </div>
+
+                    </div>
+
+                    <div id="iphoneSubscriptionPanel"
+                         class="phone-subscription-card"
+                         hidden>
+
+                        <div class="phone-subscription-header">
+                            <strong>Tambahkan Kalender ke iPhone / iPad</strong>
+
+                            <button type="button"
+                                    id="closeIphoneSubscriptionBtn"
+                                    class="phone-subscription-close">
+                                ×
+                            </button>
+                        </div>
+
+                        <p>
+                            Gunakan metode <strong>Berlangganan Kalender</strong>
+                            agar kalender HRIS REBORN tetap tersinkronisasi.
+                        </p>
+
+                        <div class="phone-subscription-url">
+
+                            <strong>URL Kalender</strong>
+
+                            <div class="phone-feed-row">
+
+                                <input type="text"
+                                       id="iphoneSubscriptionUrl"
+                                       readonly
+                                       value="">
+
+                                <button type="button"
+                                        id="copyIphoneSubscriptionBtn"
+                                        class="phone-copy-button">
+                                    Salin URL
+                                </button>
+
+                            </div>
+
+                            <div id="iphoneSubscriptionMessage"
+                                 class="phone-copy-message"
+                                 hidden>
+                                URL kalender berhasil disalin.
+                            </div>
+
+                        </div>
+
+                        <div class="phone-subscription-steps">
+
+                            <strong>Langkah di iPhone / iPad</strong>
+
+                            <ol>
+                                <li>Buka aplikasi <strong>Kalender</strong>.</li>
+                                <li>Pilih <strong>Kalender</strong>.</li>
+                                <li>Pilih <strong>Tambah Kalender</strong>.</li>
+                                <li>
+                                    Pilih
+                                    <strong>Tambah Kalender Berlangganan</strong>.
+                                </li>
+                                <li>Tempel URL Kalender di atas.</li>
+                                <li>Pilih <strong>Berlangganan</strong>.</li>
+                                <li>
+                                    Gunakan nama kalender
+                                    <strong>HRIS REBORN</strong>.
+                                </li>
+                            </ol>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            {% else %}
+
+            <div class="breadcrumb-card">
+                <strong>Dashboard Pribadi</strong>
+            </div>
+
+            <section class="calendar-card">
+
+                <div class="calendar-header">
+
+                    <div class="calendar-title">
+                        <span class="calendar-title-icon">▦</span>
+                        <strong>Personal Calendar</strong>
+                    </div>
+
+                    <div class="calendar-controls">
+
+                        <button id="monthViewBtn"
+                                class="view-button active">
+                            BULAN
+                        </button>
+
+                        <button id="yearViewBtn"
+                                class="view-button">
+                            TAHUN
+                        </button>
+
+                        <button id="prevBtn"
+                                class="nav-button"
+                                type="button">
+                            ‹
+                        </button>
+
+                        <strong id="periodTitle">-</strong>
+
+                        <button id="nextBtn"
+                                class="nav-button"
+                                type="button">
+                            ›
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div id="calendarLoading" class="calendar-loading">
+                    Memuat kalender...
+                </div>
+
+                <div id="calendarError"
+                     class="calendar-error"
+                     hidden>
+                </div>
+
+
+                <div id="monthView">
+
+                    <div class="week-header">
+                        <span>SEN</span>
+                        <span>SEL</span>
+                        <span>RAB</span>
+                        <span>KAM</span>
+                        <span>JUM</span>
+                        <span>SAB</span>
+                        <span>MIN</span>
+                    </div>
+
+                    <div id="calendarGrid" class="calendar-grid"></div>
+
+                </div>
+
+
+                <div id="yearView"
+                     class="year-grid"
+                     hidden>
+                </div>
+
+
+                <div class="agenda-section">
+
+                    <div class="agenda-header">
+                        <strong id="agendaTitle">Agenda</strong>
+                        <span id="agendaCount">0 kegiatan</span>
+                    </div>
+
+                    <div id="agendaList"></div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+        {% endif %}
+
+    </main>
+
+</div>
+
+
+<script>
+{% if active_menu == "phone" %}
+async function loadPhoneCalendar() {
+
+    const loading = document.getElementById("phoneCalendarLoading");
+    const error = document.getElementById("phoneCalendarError");
+    const content = document.getElementById("phoneCalendarContent");
+
+    try {
+
+        const response = await fetch(
+            "/api/phone-calendar-info",
+            { credentials: "same-origin" }
+        );
+
+        const payload = await response.json();
+
+        if (!response.ok || payload.status !== "success") {
+            throw new Error(
+                payload.message || "Gagal menyiapkan kalender."
+            );
+        }
+
+        const feedUrl = payload.feed_url;
+        const webcalUrl = payload.webcal_url;
+
+        document.getElementById("phoneFeedUrl").value = feedUrl;
+
+        const iphonePanel =
+            document.getElementById("iphoneSubscriptionPanel");
+
+        const iphoneUrl =
+            document.getElementById("iphoneSubscriptionUrl");
+
+        iphoneUrl.value = feedUrl;
+
+        document.getElementById("iphoneCalendarBtn")
+            .addEventListener("click", () => {
+                iphonePanel.hidden = false;
+                iphonePanel.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+            });
+
+        document.getElementById("closeIphoneSubscriptionBtn")
+            .addEventListener("click", () => {
+                iphonePanel.hidden = true;
+            });
+
+        document.getElementById("copyIphoneSubscriptionBtn")
+            .addEventListener("click", async () => {
+
+                try {
+                    await navigator.clipboard.writeText(feedUrl);
+
+                    const message =
+                        document.getElementById(
+                            "iphoneSubscriptionMessage"
+                        );
+
+                    message.hidden = false;
+
+                    setTimeout(() => {
+                        message.hidden = true;
+                    }, 2500);
+
+                } catch {
+                    iphoneUrl.focus();
+                    iphoneUrl.select();
+                    document.execCommand("copy");
+                }
+            });
+
+        document.getElementById("androidCalendarBtn")
+            .addEventListener("click", () => {
+                const googleUrl =
+                    "https://calendar.google.com/calendar/u/0/r/settings/addbyurl";
+                window.open(googleUrl, "_blank", "noopener");
+            });
+
+        document.getElementById("copyCalendarUrlBtn")
+            .addEventListener("click", async () => {
+
+                try {
+                    await navigator.clipboard.writeText(feedUrl);
+
+                    const message =
+                        document.getElementById("copyCalendarMessage");
+
+                    message.hidden = false;
+
+                    setTimeout(() => {
+                        message.hidden = true;
+                    }, 2500);
+
+                } catch {
+                    const input =
+                        document.getElementById("phoneFeedUrl");
+
+                    input.focus();
+                    input.select();
+                    document.execCommand("copy");
+                }
+            });
+
+        document.getElementById("iphoneCalendarBtn").disabled = false;
+        document.getElementById("androidCalendarBtn").disabled = false;
+
+        content.hidden = false;
+
+    } catch (errorObject) {
+
+        error.textContent =
+            errorObject.message ||
+            "Gagal menyiapkan kalender handphone.";
+
+        error.hidden = false;
+
+    } finally {
+
+        loading.hidden = true;
+    }
+}
+
+loadPhoneCalendar();
+
+{% else %}
+const MONTH_NAMES = [
+    "Januari", "Februari", "Maret", "April",
+    "Mei", "Juni", "Juli", "Agustus",
+    "September", "Oktober", "November", "Desember"
+];
+
+const priority = {
+    "DINAS LUAR": 1,
+    "DINAS_LUAR": 1,
+    "PIKET SIAGA": 2,
+    "PIKET_SIAGA": 2,
+    "CUTI": 3,
+    "SAKIT": 4,
+    "IJIN": 5,
+    "WFH": 6,
+    "LIBUR": 7
+};
+
+let currentDate = new Date();
+let selectedDate = new Date();
+let events = [];
+
+function dateKey(date) {
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0")
+    ].join("-");
+}
+
+function eventDate(event) {
+    return String(
+        event.start_date ||
+        event.start ||
+        event.tanggal ||
+        event.date ||
+        ""
+    ).substring(0, 10);
+}
+
+function eventType(event) {
+    return String(
+        event.event_type ||
+        event.type ||
+        event.jenis ||
+        event.category ||
+        event.title ||
+        "EVENT"
+    ).toUpperCase();
+}
+
+function eventTitle(event) {
+    return event.title ||
+           event.name ||
+           event.nama ||
+           event.label ||
+           eventType(event);
+}
+
+function sortedEvents(list) {
+    return [...list].sort((a, b) => {
+        const pa = priority[eventType(a)] || 99;
+        const pb = priority[eventType(b)] || 99;
+
+        if (pa !== pb) return pa - pb;
+
+        return eventTitle(a).localeCompare(eventTitle(b));
+    });
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+async function loadCalendar() {
+
+    const loading = document.getElementById("calendarLoading");
+    const error = document.getElementById("calendarError");
+
+    loading.hidden = false;
+    error.hidden = true;
+
+    try {
+
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
+
+        const response = await fetch(
+            `/api/personal-calendar?year=${year}&month=${month}`,
+            { credentials: "same-origin" }
+        );
+
+        const payload = await response.json();
+
+        if (!response.ok || payload.status !== "success") {
+            throw new Error(
+                payload.message || "Gagal mengambil kalender."
+            );
+        }
+
+        events = Array.isArray(payload.data)
+            ? payload.data
+            : [];
+
+        document.getElementById("periodTitle").textContent =
+            `${MONTH_NAMES[month - 1]} ${year}`;
+
+        renderMonth();
+        renderAgenda(selectedDate);
+
+    } catch (errorObject) {
+
+        error.textContent =
+            errorObject.message || "Gagal mengambil data kalender.";
+
+        error.hidden = false;
+
+    } finally {
+
+        loading.hidden = true;
+    }
+}
+
+function renderMonth() {
+
+    const grid = document.getElementById("calendarGrid");
+
+    grid.innerHTML = "";
+
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    const first = new Date(year, month, 1);
+    const last = new Date(year, month + 1, 0);
+
+    let startDay = first.getDay();
+
+    startDay = startDay === 0
+        ? 6
+        : startDay - 1;
+
+    for (let i = 0; i < startDay; i++) {
+
+        const empty = document.createElement("div");
+
+        empty.className = "calendar-day empty";
+
+        grid.appendChild(empty);
+    }
+
+    for (let day = 1; day <= last.getDate(); day++) {
+
+        const date = new Date(year, month, day);
+        const key = dateKey(date);
+
+        const cell = document.createElement("button");
+
+        cell.type = "button";
+        cell.className = "calendar-day";
+
+        if (dateKey(new Date()) === key) {
+            cell.classList.add("today");
+        }
+
+        if (dateKey(selectedDate) === key) {
+            cell.classList.add("selected");
+        }
+
+        const number = document.createElement("span");
+
+        number.className = "day-number";
+        number.textContent = day;
+
+        cell.appendChild(number);
+
+        const dayEvents = sortedEvents(
+            events.filter(event => eventDate(event) === key)
+        );
+
+        if (dayEvents.length) {
+
+            const dots = document.createElement("div");
+
+            dots.className = "event-dots";
+
+            dayEvents.slice(0, 4).forEach(event => {
+
+                const dot = document.createElement("span");
+
+                dot.className =
+                    "event-dot event-" +
+                    eventType(event)
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, "-");
+
+                dots.appendChild(dot);
+            });
+
+            cell.appendChild(dots);
+        }
+
+        cell.addEventListener("click", () => {
+
+            selectedDate = date;
+
+            document
+                .querySelectorAll(".calendar-day.selected")
+                .forEach(item => item.classList.remove("selected"));
+
+            cell.classList.add("selected");
+
+            renderAgenda(selectedDate);
+        });
+
+        grid.appendChild(cell);
+    }
+}
+
+function renderAgenda(date) {
+
+    const key = dateKey(date);
+
+    const dayEvents = sortedEvents(
+        events.filter(event => eventDate(event) === key)
+    );
+
+    document.getElementById("agendaTitle").textContent =
+        `Agenda ${key}`;
+
+    document.getElementById("agendaCount").textContent =
+        `${dayEvents.length} kegiatan`;
+
+    const list = document.getElementById("agendaList");
+
+    list.innerHTML = "";
+
+    if (!dayEvents.length) {
+
+        list.innerHTML =
+            `<div class="agenda-empty">Tidak ada kegiatan.</div>`;
+
+        return;
+    }
+
+    dayEvents.forEach(event => {
+
+        const item = document.createElement("div");
+
+        item.className = "agenda-item";
+
+        const type = eventType(event);
+
+        item.innerHTML = `
+            <div class="agenda-accent event-${type
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")}"></div>
+
+            <div class="agenda-body">
+                <strong>${escapeHtml(eventTitle(event))}</strong>
+                <span>${escapeHtml(
+                    event.description ||
+                    event.keterangan ||
+                    ""
+                )}</span>
+                <small>${escapeHtml(eventDate(event))}</small>
+            </div>
+        `;
+
+        list.appendChild(item);
+    });
+}
+
+function changeMonth(delta) {
+
+    currentDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + delta,
+        1
+    );
+
+    selectedDate = new Date(currentDate);
+
+    loadCalendar();
+}
+
+document.getElementById("prevBtn")
+    .addEventListener("click", () => changeMonth(-1));
+
+document.getElementById("nextBtn")
+    .addEventListener("click", () => changeMonth(1));
+
+document.getElementById("monthViewBtn")
+    .addEventListener("click", () => {
+
+        document.getElementById("monthView").hidden = false;
+        document.getElementById("yearView").hidden = true;
+
+        document.getElementById("monthViewBtn")
+            .classList.add("active");
+
+        document.getElementById("yearViewBtn")
+            .classList.remove("active");
+    });
+
+document.getElementById("yearViewBtn")
+    .addEventListener("click", () => {
+
+        document.getElementById("monthView").hidden = true;
+        document.getElementById("yearView").hidden = false;
+
+        document.getElementById("yearViewBtn")
+            .classList.add("active");
+
+        document.getElementById("monthViewBtn")
+            .classList.remove("active");
+
+        renderYear();
+    });
+
+function renderYear() {
+
+    const container = document.getElementById("yearView");
+
+    container.innerHTML = "";
+
+    const year = currentDate.getFullYear();
+
+    for (let month = 0; month < 12; month++) {
+
+        const card = document.createElement("button");
+
+        card.type = "button";
+        card.className = "year-month";
+
+        const prefix =
+            `${year}-${String(month + 1).padStart(2, "0")}`;
+
+        const count = events.filter(event =>
+            eventDate(event).startsWith(prefix)
+        ).length;
+
+        card.innerHTML = `
+            <strong>${MONTH_NAMES[month]}</strong>
+            <span>${count} kegiatan</span>
+        `;
+
+        card.addEventListener("click", () => {
+
+            currentDate = new Date(year, month, 1);
+            selectedDate = new Date(currentDate);
+
+            document.getElementById("monthViewBtn").click();
+
+            loadCalendar();
+        });
+
+        container.appendChild(card);
+    }
+}
+
+async function logout() {
+
+    try {
+        await fetch("/api/logout", {
+            method: "POST"
+        });
+    } finally {
+        window.location.href = "/";
+    }
+}
+
+
+const mobileMenuToggle =
+    document.getElementById("mobileMenuToggle");
+
+const mobileMenuOverlay =
+    document.getElementById("mobileMenuOverlay");
+
+function setMobileMenuState(open) {
+
+    document.body.classList.toggle(
+        "mobile-menu-open",
+        open
+    );
+
+    if (mobileMenuToggle) {
+        mobileMenuToggle.setAttribute(
+            "aria-label",
+            open ? "Tutup menu" : "Buka menu"
+        );
+
+        mobileMenuToggle.textContent =
+            open ? "×" : "☰";
+    }
+}
+
+if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener(
+        "click",
+        function () {
+            setMobileMenuState(
+                !document.body.classList.contains(
+                    "mobile-menu-open"
+                )
+            );
+        }
+    );
+}
+
+if (mobileMenuOverlay) {
+    mobileMenuOverlay.addEventListener(
+        "click",
+        function () {
+            setMobileMenuState(false);
+        }
+    );
+}
+
+document.querySelectorAll(".sidebar-menu a").forEach(
+    function (link) {
+        link.addEventListener("click", function () {
+            setMobileMenuState(false);
+        });
+    }
+);
+
+const accountMenuToggle =
+    document.getElementById("accountMenuToggle");
+
+const accountMenuDropdown =
+    document.getElementById("accountMenuDropdown");
+
+if (accountMenuToggle && accountMenuDropdown) {
+
+    accountMenuToggle.addEventListener("click", function (event) {
+        event.stopPropagation();
+
+        const open =
+            accountMenuDropdown.classList.toggle("open");
+
+        accountMenuToggle.setAttribute(
+            "aria-expanded",
+            open ? "true" : "false"
+        );
+    });
+
+    document.addEventListener("click", function () {
+        accountMenuDropdown.classList.remove("open");
+
+        accountMenuToggle.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+    });
+
+    accountMenuDropdown.addEventListener("click", function (event) {
+        event.stopPropagation();
+    });
+}
+
+
+const sidebarToggle = document.getElementById("sidebarToggle");
+
+function setSidebarState(minimized) {
+    document.body.classList.toggle("sidebar-minimized", minimized);
+
+    sidebarToggle.textContent = minimized ? "›" : "‹";
+
+    sidebarToggle.title = minimized
+        ? "Expand sidebar"
+        : "Minimize sidebar";
+
+    sidebarToggle.setAttribute(
+        "aria-label",
+        minimized ? "Expand sidebar" : "Minimize sidebar"
+    );
+
+    localStorage.setItem(
+        "calendarSidebarMinimized",
+        minimized ? "1" : "0"
+    );
+}
+
+sidebarToggle.addEventListener("click", () => {
+    setSidebarState(
+        !document.body.classList.contains("sidebar-minimized")
+    );
+});
+
+setSidebarState(
+    localStorage.getItem("calendarSidebarMinimized") === "1"
+);
+
+loadCalendar();
+
+{% endif %}
+</script>
+
+</body>
+</html>

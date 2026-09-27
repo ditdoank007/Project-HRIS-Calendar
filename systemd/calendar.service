@@ -1,0 +1,23 @@
+[Unit]
+Description=HRIS Reborn Calendar Portal
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/calendar/app
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/opt/calendar/venv/bin/gunicorn \
+    --bind 0.0.0.0:80 \
+    --workers 2 \
+    --timeout 60 \
+    --access-logfile - \
+    --error-logfile - \
+    app:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
