@@ -1394,7 +1394,7 @@ async function loadDashboardSummary() {
 
 loadDashboardSummary();
 
-{% else %}
+{% elif active_menu == "calendar" %}
 const MONTH_NAMES = [
     "Januari", "Februari", "Maret", "April",
     "Mei", "Juni", "Juli", "Agustus",
@@ -1760,6 +1760,8 @@ function renderYear() {
     }
 }
 
+
+
 const mobileMenuToggle =
     document.getElementById("mobileMenuToggle");
 
@@ -1817,17 +1819,29 @@ document.querySelectorAll(".sidebar-menu a").forEach(
 const sidebarToggle = document.getElementById("sidebarToggle");
 
 function setSidebarState(minimized) {
-    document.body.classList.toggle("sidebar-minimized", minimized);
 
-    sidebarToggle.textContent = minimized ? "›" : "‹";
+    if (!sidebarToggle) {
+        return;
+    }
 
-    sidebarToggle.title = minimized
-        ? "Expand sidebar"
-        : "Minimize sidebar";
+    document.body.classList.toggle(
+        "sidebar-minimized",
+        minimized
+    );
+
+    sidebarToggle.textContent =
+        minimized ? "›" : "‹";
+
+    sidebarToggle.title =
+        minimized
+            ? "Expand sidebar"
+            : "Minimize sidebar";
 
     sidebarToggle.setAttribute(
         "aria-label",
-        minimized ? "Expand sidebar" : "Minimize sidebar"
+        minimized
+            ? "Expand sidebar"
+            : "Minimize sidebar"
     );
 
     localStorage.setItem(
@@ -1836,21 +1850,21 @@ function setSidebarState(minimized) {
     );
 }
 
-sidebarToggle.addEventListener("click", () => {
+if (sidebarToggle) {
+    sidebarToggle.addEventListener("click", () => {
+        setSidebarState(
+            !document.body.classList.contains(
+                "sidebar-minimized"
+            )
+        );
+    });
+
     setSidebarState(
-        !document.body.classList.contains("sidebar-minimized")
+        localStorage.getItem(
+            "calendarSidebarMinimized"
+        ) === "1"
     );
-});
-
-setSidebarState(
-    localStorage.getItem("calendarSidebarMinimized") === "1"
-);
-
-loadCalendar();
-
-{% endif %}
-{% endif %}
-{% endif %}
+}
 
 async function logout() {
     try {
