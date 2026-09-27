@@ -186,6 +186,76 @@ button {
 }
 
 /* =========================
+   PENGAJUANKU - SAKIT
+   ========================= */
+
+.sickness-form-card {
+    margin-bottom: 15px;
+}
+
+.sickness-form-body {
+    padding: 24px 26px 22px;
+}
+
+.file-upload-box {
+    min-height: 72px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 11px 13px;
+    box-sizing: border-box;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    background: #f9fafb;
+}
+
+.file-upload-box:hover {
+    border-color: #dc2626;
+    background: #fffafa;
+}
+
+.file-upload-box input[type="file"] {
+    width: 100%;
+    max-width: 270px;
+    color: #6b7280;
+    font-family: inherit;
+    font-size: 10px;
+}
+
+.file-upload-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.file-upload-copy strong {
+    color: #374151;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.file-upload-copy span {
+    color: #9ca3af;
+    font-size: 9px;
+}
+
+.sickness-form-footer {
+    margin-top: 22px;
+    padding-top: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.sickness-history-card {
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+/* =========================
    PENGAJUANKU - CUTI
    ========================= */
 
