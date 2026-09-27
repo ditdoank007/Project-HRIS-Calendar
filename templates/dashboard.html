@@ -204,6 +204,90 @@
                 </div>
             </section>
 
+            {% elif active_menu == "plans" %}
+
+            <div class="breadcrumb-card">
+                <strong>Pengajuanku</strong>
+            </div>
+
+            <section class="submission-card submission-overview">
+
+                <div class="submission-header">
+                    <div>
+                        <div class="submission-kicker">PENGAJUANKU</div>
+                        <h2>Pengajuan Kepegawaian</h2>
+                        <p>
+                            Silahkan melakukan pengajuan Cuti, Sakit dan Ijin
+                            sesuai ketentuan yang berlaku.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="submission-overview-content">
+
+                    <p class="submission-overview-note">
+                        Pengajuan yang sudah disetujui bisa dilihat di
+                        <strong>Kalender Pribadi</strong>.
+                    </p>
+
+                    <div class="submission-summary-title">
+                        Anda sudah melakukan:
+                    </div>
+
+                    <div id="submissionSummaryLoading"
+                         class="submission-summary-loading">
+                        Memuat ringkasan pengajuan...
+                    </div>
+
+                    <div id="submissionSummaryError"
+                         class="submission-summary-error"
+                         hidden>
+                    </div>
+
+                    <div id="submissionSummary"
+                         class="submission-summary-grid"
+                         hidden>
+
+                        <a href="/plans/cuti"
+                           class="submission-summary-card">
+                            <span class="submission-summary-icon">C</span>
+                            <span class="submission-summary-body">
+                                <strong>Cuti</strong>
+                                <b id="summaryCuti">0 hari</b>
+                            </span>
+                            <span class="submission-summary-arrow">›</span>
+                        </a>
+
+                        <a href="/plans/sakit"
+                           class="submission-summary-card">
+                            <span class="submission-summary-icon">S</span>
+                            <span class="submission-summary-body">
+                                <strong>Sakit</strong>
+                                <b id="summarySakit">0 hari</b>
+                            </span>
+                            <span class="submission-summary-arrow">›</span>
+                        </a>
+
+                        <a href="/plans/ijin"
+                           class="submission-summary-card">
+                            <span class="submission-summary-icon">I</span>
+                            <span class="submission-summary-body">
+                                <strong>Ijin</strong>
+                                <b id="summaryIjin">0 hari</b>
+                            </span>
+                            <span class="submission-summary-arrow">›</span>
+                        </a>
+
+                    </div>
+
+                    <div class="submission-summary-year"
+                         id="submissionSummaryYear">
+                    </div>
+
+                </div>
+
+            </section>
+
             {% elif active_menu == "phone" %}
 
             <div class="breadcrumb-card">
@@ -488,6 +572,66 @@
 
 
 <script>
+{% if active_menu == "plans" %}
+async function loadSubmissionSummary() {
+
+    const loading =
+        document.getElementById("submissionSummaryLoading");
+
+    const error =
+        document.getElementById("submissionSummaryError");
+
+    const summary =
+        document.getElementById("submissionSummary");
+
+    try {
+
+        const response = await fetch(
+            "/api/submission-summary",
+            { credentials: "same-origin" }
+        );
+
+        const payload = await response.json();
+
+        if (!response.ok || payload.status !== "success") {
+            throw new Error(
+                payload.message || "Gagal mengambil ringkasan pengajuan."
+            );
+        }
+
+        const data = payload.data || {};
+
+        document.getElementById("summaryCuti").textContent =
+            `${data.CUTI || 0} hari`;
+
+        document.getElementById("summarySakit").textContent =
+            `${data.SAKIT || 0} hari`;
+
+        document.getElementById("summaryIjin").textContent =
+            `${data.IJIN || 0} hari`;
+
+        document.getElementById("submissionSummaryYear").textContent =
+            `Ringkasan tahun ${payload.year}`;
+
+        summary.hidden = false;
+
+    } catch (errorObject) {
+
+        error.textContent =
+            errorObject.message ||
+            "Gagal mengambil ringkasan pengajuan.";
+
+        error.hidden = false;
+
+    } finally {
+
+        loading.hidden = true;
+    }
+}
+
+loadSubmissionSummary();
+
+{% else %}
 {% if active_menu == "phone" %}
 async function loadPhoneCalendar() {
 
@@ -1115,6 +1259,7 @@ setSidebarState(
 
 loadCalendar();
 
+{% endif %}
 {% endif %}
 </script>
 
