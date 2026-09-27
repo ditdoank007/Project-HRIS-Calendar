@@ -194,11 +194,21 @@
             <div class="footer">
 
                 <div>
-                    © 2026 Kantor Pencarian dan Pertolongan Surabaya
+                    © <span id="footerYear">2026</span>
+                    Kantor Pencarian dan Pertolongan Surabaya
                 </div>
 
                 <div>
                     Badan Nasional Pencarian dan Pertolongan
+                </div>
+
+                <div>
+                    Seluruh Hak Cipta Dilindungi.
+                </div>
+
+                <div>
+                    © <span id="creativeYear">2026</span>
+                    Creative DM, made with love 198008292010121001
                 </div>
 
             </div>
@@ -211,6 +221,11 @@
 
 
 <script>
+const currentYear = new Date().getFullYear();
+
+document.getElementById("footerYear").textContent = currentYear;
+document.getElementById("creativeYear").textContent = currentYear;
+
 const loginForm = document.getElementById("loginForm");
 
 if (loginForm) {
