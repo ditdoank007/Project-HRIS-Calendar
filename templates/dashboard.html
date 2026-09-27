@@ -354,32 +354,187 @@
 
             </section>
 
-            {% elif active_menu in ["sakit", "ijin"] %}
+            {% elif active_menu == "sakit" %}
 
             <div class="breadcrumb-card">
-                <strong>
-                    Pengajuanku / {{ active_menu|capitalize }}
-                </strong>
+                <strong>Pengajuanku / Sakit</strong>
+            </div>
+
+            <section class="submission-card sickness-form-card">
+
+                <div class="submission-header">
+                    <div>
+                        <div class="submission-kicker">PENGAJUANKU</div>
+                        <h2>Pengajuan Sakit</h2>
+                        <p>
+                            Silahkan isi data pengajuan sakit sesuai ketentuan
+                            yang berlaku.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="sickness-form-body">
+
+                    <div class="leave-form-grid">
+
+                        <div class="form-field">
+                            <label for="sicknessStartDate">
+                                Tanggal Mulai <span>*</span>
+                            </label>
+                            <input type="date"
+                                   id="sicknessStartDate"
+                                   name="start_date">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="sicknessEndDate">
+                                Tanggal Selesai <span>*</span>
+                            </label>
+                            <input type="date"
+                                   id="sicknessEndDate"
+                                   name="end_date">
+                        </div>
+
+                        <div class="form-field form-field-wide">
+                            <label for="sicknessType">
+                                Jenis Sakit <span>*</span>
+                            </label>
+                            <select id="sicknessType" name="sickness_type">
+                                <option value="">Pilih jenis sakit</option>
+                                <option value="sakit">Sakit</option>
+                                <option value="rawat-jalan">Rawat Jalan</option>
+                                <option value="rawat-inap">Rawat Inap</option>
+                            </select>
+                            <small>
+                                Jenis sakit akan diambil dari Master Potongan HRIS.
+                            </small>
+                        </div>
+
+                        <div class="form-field form-field-wide">
+                            <label for="sicknessProof">
+                                Surat Keterangan Sakit
+                            </label>
+
+                            <div class="file-upload-box">
+                                <input type="file"
+                                       id="sicknessProof"
+                                       name="sickness_proof"
+                                       accept=".pdf,.jpg,.jpeg,.png">
+
+                                <div class="file-upload-copy">
+                                    <strong>Pilih file surat keterangan sakit</strong>
+                                    <span>PDF, JPG, JPEG atau PNG. Boleh dikosongkan.</span>
+                                </div>
+                            </div>
+
+                            <small>
+                                Surat keterangan sakit bersifat opsional.
+                            </small>
+                        </div>
+
+                    </div>
+
+                    <div class="sickness-form-footer">
+
+                        <div class="form-required-note">
+                            <span>*</span> Wajib diisi
+                        </div>
+
+                        <button type="button"
+                                id="sicknessSubmitButton"
+                                class="primary-action-button">
+                            Simpan Pengajuan
+                        </button>
+
+                    </div>
+
+                    <div id="sicknessFormMessage"
+                         class="form-message"
+                         hidden>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="submission-card sickness-history-card">
+
+                <div class="history-header">
+                    <div>
+                        <div class="submission-kicker">RIWAYAT</div>
+                        <h2>History Pengajuan Sakit</h2>
+                        <p>
+                            Pengajuan yang pernah Anda buat akan tampil di sini.
+                        </p>
+                    </div>
+
+                    <div class="history-filter">
+                        <select id="sicknessHistoryYear">
+                            <option>2026</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="history-table-wrap">
+
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Jenis Sakit</th>
+                                <th>Durasi</th>
+                                <th>Bukti</th>
+                                <th>Status</th>
+                                <th class="history-action-col">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="sicknessHistoryBody">
+
+                            <tr>
+                                <td>—</td>
+                                <td>Belum ada data</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>
+                                    <span class="status-badge status-empty">
+                                        Belum ada pengajuan
+                                    </span>
+                                </td>
+                                <td class="history-actions">—</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </section>
+
+            {% elif active_menu == "ijin" %}
+
+            <div class="breadcrumb-card">
+                <strong>Pengajuanku / Ijin</strong>
             </div>
 
             <section class="submission-card">
                 <div class="submission-header">
                     <div>
                         <div class="submission-kicker">PENGAJUANKU</div>
-                        <h2>{{ active_menu|capitalize }}</h2>
+                        <h2>Ijin</h2>
                         <p>
-                            Halaman pengajuan {{ active_menu }} akan mengikuti
-                            pola UI Pengajuan Cuti.
+                            Halaman pengajuan ijin akan mengikuti pola UI
+                            Pengajuan Cuti dan Sakit.
                         </p>
                     </div>
                 </div>
 
                 <div class="submission-placeholder">
                     <span class="submission-placeholder-icon">◇</span>
-                    <strong>Modul {{ active_menu|capitalize }} siap dikembangkan</strong>
+                    <strong>Modul Ijin siap dikembangkan</strong>
                     <span>
                         Form, history, status persetujuan, dan integrasi HRIS
-                        akan dibuat setelah pola Pengajuan Cuti selesai.
+                        akan dibuat pada tahap berikutnya.
                     </span>
                 </div>
             </section>
