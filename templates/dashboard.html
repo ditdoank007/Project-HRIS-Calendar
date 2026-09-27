@@ -519,26 +519,129 @@
                 <strong>Pengajuanku / Ijin</strong>
             </div>
 
-            <section class="submission-card">
+            <section class="submission-card permission-form-card">
+
                 <div class="submission-header">
                     <div>
                         <div class="submission-kicker">PENGAJUANKU</div>
-                        <h2>Ijin</h2>
+                        <h2>Pengajuan Ijin</h2>
                         <p>
-                            Halaman pengajuan ijin akan mengikuti pola UI
-                            Pengajuan Cuti dan Sakit.
+                            Silahkan isi data pengajuan ijin sesuai ketentuan
+                            yang berlaku.
                         </p>
                     </div>
                 </div>
 
-                <div class="submission-placeholder">
-                    <span class="submission-placeholder-icon">◇</span>
-                    <strong>Modul Ijin siap dikembangkan</strong>
-                    <span>
-                        Form, history, status persetujuan, dan integrasi HRIS
-                        akan dibuat pada tahap berikutnya.
-                    </span>
+                <div class="permission-form-body">
+
+                    <div class="leave-form-grid">
+
+                        <div class="form-field">
+                            <label for="permissionStartDate">
+                                Tanggal Mulai <span>*</span>
+                            </label>
+                            <input type="date"
+                                   id="permissionStartDate"
+                                   name="start_date">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="permissionEndDate">
+                                Tanggal Selesai <span>*</span>
+                            </label>
+                            <input type="date"
+                                   id="permissionEndDate"
+                                   name="end_date">
+                        </div>
+
+                        <div class="form-field form-field-wide">
+                            <label for="permissionType">
+                                Jenis Ijin <span>*</span>
+                            </label>
+                            <select id="permissionType" name="permission_type">
+                                <option value="">Pilih jenis ijin</option>
+                                <option value="I">Ijin</option>
+                            </select>
+                            <small>
+                                Jenis ijin akan diambil dari Master Potongan HRIS.
+                            </small>
+                        </div>
+
+                    </div>
+
+                    <div class="permission-form-footer">
+
+                        <div class="form-required-note">
+                            <span>*</span> Wajib diisi
+                        </div>
+
+                        <button type="button"
+                                id="permissionSubmitButton"
+                                class="primary-action-button">
+                            Simpan Pengajuan
+                        </button>
+
+                    </div>
+
+                    <div id="permissionFormMessage"
+                         class="form-message"
+                         hidden>
+                    </div>
+
                 </div>
+
+            </section>
+
+            <section class="submission-card permission-history-card">
+
+                <div class="history-header">
+                    <div>
+                        <div class="submission-kicker">RIWAYAT</div>
+                        <h2>History Pengajuan Ijin</h2>
+                        <p>
+                            Pengajuan yang pernah Anda buat akan tampil di sini.
+                        </p>
+                    </div>
+
+                    <div class="history-filter">
+                        <select id="permissionHistoryYear">
+                            <option>2026</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="history-table-wrap">
+
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Jenis Ijin</th>
+                                <th>Durasi</th>
+                                <th>Status</th>
+                                <th class="history-action-col">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="permissionHistoryBody">
+
+                            <tr>
+                                <td>—</td>
+                                <td>Belum ada data</td>
+                                <td>—</td>
+                                <td>
+                                    <span class="status-badge status-empty">
+                                        Belum ada pengajuan
+                                    </span>
+                                </td>
+                                <td class="history-actions">—</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+
             </section>
 
             {% elif active_menu == "plans" %}
