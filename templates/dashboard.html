@@ -1220,6 +1220,90 @@ async function loadPhoneCalendar() {
 loadPhoneCalendar();
 
 {% else %}
+{% if not active_menu or active_menu == "dashboard" %}
+async function loadDashboardSummary() {
+
+    const loading =
+        document.getElementById("dashboardSummaryLoading");
+
+    const error =
+        document.getElementById("dashboardSummaryError");
+
+    const content =
+        document.getElementById("dashboardSummaryContent");
+
+    try {
+
+        const response = await fetch(
+            "/api/dashboard-summary",
+            { credentials: "same-origin" }
+        );
+
+        const payload = await response.json();
+
+        if (!response.ok || payload.status !== "success") {
+            throw new Error(
+                payload.message ||
+                "Gagal mengambil ringkasan dashboard."
+            );
+        }
+
+        const data = payload.data || {};
+
+        document.getElementById("dashboardDaysPassed").textContent =
+            Number(payload.days_passed || 0);
+
+        document.getElementById("dashboardYear").textContent =
+            payload.year || "-";
+
+        document.getElementById("dashboardDinasLuar").textContent =
+            Number(data.DINAS_LUAR || 0);
+
+        document.getElementById("dashboardSakit").textContent =
+            Number(data.SAKIT || 0);
+
+        document.getElementById("dashboardIjin").textContent =
+            Number(data.IJIN || 0);
+
+        document.getElementById("dashboardCuti").textContent =
+            Number(data.CUTI || 0);
+
+        const nama =
+            "{{ (nama or 'Pegawai')|e }}";
+
+        document.getElementById("dashboardWelcomeText").textContent =
+            `Halo, ${nama}. Berikut ringkasan aktivitas kepegawaian kamu
+            sampai dengan ${payload.today || "hari ini"}.`;
+
+        document.getElementById("dashboardSakitMessage").textContent =
+            Number(data.SAKIT || 0) > 0
+                ? "Sehat-sehat selalu ya kamu."
+                : "Sehat-sehat selalu ya kamu.";
+
+        document.getElementById("dashboardIjinMessage").textContent =
+            Number(data.IJIN || 0) === 0
+                ? "Mantap kamu tidak pernah ijin."
+                : "Semoga urusanmu selalu lancar.";
+
+        content.hidden = false;
+
+    } catch (errorObject) {
+
+        error.textContent =
+            errorObject.message ||
+            "Gagal mengambil data dashboard dari HRIS Reborn.";
+
+        error.hidden = false;
+
+    } finally {
+
+        loading.hidden = true;
+    }
+}
+
+loadDashboardSummary();
+
+{% else %}
 const MONTH_NAMES = [
     "Januari", "Februari", "Maret", "April",
     "Mei", "Juni", "Juli", "Agustus",
@@ -1720,6 +1804,7 @@ setSidebarState(
 
 loadCalendar();
 
+{% endif %}
 {% endif %}
 {% endif %}
 </script>
