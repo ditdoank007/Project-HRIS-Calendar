@@ -96,6 +96,131 @@ button {
     color: #fff;
 }
 
+.sidebar-menu-group {
+    margin-bottom: 5px;
+}
+
+.sidebar-menu-parent {
+    position: relative;
+}
+
+.menu-chevron {
+    margin-left: auto;
+    font-size: 16px;
+    color: #9ca3af;
+    transition: transform .15s ease;
+}
+
+.sidebar-menu-group.open .menu-chevron {
+    transform: rotate(90deg);
+}
+
+.sidebar-submenu {
+    display: none;
+    margin: 2px 0 8px 48px;
+    padding-left: 10px;
+    border-left: 1px solid rgba(255,255,255,.12);
+}
+
+.sidebar-menu-group.open .sidebar-submenu {
+    display: block;
+}
+
+.sidebar-submenu a {
+    min-height: 36px;
+    margin-bottom: 2px;
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.sidebar-submenu a.active {
+    background: rgba(220,38,38,.18);
+    color: #fff;
+}
+
+.submenu-dot {
+    width: 5px;
+    height: 5px;
+    flex: 0 0 5px;
+    border-radius: 50%;
+    background: #9ca3af;
+}
+
+.sidebar-submenu a.active .submenu-dot {
+    background: #dc2626;
+}
+
+.submission-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(15,23,42,.04);
+}
+
+.submission-header {
+    padding: 24px 26px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.submission-kicker {
+    font-size: 9px;
+    font-weight: 800;
+    color: #dc2626;
+    letter-spacing: 1.2px;
+}
+
+.submission-header h2 {
+    margin: 6px 0 5px;
+    font-size: 22px;
+    font-weight: 800;
+    color: #111827;
+}
+
+.submission-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.submission-placeholder {
+    min-height: 260px;
+    padding: 45px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
+    color: #6b7280;
+}
+
+.submission-placeholder-icon {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 23px;
+}
+
+.submission-placeholder strong {
+    color: #374151;
+    font-size: 14px;
+}
+
+.submission-placeholder span:not(.submission-placeholder-icon) {
+    max-width: 620px;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
 .menu-icon {
     width: 22px;
     text-align: center;
