@@ -186,6 +186,33 @@ button {
 }
 
 /* =========================
+   PENGAJUANKU - IJIN
+   ========================= */
+
+.permission-form-card {
+    margin-bottom: 15px;
+}
+
+.permission-form-body {
+    padding: 24px 26px 22px;
+}
+
+.permission-form-footer {
+    margin-top: 22px;
+    padding-top: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.permission-history-card {
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+/* =========================
    PENGAJUANKU - SAKIT
    ========================= */
 
