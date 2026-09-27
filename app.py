@@ -222,6 +222,79 @@ def plans():
     )
 
 
+@app.route("/api/submission-summary")
+@login_required
+def api_submission_summary():
+    """
+    Ringkasan hari CUTI / SAKIT / IJIN yang sudah masuk
+    ke Personal Calendar pada tahun berjalan.
+
+    Sumber data tetap HRIS melalui internal Personal Calendar API.
+    """
+    import concurrent.futures
+    from datetime import datetime
+
+    nip = session.get("nip")
+
+    if not nip:
+        return jsonify({
+            "status": "error",
+            "message": "NIP tidak ditemukan."
+        }), 401
+
+    year = datetime.now().year
+
+    def load_month(month):
+        try:
+            response = requests.get(
+                f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/personal",
+                params={"year": year, "month": month},
+                headers={
+                    "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+                    "X-Calendar-NIP": nip,
+                },
+                timeout=10,
+                verify="/etc/ssl/certs/ca-certificates.crt",
+            )
+
+            if response.status_code != 200:
+                return []
+
+            payload = response.json() or {}
+            return payload.get("data") or []
+
+        except requests.RequestException:
+            return []
+
+    events = []
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+        for month_events in executor.map(load_month, range(1, 13)):
+            events.extend(month_events)
+
+    summary = {
+        "CUTI": 0,
+        "SAKIT": 0,
+        "IJIN": 0,
+    }
+
+    for event in events:
+        event_type = str(
+            event.get("type")
+            or event.get("event_type")
+            or ""
+        ).strip().upper()
+
+        if event_type in summary:
+            summary[event_type] += 1
+
+    return jsonify({
+        "status": "success",
+        "year": year,
+        "data": summary,
+    })
+
+
 @app.route("/plans/<jenis>")
 @login_required
 def plan_submission(jenis):
