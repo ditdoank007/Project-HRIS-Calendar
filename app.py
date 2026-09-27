@@ -295,6 +295,145 @@ def api_submission_summary():
     })
 
 
+@app.route("/api/dashboard-summary")
+@login_required
+def api_dashboard_summary():
+    """
+    Ringkasan Dashboard Pribadi berbasis data real HRIS Reborn.
+
+    Sumber utama:
+    /api/internal/calendar/personal
+
+    Event yang dihitung sampai dengan hari ini:
+    - DINAS_LUAR: seluruh hari dalam rentang Dinas Luar
+      (DL / OP / SD) dan dihitung unik per tanggal.
+    - SAKIT: event SAKIT dari ABSENSI.
+    - IJIN: event IJIN dari ABSENSI.
+    - CUTI: event CUTI dari ABSENSI.
+
+    Data diambil berdasarkan NIP pegawai yang sedang login.
+    """
+    import concurrent.futures
+    from datetime import date, timedelta
+    from zoneinfo import ZoneInfo
+
+    nip = session.get("nip")
+
+    if not nip:
+        return jsonify({
+            "status": "error",
+            "message": "NIP tidak ditemukan."
+        }), 401
+
+    today = datetime_now = __import__("datetime").datetime.now(
+        ZoneInfo("Asia/Jakarta")
+    ).date()
+
+    year = today.year
+    year_start = date(year, 1, 1)
+    tomorrow = today + timedelta(days=1)
+
+    def load_month(month):
+        try:
+            response = requests.get(
+                f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/personal",
+                params={"year": year, "month": month},
+                headers={
+                    "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+                    "X-Calendar-NIP": nip,
+                },
+                timeout=10,
+                verify="/etc/ssl/certs/ca-certificates.crt",
+            )
+
+            if response.status_code != 200:
+                app.logger.warning(
+                    "Dashboard HRIS calendar month %s returned %s",
+                    month,
+                    response.status_code,
+                )
+                return []
+
+            payload = response.json() or {}
+            return payload.get("data") or []
+
+        except requests.RequestException:
+            app.logger.exception(
+                "Dashboard HRIS calendar request failed for month %s",
+                month,
+            )
+            return []
+
+    events = []
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+        for month_events in executor.map(load_month, range(1, 13)):
+            events.extend(month_events)
+
+    # Set tanggal dipakai supaya event yang muncul berulang pada
+    # beberapa request bulan tidak dihitung dua kali.
+    day_sets = {
+        "DINAS_LUAR": set(),
+        "SAKIT": set(),
+        "IJIN": set(),
+        "CUTI": set(),
+    }
+
+    def parse_date(value):
+        try:
+            return date.fromisoformat(str(value)[:10])
+        except (TypeError, ValueError):
+            return None
+
+    for event in events:
+        event_type = str(
+            event.get("type")
+            or event.get("event_type")
+            or ""
+        ).strip().upper()
+
+        if event_type not in day_sets:
+            continue
+
+        start = parse_date(event.get("start"))
+        end = parse_date(event.get("end")) or start
+
+        if not start or not end:
+            continue
+
+        if end < start:
+            end = start
+
+        # Dashboard hanya menghitung hari yang sudah dijalani sampai hari ini.
+        start = max(start, year_start)
+        end = min(end, today)
+
+        if end < start:
+            continue
+
+        current = start
+        while current <= end:
+            day_sets[event_type].add(current)
+            current += timedelta(days=1)
+
+    days_passed = max((today - year_start).days, 0)
+
+    return jsonify({
+        "status": "success",
+        "year": year,
+        "today": today.isoformat(),
+        "days_passed": days_passed,
+        "nip": nip,
+        "nama": session.get("nama"),
+        "data": {
+            "DINAS_LUAR": len(day_sets["DINAS_LUAR"]),
+            "SAKIT": len(day_sets["SAKIT"]),
+            "IJIN": len(day_sets["IJIN"]),
+            "CUTI": len(day_sets["CUTI"]),
+        },
+    })
+
+
 @app.route("/plans/<jenis>")
 @login_required
 def plan_submission(jenis):
