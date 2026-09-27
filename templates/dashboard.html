@@ -90,22 +90,6 @@
 
         </nav>
 
-        <div class="sidebar-bottom">
-
-            <div class="user-card">
-                <div class="user-avatar">
-                    {{ nama[:1]|upper if nama else "?" }}
-                </div>
-
-                <div class="user-info">
-                    <div class="user-name">{{ nama or "Pegawai" }}</div>
-                    <div class="user-nip">{{ nip or "-" }}</div>
-                </div>
-            </div>
-
-
-        </div>
-
     </aside>
 
     <div id="mobileMenuOverlay"
@@ -1669,18 +1653,6 @@ function renderYear() {
     }
 }
 
-async function logout() {
-
-    try {
-        await fetch("/api/logout", {
-            method: "POST"
-        });
-    } finally {
-        window.location.href = "/";
-    }
-}
-
-
 const mobileMenuToggle =
     document.getElementById("mobileMenuToggle");
 
@@ -1735,41 +1707,6 @@ document.querySelectorAll(".sidebar-menu a").forEach(
     }
 );
 
-const accountMenuToggle =
-    document.getElementById("accountMenuToggle");
-
-const accountMenuDropdown =
-    document.getElementById("accountMenuDropdown");
-
-if (accountMenuToggle && accountMenuDropdown) {
-
-    accountMenuToggle.addEventListener("click", function (event) {
-        event.stopPropagation();
-
-        const open =
-            accountMenuDropdown.classList.toggle("open");
-
-        accountMenuToggle.setAttribute(
-            "aria-expanded",
-            open ? "true" : "false"
-        );
-    });
-
-    document.addEventListener("click", function () {
-        accountMenuDropdown.classList.remove("open");
-
-        accountMenuToggle.setAttribute(
-            "aria-expanded",
-            "false"
-        );
-    });
-
-    accountMenuDropdown.addEventListener("click", function (event) {
-        event.stopPropagation();
-    });
-}
-
-
 const sidebarToggle = document.getElementById("sidebarToggle");
 
 function setSidebarState(minimized) {
@@ -1807,6 +1744,56 @@ loadCalendar();
 {% endif %}
 {% endif %}
 {% endif %}
+
+async function logout() {
+    try {
+        const response = await fetch("/api/logout", {
+            method: "POST",
+            credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+            throw new Error("Logout gagal.");
+        }
+    } catch (error) {
+        console.error("Logout error:", error);
+    } finally {
+        window.location.href = "/";
+    }
+}
+
+const accountMenuToggle =
+    document.getElementById("accountMenuToggle");
+
+const accountMenuDropdown =
+    document.getElementById("accountMenuDropdown");
+
+if (accountMenuToggle && accountMenuDropdown) {
+    accountMenuToggle.addEventListener("click", function (event) {
+        event.stopPropagation();
+
+        const open =
+            accountMenuDropdown.classList.toggle("open");
+
+        accountMenuToggle.setAttribute(
+            "aria-expanded",
+            open ? "true" : "false"
+        );
+    });
+
+    accountMenuDropdown.addEventListener("click", function (event) {
+        event.stopPropagation();
+    });
+
+    document.addEventListener("click", function () {
+        accountMenuDropdown.classList.remove("open");
+
+        accountMenuToggle.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+    });
+}
 </script>
 
 </body>
