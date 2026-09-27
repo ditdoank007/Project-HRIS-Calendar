@@ -172,7 +172,189 @@
 
         <section class="dashboard-content">
 
-            {% if active_menu in ["cuti", "sakit", "ijin"] %}
+            {% if active_menu == "cuti" %}
+
+            <div class="breadcrumb-card">
+                <strong>Pengajuanku / Cuti</strong>
+            </div>
+
+            <section class="leave-balance-grid">
+
+                <div class="leave-balance-card">
+                    <div class="leave-balance-icon">L</div>
+                    <div class="leave-balance-body">
+                        <span>Sisa Cuti Tahun Lalu</span>
+                        <strong id="leaveBalancePrevious">- hari</strong>
+                    </div>
+                </div>
+
+                <div class="leave-balance-card">
+                    <div class="leave-balance-icon">T</div>
+                    <div class="leave-balance-body">
+                        <span>Sisa Cuti Tahun Berjalan</span>
+                        <strong id="leaveBalanceCurrent">- hari</strong>
+                    </div>
+                </div>
+
+                <div class="leave-balance-card leave-balance-total">
+                    <div class="leave-balance-icon">Σ</div>
+                    <div class="leave-balance-body">
+                        <span>Total Sisa Cuti</span>
+                        <strong id="leaveBalanceTotal">- hari</strong>
+                    </div>
+                </div>
+
+            </section>
+
+            <section class="submission-card leave-form-card">
+
+                <div class="submission-header">
+                    <div>
+                        <div class="submission-kicker">PENGAJUANKU</div>
+                        <h2>Pengajuan Cuti</h2>
+                        <p>
+                            Silahkan isi data pengajuan cuti sesuai ketentuan
+                            yang berlaku.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="leave-form-body">
+
+                    <div class="leave-form-grid">
+
+                        <div class="form-field">
+                            <label for="leaveStartDate">
+                                Tanggal Mulai <span>*</span>
+                            </label>
+                            <input type="date"
+                                   id="leaveStartDate"
+                                   name="start_date">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="leaveEndDate">
+                                Tanggal Selesai <span>*</span>
+                            </label>
+                            <input type="date"
+                                   id="leaveEndDate"
+                                   name="end_date">
+                        </div>
+
+                        <div class="form-field form-field-wide">
+                            <label for="leaveType">
+                                Jenis Cuti <span>*</span>
+                            </label>
+                            <select id="leaveType" name="leave_type">
+                                <option value="">Pilih jenis cuti</option>
+                                <option value="cuti-tahunan">Cuti Tahunan</option>
+                                <option value="cuti-besar">Cuti Besar</option>
+                                <option value="cuti-sakit">Cuti Sakit</option>
+                                <option value="cuti-melahirkan">Cuti Melahirkan</option>
+                                <option value="cuti-alasan-penting">Cuti Alasan Penting</option>
+                            </select>
+                            <small>
+                                Jenis cuti akan diambil dari Master Potongan HRIS.
+                            </small>
+                        </div>
+
+                        <div class="form-field form-field-wide">
+                            <label for="leaveLocation">
+                                Lokasi Selama Cuti <span>*</span>
+                            </label>
+                            <input type="text"
+                                   id="leaveLocation"
+                                   name="location"
+                                   placeholder="Contoh: Surabaya, Jawa Timur">
+                        </div>
+
+                    </div>
+
+                    <div class="leave-form-footer">
+
+                        <div class="form-required-note">
+                            <span>*</span> Wajib diisi
+                        </div>
+
+                        <button type="button"
+                                id="leaveSubmitButton"
+                                class="primary-action-button">
+                            Simpan Pengajuan
+                        </button>
+
+                    </div>
+
+                    <div id="leaveFormMessage"
+                         class="form-message"
+                         hidden>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="submission-card leave-history-card">
+
+                <div class="history-header">
+                    <div>
+                        <div class="submission-kicker">RIWAYAT</div>
+                        <h2>History Pengajuan Cuti</h2>
+                        <p>
+                            Pengajuan yang pernah Anda buat akan tampil di sini.
+                        </p>
+                    </div>
+
+                    <div class="history-filter">
+                        <select id="leaveHistoryYear">
+                            <option>2026</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="history-table-wrap">
+
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Jenis Cuti</th>
+                                <th>Durasi</th>
+                                <th>Lokasi</th>
+                                <th>Status</th>
+                                <th class="history-action-col">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="leaveHistoryBody">
+
+                            <tr>
+                                <td>—</td>
+                                <td>Belum ada data</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>
+                                    <span class="status-badge status-empty">
+                                        Belum ada pengajuan
+                                    </span>
+                                </td>
+                                <td class="history-actions">
+                                    —
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="history-mobile-note">
+                    History pengajuan akan menampilkan tanggal, jenis,
+                    durasi, lokasi, status persetujuan, serta aksi Edit/Hapus.
+                </div>
+
+            </section>
+
+            {% elif active_menu in ["sakit", "ijin"] %}
 
             <div class="breadcrumb-card">
                 <strong>
@@ -186,9 +368,8 @@
                         <div class="submission-kicker">PENGAJUANKU</div>
                         <h2>{{ active_menu|capitalize }}</h2>
                         <p>
-                            Halaman pengajuan {{ active_menu }}.
-                            Form dan history pengajuan akan kita bangun
-                            pada tahap berikutnya.
+                            Halaman pengajuan {{ active_menu }} akan mengikuti
+                            pola UI Pengajuan Cuti.
                         </p>
                     </div>
                 </div>
@@ -197,9 +378,8 @@
                     <span class="submission-placeholder-icon">◇</span>
                     <strong>Modul {{ active_menu|capitalize }} siap dikembangkan</strong>
                     <span>
-                        Struktur menu sudah tersedia. Berikutnya kita
-                        implementasikan form pengajuan, history, status
-                        persetujuan, dan integrasi HRIS.
+                        Form, history, status persetujuan, dan integrasi HRIS
+                        akan dibuat setelah pola Pengajuan Cuti selesai.
                     </span>
                 </div>
             </section>
