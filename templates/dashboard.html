@@ -109,7 +109,9 @@
 
             <div class="topbar-title">
                 <div class="page-kicker">CALENDAR INTERNAL</div>
-                <h1>Dashboard</h1>
+                <h1>
+                    {{ "Kalender Saya" if active_menu == "calendar" else "Dashboard" }}
+                </h1>
             </div>
 
             <div class="topbar-actions">
@@ -897,10 +899,192 @@
             {% else %}
 
             <div class="breadcrumb-card">
-                <strong>Dashboard Pribadi</strong>
+                <strong>Kalender Saya</strong>
             </div>
 
-            <section class="personal-dashboard-card">
+            <section class="calendar-card">
+
+                <div class="calendar-header">
+
+                    <div class="calendar-title">
+                        <span class="calendar-title-icon">▦</span>
+                        <strong>Personal Calendar</strong>
+                    </div>
+
+                    <div class="calendar-controls">
+
+                        <button id="monthViewBtn"
+                                class="view-button active"
+                                type="button">
+                            BULAN
+                        </button>
+
+                        <button id="yearViewBtn"
+                                class="view-button"
+                                type="button">
+                            TAHUN
+                        </button>
+
+                        <button id="prevBtn"
+                                class="nav-button"
+                                type="button">
+                            ‹
+                        </button>
+
+                        <strong id="periodTitle">-</strong>
+
+                        <button id="nextBtn"
+                                class="nav-button"
+                                type="button">
+                            ›
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div id="calendarLoading" class="calendar-loading">
+                    Memuat kalender...
+                </div>
+
+                <div id="calendarError"
+                     class="calendar-error"
+                     hidden>
+                </div>
+
+                <div id="monthView">
+
+                    <div class="week-header">
+                        <span>SEN</span>
+                        <span>SEL</span>
+                        <span>RAB</span>
+                        <span>KAM</span>
+                        <span>JUM</span>
+                        <span>SAB</span>
+                        <span>MIN</span>
+                    </div>
+
+                    <div id="calendarGrid" class="calendar-grid"></div>
+
+                </div>
+
+                <div id="yearView"
+                     class="year-grid"
+                     hidden>
+                </div>
+
+                <div class="agenda-section">
+
+                    <div class="agenda-header">
+                        <strong id="agendaTitle">Agenda</strong>
+                        <span id="agendaCount">0 kegiatan</span>
+                    </div>
+
+                    <div id="agendaList"></div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+        {% elif active_menu == "calendar" %}
+
+        <div class="breadcrumb-card">
+            <strong>Kalender Saya</strong>
+        </div>
+
+        <section class="calendar-card">
+
+            <div class="calendar-header">
+
+                <div class="calendar-title">
+                    <span class="calendar-title-icon">▦</span>
+                    <strong>Personal Calendar</strong>
+                </div>
+
+                <div class="calendar-controls">
+
+                    <button id="monthViewBtn"
+                            class="view-button active"
+                            type="button">
+                        BULAN
+                    </button>
+
+                    <button id="yearViewBtn"
+                            class="view-button"
+                            type="button">
+                        TAHUN
+                    </button>
+
+                    <button id="prevBtn"
+                            class="nav-button"
+                            type="button">
+                        ‹
+                    </button>
+
+                    <strong id="periodTitle">-</strong>
+
+                    <button id="nextBtn"
+                            class="nav-button"
+                            type="button">
+                        ›
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div id="calendarLoading" class="calendar-loading">
+                Memuat kalender...
+            </div>
+
+            <div id="calendarError"
+                 class="calendar-error"
+                 hidden>
+            </div>
+
+            <div id="monthView">
+
+                <div class="week-header">
+                    <span>SEN</span>
+                    <span>SEL</span>
+                    <span>RAB</span>
+                    <span>KAM</span>
+                    <span>JUM</span>
+                    <span>SAB</span>
+                    <span>MIN</span>
+                </div>
+
+                <div id="calendarGrid" class="calendar-grid"></div>
+
+            </div>
+
+            <div id="yearView"
+                 class="year-grid"
+                 hidden>
+            </div>
+
+            <div class="agenda-section">
+
+                <div class="agenda-header">
+                    <strong id="agendaTitle">Agenda</strong>
+                    <span id="agendaCount">0 kegiatan</span>
+                </div>
+
+                <div id="agendaList"></div>
+
+            </div>
+
+        </section>
+
+        {% else %}
+
+        <div class="breadcrumb-card">
+            <strong>Dashboard Pribadi</strong>
+        </div>
+
+        <section class="personal-dashboard-card">
 
                 <div class="personal-dashboard-header">
                     <div class="personal-dashboard-kicker">KALENDAR PRIBADI PEGAWAI</div>
