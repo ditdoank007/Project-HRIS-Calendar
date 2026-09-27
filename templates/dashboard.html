@@ -35,30 +35,58 @@
 
         <nav class="sidebar-menu">
 
-            <a href="/dashboard" class="active">
+            <a href="/dashboard"
+               class="{{ 'active' if active_menu == 'dashboard' or not active_menu else '' }}">
                 <span class="menu-icon">⌂</span>
                 <span>DASHBOARD</span>
             </a>
 
-            <a href="/calendar">
+            <a href="/calendar"
+               class="{{ 'active' if active_menu == 'calendar' else '' }}">
                 <span class="menu-icon">▦</span>
                 <span>KALENDER SAYA</span>
             </a>
 
-            <a href="/phone-calendar">
+            <a href="/phone-calendar"
+               class="{{ 'active' if active_menu == 'phone' else '' }}">
                 <span class="menu-icon">▣</span>
                 <span>KALENDER HANDPHONE</span>
             </a>
 
-            <a href="/agenda">
+            <a href="/agenda"
+               class="{{ 'active' if active_menu == 'agenda' else '' }}">
                 <span class="menu-icon">◆</span>
                 <span>AGENDAKU</span>
             </a>
 
-            <a href="/plans">
-                <span class="menu-icon">◇</span>
-                <span>RENCANAKU</span>
-            </a>
+            <div class="sidebar-menu-group {{ 'open' if active_menu in ['cuti', 'sakit', 'ijin'] else '' }}">
+                <a href="/plans"
+                   class="sidebar-menu-parent {{ 'active' if active_menu in ['plans', 'cuti', 'sakit', 'ijin'] else '' }}">
+                    <span class="menu-icon">◇</span>
+                    <span>PENGAJUANKU</span>
+                    <span class="menu-chevron">›</span>
+                </a>
+
+                <div class="sidebar-submenu">
+                    <a href="/plans/cuti"
+                       class="{{ 'active' if active_menu == 'cuti' else '' }}">
+                        <span class="submenu-dot"></span>
+                        <span>Cuti</span>
+                    </a>
+
+                    <a href="/plans/sakit"
+                       class="{{ 'active' if active_menu == 'sakit' else '' }}">
+                        <span class="submenu-dot"></span>
+                        <span>Sakit</span>
+                    </a>
+
+                    <a href="/plans/ijin"
+                       class="{{ 'active' if active_menu == 'ijin' else '' }}">
+                        <span class="submenu-dot"></span>
+                        <span>Ijin</span>
+                    </a>
+                </div>
+            </div>
 
         </nav>
 
@@ -144,7 +172,39 @@
 
         <section class="dashboard-content">
 
-            {% if active_menu == "phone" %}
+            {% if active_menu in ["cuti", "sakit", "ijin"] %}
+
+            <div class="breadcrumb-card">
+                <strong>
+                    Pengajuanku / {{ active_menu|capitalize }}
+                </strong>
+            </div>
+
+            <section class="submission-card">
+                <div class="submission-header">
+                    <div>
+                        <div class="submission-kicker">PENGAJUANKU</div>
+                        <h2>{{ active_menu|capitalize }}</h2>
+                        <p>
+                            Halaman pengajuan {{ active_menu }}.
+                            Form dan history pengajuan akan kita bangun
+                            pada tahap berikutnya.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="submission-placeholder">
+                    <span class="submission-placeholder-icon">◇</span>
+                    <strong>Modul {{ active_menu|capitalize }} siap dikembangkan</strong>
+                    <span>
+                        Struktur menu sudah tersedia. Berikutnya kita
+                        implementasikan form pengajuan, history, status
+                        persetujuan, dan integrasi HRIS.
+                    </span>
+                </div>
+            </section>
+
+            {% elif active_menu == "phone" %}
 
             <div class="breadcrumb-card">
                 <strong>Kalender Handphone</strong>
