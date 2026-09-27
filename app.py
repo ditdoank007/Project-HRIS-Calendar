@@ -222,6 +222,22 @@ def plans():
     )
 
 
+@app.route("/plans/<jenis>")
+@login_required
+def plan_submission(jenis):
+    jenis = str(jenis or "").strip().lower()
+
+    if jenis not in {"cuti", "sakit", "ijin"}:
+        return redirect(url_for("plans"))
+
+    return render_template(
+        "dashboard.html",
+        nama=session.get("nama"),
+        nip=session.get("nip"),
+        active_menu=jenis
+    )
+
+
 @app.route("/api/phone-calendar-info")
 @login_required
 def api_phone_calendar_info():
