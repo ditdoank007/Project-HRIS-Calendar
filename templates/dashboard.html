@@ -916,87 +916,107 @@
                 <strong>Dashboard Pribadi</strong>
             </div>
 
-            <section class="calendar-card">
+            <section class="personal-dashboard-card">
 
-                <div class="calendar-header">
+                <div class="personal-dashboard-header">
+                    <div class="personal-dashboard-kicker">KALENDAR PRIBADI PEGAWAI</div>
 
-                    <div class="calendar-title">
-                        <span class="calendar-title-icon">▦</span>
-                        <strong>Personal Calendar</strong>
-                    </div>
+                    <h2>
+                        Selamat datang di Kalendar Pribadi Pegawai
+                        Kantor SAR Surabaya
+                    </h2>
 
-                    <div class="calendar-controls">
-
-                        <button id="monthViewBtn"
-                                class="view-button active">
-                            BULAN
-                        </button>
-
-                        <button id="yearViewBtn"
-                                class="view-button">
-                            TAHUN
-                        </button>
-
-                        <button id="prevBtn"
-                                class="nav-button"
-                                type="button">
-                            ‹
-                        </button>
-
-                        <strong id="periodTitle">-</strong>
-
-                        <button id="nextBtn"
-                                class="nav-button"
-                                type="button">
-                            ›
-                        </button>
-
-                    </div>
-
+                    <p id="dashboardWelcomeText">
+                        Menyiapkan ringkasan aktivitas kamu...
+                    </p>
                 </div>
 
-
-                <div id="calendarLoading" class="calendar-loading">
-                    Memuat kalender...
+                <div id="dashboardSummaryLoading"
+                     class="dashboard-summary-loading">
+                    Memuat data real dari HRIS Reborn...
                 </div>
 
-                <div id="calendarError"
-                     class="calendar-error"
+                <div id="dashboardSummaryError"
+                     class="dashboard-summary-error"
                      hidden>
                 </div>
 
-
-                <div id="monthView">
-
-                    <div class="week-header">
-                        <span>SEN</span>
-                        <span>SEL</span>
-                        <span>RAB</span>
-                        <span>KAM</span>
-                        <span>JUM</span>
-                        <span>SAB</span>
-                        <span>MIN</span>
-                    </div>
-
-                    <div id="calendarGrid" class="calendar-grid"></div>
-
-                </div>
-
-
-                <div id="yearView"
-                     class="year-grid"
+                <div id="dashboardSummaryContent"
                      hidden>
-                </div>
 
+                    <div class="dashboard-passed-card">
+                        <div class="dashboard-passed-icon">✓</div>
 
-                <div class="agenda-section">
+                        <div>
+                            <span>Sampai dengan hari ini</span>
 
-                    <div class="agenda-header">
-                        <strong id="agendaTitle">Agenda</strong>
-                        <span id="agendaCount">0 kegiatan</span>
+                            <strong>
+                                Kamu sudah melewati
+                                <b id="dashboardDaysPassed">0</b>
+                                hari di tahun
+                                <b id="dashboardYear">-</b>
+                            </strong>
+                        </div>
                     </div>
 
-                    <div id="agendaList"></div>
+                    <div class="dashboard-activity-title">
+                        Rekap aktivitas kamu tahun berjalan
+                    </div>
+
+                    <div class="dashboard-activity-grid">
+
+                        <div class="dashboard-activity-card dashboard-activity-dinas">
+                            <div class="dashboard-activity-icon">D</div>
+
+                            <div class="dashboard-activity-body">
+                                <span>Dinas Luar</span>
+                                <strong><b id="dashboardDinasLuar">0</b> hari</strong>
+                                <small>
+                                    Termasuk Dinas Luar Umum, Operasi dan Sumber Daya.
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-activity-card dashboard-activity-sakit">
+                            <div class="dashboard-activity-icon">S</div>
+
+                            <div class="dashboard-activity-body">
+                                <span>Sakit</span>
+                                <strong><b id="dashboardSakit">0</b> hari</strong>
+                                <small id="dashboardSakitMessage">
+                                    Sehat-sehat selalu ya kamu.
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-activity-card dashboard-activity-ijin">
+                            <div class="dashboard-activity-icon">I</div>
+
+                            <div class="dashboard-activity-body">
+                                <span>Ijin</span>
+                                <strong><b id="dashboardIjin">0</b> hari</strong>
+                                <small id="dashboardIjinMessage">
+                                    Mantap kamu tidak pernah ijin.
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-activity-card dashboard-activity-cuti">
+                            <div class="dashboard-activity-icon">C</div>
+
+                            <div class="dashboard-activity-body">
+                                <span>Cuti</span>
+                                <strong><b id="dashboardCuti">0</b> hari</strong>
+                                <small>Selamat berlibur.</small>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="dashboard-data-note">
+                        Data dihitung berdasarkan transaksi kalender pegawai
+                        dari HRIS Reborn sampai dengan hari ini.
+                    </div>
 
                 </div>
 
@@ -1005,6 +1025,7 @@
         </section>
 
         {% endif %}
+
 
     </main>
 
