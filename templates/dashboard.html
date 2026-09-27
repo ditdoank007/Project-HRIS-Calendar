@@ -1030,7 +1030,11 @@
                                 Kamu sudah melewati
                                 <b id="dashboardDaysPassed">0</b>
                                 hari di tahun
-                                <b id="dashboardYear">-</b>
+                                <b id="dashboardYear">-</b>.
+                                Sisa
+                                <b id="dashboardDaysRemaining">0</b>
+                                hari menuju tahun
+                                <b id="dashboardNextYear">-</b>.
                             </strong>
                         </div>
                     </div>
@@ -1332,6 +1336,12 @@ async function loadDashboardSummary() {
         document.getElementById("dashboardYear").textContent =
             payload.year || "-";
 
+        document.getElementById("dashboardDaysRemaining").textContent =
+            Number(payload.days_remaining || 0);
+
+        document.getElementById("dashboardNextYear").textContent =
+            Number(payload.year || 0) + 1;
+
         document.getElementById("dashboardDinasLuar").textContent =
             Number(data.DINAS_LUAR || 0);
 
@@ -1347,9 +1357,14 @@ async function loadDashboardSummary() {
         const nama =
             "{{ (nama or 'Pegawai')|e }}";
 
+        const todayDisplay = String(payload.today || "")
+            .split("-")
+            .reverse()
+            .join("-");
+
         document.getElementById("dashboardWelcomeText").textContent =
             `Halo, ${nama}. Berikut ringkasan aktivitas kepegawaian kamu
-            sampai dengan ${payload.today || "hari ini"}.`;
+            sampai dengan ${todayDisplay || "hari ini"}.`;
 
         document.getElementById("dashboardSakitMessage").textContent =
             Number(data.SAKIT || 0) > 0
