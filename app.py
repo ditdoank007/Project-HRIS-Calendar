@@ -331,7 +331,6 @@ def api_dashboard_summary():
 
     year = today.year
     year_start = date(year, 1, 1)
-    tomorrow = today + timedelta(days=1)
 
     def load_month(month):
         try:
