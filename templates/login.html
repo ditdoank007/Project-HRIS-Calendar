@@ -99,6 +99,7 @@
 
 
             <form id="loginForm">
+                <input type="hidden" id="nextUrl" value="{{ next_url or '/dashboard' }}">
 
                 <div class="field">
 
@@ -250,7 +251,8 @@ if (loginForm) {
                 body: JSON.stringify({
                     username,
                     password,
-                    remember
+                    remember,
+                    next: document.getElementById("nextUrl").value
                 })
             });
 
@@ -264,7 +266,7 @@ if (loginForm) {
                 return;
             }
 
-            window.location.href = "/dashboard";
+            window.location.href = result.redirect_url || "/dashboard";
 
         } catch (error) {
             alert(
