@@ -326,6 +326,109 @@
 
             </section>
 
+            {% elif active_menu == "agenda" %}
+
+            <div class="breadcrumb-card">
+                <strong>AgendaKu</strong>
+            </div>
+
+            <section class="agenda-portal">
+                <div class="agenda-portal-header">
+                    <div>
+                        <div class="agenda-portal-kicker">AGENDAKU</div>
+                        <h2>Agenda Kegiatan Saya</h2>
+                        <p>Agenda yang terhubung dengan HRIS Reborn.</p>
+                    </div>
+                </div>
+
+                <section class="agenda-group-card">
+                    <div class="agenda-group-header">
+                        <div class="agenda-group-title">
+                            <div class="agenda-group-icon">👥</div>
+                            <div>
+                                <h3>RAPAT</h3>
+                                <p>Agenda rapat dari HRIS Reborn.</p>
+                            </div>
+                        </div>
+                        <span id="agendaRapatCount" class="agenda-group-count">0 rapat</span>
+                    </div>
+
+                    <div id="agendaRapatLoading" class="agenda-portal-loading">
+                        Memuat daftar rapat...
+                    </div>
+                    <div id="agendaRapatError"
+                         class="agenda-portal-error"
+                         hidden></div>
+
+                    <div class="agenda-table-wrap">
+                        <table class="agenda-table">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal / Waktu</th>
+                                    <th>Agenda Rapat</th>
+                                    <th>Tempat</th>
+                                    <th>Pimpinan</th>
+                                    <th>Peserta</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agendaRapatBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="agenda-group-card">
+                    <div class="agenda-group-header">
+                        <div class="agenda-group-title">
+                            <div class="agenda-group-icon">📄</div>
+                            <div>
+                                <h3>DISPOSISI</h3>
+                                <p>Disposisi yang ditujukan kepada Anda.</p>
+                            </div>
+                        </div>
+                        <span id="agendaDisposisiCount" class="agenda-group-count">0 disposisi</span>
+                    </div>
+
+                    <div id="agendaDisposisiLoading" class="agenda-portal-loading">
+                        Memuat daftar disposisi...
+                    </div>
+                    <div id="agendaDisposisiError"
+                         class="agenda-portal-error"
+                         hidden></div>
+                    <div id="agendaDisposisiList"
+                         class="agenda-disposisi-list"></div>
+                </section>
+            </section>
+
+            <div id="agendaRapatModal"
+                 class="agenda-portal-modal"
+                 hidden>
+                <div class="agenda-portal-modal-backdrop"
+                     onclick="closeAgendaRapatModal()"></div>
+
+                <div class="agenda-portal-modal-card"
+                     role="dialog"
+                     aria-modal="true"
+                     aria-labelledby="agendaRapatModalTitle">
+
+                    <div class="agenda-portal-modal-header">
+                        <div>
+                            <div class="agenda-portal-kicker">DETAIL RAPAT</div>
+                            <h3 id="agendaRapatModalTitle">-</h3>
+                        </div>
+                        <button type="button"
+                                class="agenda-modal-close"
+                                onclick="closeAgendaRapatModal()">
+                            ×
+                        </button>
+                    </div>
+
+                    <div id="agendaRapatModalBody"
+                         class="agenda-portal-modal-body"></div>
+                </div>
+            </div>
+
             {% else %}
 
             <div class="breadcrumb-card">
