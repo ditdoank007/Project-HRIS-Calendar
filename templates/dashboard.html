@@ -35,27 +35,27 @@
 
         <nav class="sidebar-menu">
 
-            <a href="/dashboard" class="active">
+            <a href="/dashboard" class="{{ 'active' if not active_menu else '' }}">
                 <span class="menu-icon">⌂</span>
                 <span>DASHBOARD</span>
             </a>
 
-            <a href="/calendar">
+            <a href="/calendar" class="{{ 'active' if active_menu == 'calendar' else '' }}">
                 <span class="menu-icon">▦</span>
                 <span>KALENDER SAYA</span>
             </a>
 
-            <a href="/phone-calendar">
+            <a href="/phone-calendar" class="{{ 'active' if active_menu == 'phone' else '' }}">
                 <span class="menu-icon">▣</span>
                 <span>KALENDER HANDPHONE</span>
             </a>
 
-            <a href="/agenda">
+            <a href="/agenda" class="{{ 'active' if active_menu == 'agenda' else '' }}">
                 <span class="menu-icon">◆</span>
                 <span>AGENDAKU</span>
             </a>
 
-            <a href="/plans">
+            <a href="/plans" class="{{ 'active' if active_menu == 'plans' else '' }}">
                 <span class="menu-icon">◇</span>
                 <span>RENCANAKU</span>
             </a>
@@ -97,7 +97,7 @@
 
             <div class="topbar-title">
                 <div class="page-kicker">CALENDAR INTERNAL</div>
-                <h1>Dashboard</h1>
+                <h1>{% if active_menu == "agenda" %}AgendaKu{% elif active_menu == "calendar" %}Kalender Saya{% elif active_menu == "phone" %}Kalender Handphone{% elif active_menu == "plans" %}Rencanaku{% else %}Dashboard{% endif %}</h1>
             </div>
 
             <div class="topbar-actions">
