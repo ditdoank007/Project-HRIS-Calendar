@@ -560,9 +560,29 @@ def api_calendar_my_agenda():
             "message": "Layanan Agenda Kalender HRIS tidak tersedia."
         }), 502
 
+    content_type = str(response.headers.get("Content-Type") or "").lower()
+
+    if "application/json" not in content_type:
+        app.logger.error(
+            "HRIS personal agenda returned non-JSON response: status=%s content_type=%s",
+            response.status_code,
+            content_type,
+        )
+        return jsonify({
+            "status": "error",
+            "message": (
+                "Respons Agenda Kalender HRIS tidak valid "
+                f"(HTTP {response.status_code})."
+            )
+        }), 502
+
     try:
         payload = response.json()
-    except Exception:
+    except ValueError:
+        app.logger.error(
+            "HRIS personal agenda returned invalid JSON: status=%s",
+            response.status_code,
+        )
         return jsonify({
             "status": "error",
             "message": "Respons Agenda Kalender HRIS tidak valid."
