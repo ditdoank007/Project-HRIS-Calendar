@@ -657,6 +657,229 @@ async function loadPhoneCalendar() {
 
 loadPhoneCalendar();
 
+{% elif active_menu == "agenda" %}
+
+function agendaFormatDate(value) {
+    if (!value) return "-";
+    const d = new Date(value);
+    return d.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    });
+}
+
+function agendaFormatTime(value) {
+    if (!value) return "-";
+    const d = new Date(value);
+    return d.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    });
+}
+
+function agendaStatusBadge(status) {
+    const safe = String(status || "-");
+    const cls = safe === "SELESAI"
+        ? "agenda-status-selesai"
+        : safe === "BATAL"
+            ? "agenda-status-batal"
+            : "agenda-status-terjadwal";
+
+    return '<span class="agenda-status-badge ' + cls + '">' +
+        escapeHtml(safe) +
+        '</span>';
+}
+
+let agendaRapatRows = [];
+
+function renderAgendaRapatRows(rows) {
+    const body = document.getElementById("agendaRapatBody");
+    const count = document.getElementById("agendaRapatCount");
+
+    count.textContent = rows.length + " rapat";
+
+    if (!rows.length) {
+        body.innerHTML =
+            '<tr><td colspan="7" class="agenda-empty-row">' +
+            'Belum ada agenda rapat.' +
+            '</td></tr>';
+        return;
+    }
+
+    body.innerHTML = rows.map(function (item) {
+        return '<tr>' +
+            '<td><strong>' + agendaFormatDate(item.start) + '</strong>' +
+                '<span>' + agendaFormatTime(item.start) +
+                ' - ' + agendaFormatTime(item.end) + ' WIB</span></td>' +
+            '<td><strong>' + escapeHtml(item.title || "-") + '</strong></td>' +
+            '<td>' + escapeHtml(item.location || "-") + '</td>' +
+            '<td>' + escapeHtml(item.organizer_name || "-") + '</td>' +
+            '<td class="agenda-count-cell">' +
+                Number(item.attendance_count || 0) + ' orang</td>' +
+            '<td>' + agendaStatusBadge(item.status) + '</td>' +
+            '<td class="agenda-action-cell">' +
+                '<button type="button" class="agenda-view-button" ' +
+                'onclick="openAgendaRapatModal(' +
+                Number(item.event_id) + ')">View</button></td>' +
+        '</tr>';
+    }).join("");
+}
+
+function renderAgendaDisposisi(rows) {
+    const list = document.getElementById("agendaDisposisiList");
+    const count = document.getElementById("agendaDisposisiCount");
+
+    const filtered = (rows || []).filter(function (item) {
+        return String(item.event_type || "").toUpperCase() === "DISPOSISI";
+    });
+
+    count.textContent = filtered.length + " disposisi";
+
+    if (!filtered.length) {
+        list.innerHTML =
+            '<div class="agenda-empty-card">Belum ada disposisi.</div>';
+        return;
+    }
+
+    list.innerHTML = filtered.map(function (item) {
+        return '<div class="agenda-disposisi-item">' +
+            '<div><strong>' + escapeHtml(item.title || "-") + '</strong>' +
+            '<span>' + agendaFormatDate(item.start_date) + '</span>' +
+            '<small>' + escapeHtml(item.location || item.description || "") +
+            '</small></div>' +
+            agendaStatusBadge(item.status) +
+        '</div>';
+    }).join("");
+}
+
+async function loadAgendaPortal() {
+    const loading = document.getElementById("agendaRapatLoading");
+    const error = document.getElementById("agendaRapatError");
+
+    try {
+        const response = await fetch(
+            "/api/agenda/rapat",
+            { credentials: "same-origin" }
+        );
+        const payload = await response.json();
+
+        if (!response.ok || payload.status !== "success") {
+            throw new Error(
+                payload.message || "Gagal mengambil Agenda Rapat."
+            );
+        }
+
+        agendaRapatRows = Array.isArray(payload.data)
+            ? payload.data : [];
+
+        renderAgendaRapatRows(agendaRapatRows);
+
+    } catch (errorObject) {
+        error.textContent =
+            errorObject.message || "Gagal mengambil Agenda Rapat.";
+        error.hidden = false;
+    } finally {
+        loading.hidden = true;
+    }
+
+    const disposisiLoading =
+        document.getElementById("agendaDisposisiLoading");
+    const disposisiError =
+        document.getElementById("agendaDisposisiError");
+
+    try {
+        const response = await fetch(
+            "/api/calendar/my-agenda",
+            { credentials: "same-origin" }
+        );
+        const payload = await response.json();
+
+        if (!response.ok || payload.status !== "success") {
+            throw new Error(
+                payload.message || "Gagal mengambil Disposisi."
+            );
+        }
+
+        renderAgendaDisposisi(payload.data || []);
+
+    } catch (errorObject) {
+        disposisiError.textContent =
+            errorObject.message || "Gagal mengambil Disposisi.";
+        disposisiError.hidden = false;
+    } finally {
+        disposisiLoading.hidden = true;
+    }
+}
+
+function openAgendaRapatModal(eventId) {
+    const item = agendaRapatRows.find(function (row) {
+        return Number(row.event_id) === Number(eventId);
+    });
+
+    if (!item) return;
+
+    document.getElementById("agendaRapatModalTitle").textContent =
+        item.title || "-";
+
+    const attendance = Array.isArray(item.attendance)
+        ? item.attendance : [];
+
+    const attendanceHtml = attendance.length
+        ? '<div class="agenda-detail-attendance">' +
+            attendance.map(function (person, index) {
+                return '<div class="agenda-attendance-row">' +
+                    '<span>' + (index + 1) + '.</span>' +
+                    '<strong>' + escapeHtml(person.nama || person.nip) + '</strong>' +
+                    '<small>' + escapeHtml(person.nip || "-") + '</small>' +
+                '</div>';
+            }).join("") +
+          '</div>'
+        : '<div class="agenda-detail-empty">' +
+            'Belum ada pegawai yang tercatat hadir.' +
+          '</div>';
+
+    const notulenHtml = item.notulen_available
+        ? '<a class="agenda-notulen-button" href="/api/agenda/rapat/' +
+            Number(item.event_id) + '/notulen" target="_blank" rel="noopener">' +
+            'Buka / Download Notulen PDF</a>'
+        : '<div class="agenda-detail-empty">Notulen belum tersedia.</div>';
+
+    document.getElementById("agendaRapatModalBody").innerHTML =
+        '<div class="agenda-detail-grid">' +
+            '<div class="agenda-detail-field"><span>Tanggal / Waktu</span>' +
+                '<strong>' + agendaFormatDate(item.start) +
+                ' · ' + agendaFormatTime(item.start) +
+                ' - ' + agendaFormatTime(item.end) + ' WIB</strong></div>' +
+            '<div class="agenda-detail-field"><span>Tempat</span>' +
+                '<strong>' + escapeHtml(item.location || "-") + '</strong></div>' +
+            '<div class="agenda-detail-field"><span>Pimpinan Rapat</span>' +
+                '<strong>' + escapeHtml(item.organizer_name || "-") + '</strong></div>' +
+            '<div class="agenda-detail-field"><span>Status</span>' +
+                agendaStatusBadge(item.status) + '</div>' +
+        '</div>' +
+        '<div class="agenda-detail-section">' +
+            '<div class="agenda-detail-section-title">Kehadiran · ' +
+                Number(item.attendance_count || 0) + ' orang</div>' +
+            attendanceHtml +
+        '</div>' +
+        '<div class="agenda-detail-section">' +
+            '<div class="agenda-detail-section-title">Notulen Rapat</div>' +
+            notulenHtml +
+        '</div>';
+
+    document.getElementById("agendaRapatModal").hidden = false;
+    document.body.classList.add("agenda-modal-open");
+}
+
+function closeAgendaRapatModal() {
+    document.getElementById("agendaRapatModal").hidden = true;
+    document.body.classList.remove("agenda-modal-open");
+}
+
+loadAgendaPortal();
+
 {% else %}
 const MONTH_NAMES = [
     "Januari", "Februari", "Maret", "April",
