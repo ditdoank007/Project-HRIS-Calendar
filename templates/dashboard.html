@@ -837,8 +837,7 @@ function openAgendaRapatModal(eventId) {
                     '<span>' + (index + 1) + '.</span>' +
                     '<strong>' + escapeHtml(person.nama || person.nip || "-") +
                         '<small>' + escapeHtml(typeLabel) + '</small></strong>' +
-                    '<small>' + escapeHtml(person.nip || "-") +
-                        (person.email ? ' · ' + escapeHtml(person.email) : '') + '</small>' +
+                    '<small>' + escapeHtml(person.nip || "-") + '</small>' +
                 '</div>';
             }).join("") +
           '</div>'
