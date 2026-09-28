@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absensi QR Rapat — Calendar</title>
+<style>
+:root{font-family:Inter,Arial,sans-serif;color:#111827;background:#f3f4f6}*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#f8fafc,#eef2f7);min-height:100vh}.wrap{min-height:100vh;padding:18px;display:flex;align-items:center;justify-content:center}.card{width:min(560px,100%);background:#fff;border:1px solid #e5e7eb;border-radius:18px;box-shadow:0 18px 45px rgba(15,23,42,.10);overflow:hidden}.head{padding:24px 24px 18px;border-bottom:1px solid #edf0f3}.kicker{font-size:10px;font-weight:800;letter-spacing:1.2px;color:#dc2626}h1{margin:6px 0 5px;font-size:22px}.muted{color:#6b7280;font-size:12px;line-height:1.55}.event{margin-top:16px;padding:14px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb}.event strong{display:block;font-size:15px}.event span{display:block;margin-top:5px;color:#6b7280;font-size:11px}.body{padding:24px}.notice{padding:13px 14px;border-radius:10px;margin-bottom:16px;font-size:12px;line-height:1.5}.info{background:#eff6ff;color:#1d4ed8}.success{background:#dcfce7;color:#166534}.danger{background:#fee2e2;color:#991b1b}.choice{width:100%;padding:16px;margin-top:10px;border:1px solid #d1d5db;border-radius:11px;background:#fff;text-align:left;cursor:pointer}.choice:hover{border-color:#dc2626;background:#fff7f7}.choice strong{display:block;font-size:13px}.choice span{display:block;margin-top:4px;color:#6b7280;font-size:11px}button.primary{width:100%;min-height:46px;border:0;border-radius:10px;background:#dc2626;color:#fff;font-weight:800;cursor:pointer}button.primary:hover{background:#b91c1c}button.secondary{min-height:42px;border:1px solid #d1d5db;border-radius:9px;background:#fff;padding:0 14px;cursor:pointer}button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}.employee{padding:16px;border:1px solid #e5e7eb;border-radius:11px;margin-bottom:14px}.employee strong{display:block}.employee span{display:block;margin-top:4px;color:#6b7280;font-size:11px}label{display:block;margin:14px 0 6px;font-size:11px;font-weight:800;color:#374151}input{width:100%;height:44px;border:1px solid #d1d5db;border-radius:8px;padding:0 12px;font-size:13px}input:focus{outline:2px solid #fee2e2;border-color:#dc2626}.signature-wrap{border:1px solid #d1d5db;border-radius:9px;overflow:hidden;background:#fff}canvas{display:block;width:100%;height:190px;touch-action:none;background:#fff}.signature-actions{padding:8px;border-top:1px solid #edf0f3;text-align:right}.small{font-size:10px;color:#6b7280;margin-top:5px}.result{text-align:center;padding:18px 0}.result .mark{font-size:52px}.footer{text-align:center;padding:0 24px 24px;color:#9ca3af;font-size:10px}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card">
+<div class="head">
+<div class="kicker">CALENDAR · ABSENSI RAPAT</div>
+<h1>Absensi Rapat</h1>
+<div class="muted">Scan QR untuk mencatat kehadiran Anda.</div>
+<div id="eventBox" class="event hidden"></div>
+</div>
+<div class="body">
+<div id="loading" class="notice info">Memeriksa QR rapat...</div>
+<div id="error" class="notice danger hidden"></div>
+<section id="choices" class="hidden">
+<button class="choice" id="employeeChoice"><strong>👤 Pegawai Kantor SAR Surabaya</strong><span>Gunakan login SSO BDIP. Tidak perlu mengisi nama atau NIP.</span></button>
+<button class="choice" id="guestChoice"><strong>👥 Non Pegawai Kantor SAR Surabaya</strong><span>Isi nama, email, NIP/Finger ID opsional, dan tanda tangan.</span></button>
+</section>
+<section id="employeeSection" class="hidden">
+<div class="employee"><strong id="employeeName">Pegawai</strong><span id="employeeNip">-</span></div>
+<div id="employeeMessage" class="notice info hidden"></div>
+<button id="employeeAttend" class="primary">HADIR</button>
+</section>
+<section id="guestSection" class="hidden">
+<div class="notice info">Form ini khusus tamu/instansi/rekanan yang bukan pegawai Kantor SAR Surabaya.</div>
+<label for="guestName">Nama Lengkap *</label><input id="guestName" maxlength="150" autocomplete="name" placeholder="Nama lengkap">
+<label for="guestIdentity">NIP / Finger ID</label><input id="guestIdentity" maxlength="50" placeholder="Opsional">
+<label for="guestEmail">Email *</label><input id="guestEmail" maxlength="255" type="email" autocomplete="email" placeholder="nama@instansi.com">
+<label>Tanda Tangan *</label>
+<div class="signature-wrap"><canvas id="signatureCanvas"></canvas><div class="signature-actions"><button type="button" class="secondary" id="clearSignature">Hapus</button></div></div>
+<div class="small">Gunakan jari di HP atau stylus di tablet/iPad.</div><div style="height:14px"></div>
+<button id="guestAttend" class="primary">HADIR</button>
+</section>
+<section id="successSection" class="result hidden"><div class="mark">✓</div><h2>Kehadiran Tercatat</h2><div id="successMessage" class="muted"></div></section>
+</div>
+<div class="footer">Kantor Pencarian dan Pertolongan Surabaya · Calendar</div>
+</div></div>
+<script>
+const token={{ token|tojson }};
+const loggedIn={{ 'true' if logged_in else 'false' }};
+const loggedNip={{ (nip or '')|tojson }};
+const loggedName={{ (nama or '')|tojson }};
+const attendanceKey=(window.crypto&&crypto.randomUUID)?crypto.randomUUID().replaceAll('-',''):(Date.now().toString(36)+Math.random().toString(36).slice(2));
+const loading=document.getElementById("loading"),errorBox=document.getElementById("error"),eventBox=document.getElementById("eventBox"),choices=document.getElementById("choices"),employeeSection=document.getElementById("employeeSection"),guestSection=document.getElementById("guestSection"),successSection=document.getElementById("successSection");
+function showError(message){loading.classList.add("hidden");errorBox.textContent=message||"Terjadi kesalahan.";errorBox.classList.remove("hidden")}
+function formatDate(value){if(!value)return "-";const d=new Date(value);if(Number.isNaN(d.getTime()))return value;return new Intl.DateTimeFormat("id-ID",{dateStyle:"full",timeStyle:"short"}).format(d)+" WIB"}
+function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]))}
+function renderEvent(data){eventBox.innerHTML="<strong>"+escapeHtml(data.title||"-")+"</strong><span>"+escapeHtml(formatDate(data.start))+"</span><span>Tempat: "+escapeHtml(data.location||"-")+"</span><span>Pimpinan: "+escapeHtml(data.organizer_name||"-")+"</span>";eventBox.classList.remove("hidden")}
+function showSuccess(message){choices.classList.add("hidden");employeeSection.classList.add("hidden");guestSection.classList.add("hidden");errorBox.classList.add("hidden");loading.classList.add("hidden");successSection.classList.remove("hidden");document.getElementById("successMessage").textContent=message||"Kehadiran berhasil dicatat."}
+async function loadInfo(){try{const response=await fetch("/api/absen-qrcode/info?token="+encodeURIComponent(token),{headers:{"Accept":"application/json"}});const result=await response.json();if(!response.ok||result.status!=="success"){showError(result.message||"QR rapat tidak valid.");return}renderEvent(result.data);loading.classList.add("hidden");if(!result.data.qr_active||["SELESAI","BATAL"].includes(result.data.status)){showError("Absensi rapat telah ditutup.");return}if(loggedIn){employeeSection.classList.remove("hidden");document.getElementById("employeeName").textContent=loggedName||"Pegawai";document.getElementById("employeeNip").textContent=loggedNip||"-";if(result.data.employee_attended){document.getElementById("employeeAttend").disabled=true;document.getElementById("employeeAttend").textContent="SUDAH HADIR";const msg=document.getElementById("employeeMessage");msg.textContent="Kehadiran Anda sudah tercatat pada "+formatDate(result.data.employee_attendance_at)+".";msg.classList.remove("hidden")}}else choices.classList.remove("hidden")}catch(e){showError("Tidak dapat terhubung ke Calendar.")}}
+document.getElementById("employeeChoice").addEventListener("click",()=>{window.location.href="/login?next="+encodeURIComponent("/absen-qrcode?token="+token)});
+document.getElementById("guestChoice").addEventListener("click",()=>{choices.classList.add("hidden");guestSection.classList.remove("hidden");resizeCanvas()});
+document.getElementById("employeeAttend").addEventListener("click",async()=>{const button=document.getElementById("employeeAttend");button.disabled=true;button.textContent="Mencatat...";try{const response=await fetch("/api/absen-qrcode/employee",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token})});const result=await response.json();if(!response.ok||result.status!=="success")throw new Error(result.message||"Kehadiran gagal dicatat.");showSuccess(result.message)}catch(e){button.disabled=false;button.textContent="HADIR";const msg=document.getElementById("employeeMessage");msg.textContent=e.message;msg.className="notice danger";msg.classList.remove("hidden")}});
+const canvas=document.getElementById("signatureCanvas"),ctx=canvas.getContext("2d");let drawing=false,hasSignature=false;
+function resizeCanvas(){const rect=canvas.getBoundingClientRect(),ratio=Math.max(window.devicePixelRatio||1,1);canvas.width=Math.round(rect.width*ratio);canvas.height=Math.round(rect.height*ratio);ctx.setTransform(ratio,0,0,ratio,0,0);ctx.lineWidth=2;ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#111827"}
+function point(e){const rect=canvas.getBoundingClientRect();return{x:e.clientX-rect.left,y:e.clientY-rect.top}}
+canvas.addEventListener("pointerdown",e=>{drawing=true;hasSignature=true;canvas.setPointerCapture(e.pointerId);const p=point(e);ctx.beginPath();ctx.moveTo(p.x,p.y)});
+canvas.addEventListener("pointermove",e=>{if(!drawing)return;const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke()});
+["pointerup","pointercancel","pointerleave"].forEach(name=>canvas.addEventListener(name,()=>drawing=false));
+document.getElementById("clearSignature").addEventListener("click",()=>{resizeCanvas();hasSignature=false});
+window.addEventListener("resize",()=>{if(!guestSection.classList.contains("hidden"))resizeCanvas()});
+document.getElementById("guestAttend").addEventListener("click",async()=>{const button=document.getElementById("guestAttend"),name=document.getElementById("guestName").value.trim(),identity=document.getElementById("guestIdentity").value.trim(),email=document.getElementById("guestEmail").value.trim();if(!name)return alert("Nama Lengkap wajib diisi.");if(!email)return alert("Email wajib diisi.");if(!hasSignature)return alert("Tanda tangan wajib diisi.");button.disabled=true;button.textContent="Mencatat...";try{const response=await fetch("/api/absen-qrcode/guest",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token,name,email,nip_or_finger:identity,signature_data:canvas.toDataURL("image/png"),attendance_key:attendanceKey})});const result=await response.json();if(!response.ok||result.status!=="success")throw new Error(result.message||"Kehadiran tamu gagal dicatat.");showSuccess(result.message)}catch(e){button.disabled=false;button.textContent="HADIR";alert(e.message)}});
+resizeCanvas();loadInfo();
+</script>
+</body></html>
