@@ -222,6 +222,14 @@ def plans():
     )
 
 
+def hris_internal_headers():
+    nip = str(session.get("nip") or "").strip()
+    return {
+        "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+        "X-Calendar-NIP": nip,
+    }
+
+
 @app.route("/api/phone-calendar-info")
 @login_required
 def api_phone_calendar_info():
@@ -347,6 +355,89 @@ def api_calendar_feed_proxy(token):
         response.content,
         status=200,
         mimetype="text/calendar"
+    )
+
+
+
+@app.route("/api/agenda/rapat")
+@login_required
+def api_agenda_rapat():
+    headers = hris_internal_headers()
+
+    if not headers["X-Calendar-NIP"]:
+        return jsonify({
+            "status": "error",
+            "message": "Identitas pegawai tidak ditemukan."
+        }), 401
+
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/agenda/rapat",
+            headers=headers,
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan Agenda Rapat HRIS tidak tersedia."
+        }), 502
+
+    try:
+        payload = response.json()
+    except Exception:
+        return jsonify({
+            "status": "error",
+            "message": "Respons Agenda Rapat HRIS tidak valid."
+        }), 502
+
+    return jsonify(payload), response.status_code
+
+
+@app.route("/api/agenda/rapat/<int:event_id>/notulen")
+@login_required
+def api_agenda_rapat_notulen(event_id):
+    headers = hris_internal_headers()
+
+    if not headers["X-Calendar-NIP"]:
+        return jsonify({
+            "status": "error",
+            "message": "Identitas pegawai tidak ditemukan."
+        }), 401
+
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/agenda/rapat/{event_id}/notulen",
+            headers=headers,
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan Notulen HRIS tidak tersedia."
+        }), 502
+
+    if response.status_code != 200:
+        try:
+            payload = response.json()
+        except Exception:
+            payload = {
+                "status": "error",
+                "message": "Notulen tidak dapat diakses."
+            }
+        return jsonify(payload), response.status_code
+
+    return Response(
+        response.content,
+        status=200,
+        mimetype=response.headers.get("Content-Type", "application/pdf"),
+        headers={
+            "Content-Disposition": response.headers.get(
+                "Content-Disposition",
+                "inline"
+            )
+        },
     )
 
 
