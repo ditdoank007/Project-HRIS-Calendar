@@ -1267,8 +1267,7 @@ async function loadSubmissionSummary() {
 
 loadSubmissionSummary();
 
-{% else %}
-{% if active_menu == "phone" %}
+{% elif active_menu == "phone" %}
 async function loadPhoneCalendar() {
 
     const loading = document.getElementById("phoneCalendarLoading");
@@ -1394,7 +1393,6 @@ async function loadPhoneCalendar() {
 
 loadPhoneCalendar();
 
-{% else %}
 {% elif active_menu == "agenda" %}
 
 function escapeHtml(value) {
@@ -2217,7 +2215,6 @@ setSidebarState(
 loadCalendar();
 
 
-{% endif %}
 {% endif %}
 </script>
 
