@@ -829,15 +829,21 @@ function openAgendaRapatModal(eventId) {
     const attendanceHtml = attendance.length
         ? '<div class="agenda-detail-attendance">' +
             attendance.map(function (person, index) {
+                const typeLabel =
+                    String(person.attendee_type || "").toUpperCase() === "NON_PEGAWAI"
+                        ? "Non Pegawai"
+                        : "Pegawai";
                 return '<div class="agenda-attendance-row">' +
                     '<span>' + (index + 1) + '.</span>' +
-                    '<strong>' + escapeHtml(person.nama || person.nip) + '</strong>' +
-                    '<small>' + escapeHtml(person.nip || "-") + '</small>' +
+                    '<strong>' + escapeHtml(person.nama || person.nip || "-") +
+                        '<small>' + escapeHtml(typeLabel) + '</small></strong>' +
+                    '<small>' + escapeHtml(person.nip || "-") +
+                        (person.email ? ' · ' + escapeHtml(person.email) : '') + '</small>' +
                 '</div>';
             }).join("") +
           '</div>'
         : '<div class="agenda-detail-empty">' +
-            'Belum ada pegawai yang tercatat hadir.' +
+            'Belum ada peserta yang tercatat hadir.' +
           '</div>';
 
     const notulenHtml = item.notulen_available
