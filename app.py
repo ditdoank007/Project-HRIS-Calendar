@@ -1,4 +1,5 @@
 from functools import wraps
+from urllib.parse import urlparse
 
 import requests
 from flask import (
@@ -18,6 +19,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.config["MAX_CONTENT_LENGTH"] = 1024 * 1024
 
 # Nginx Proxy Manager terminates HTTPS.
 # Trust the forwarded scheme/host so Flask generates HTTPS URLs.
@@ -42,12 +44,22 @@ def login_required(view_func):
     return wrapped
 
 
-@app.route("/")
-def login():
-    if session.get("logged_in"):
-        return redirect(url_for("dashboard"))
+def safe_next_url(value):
+    value = str(value or "").strip()
+    parsed = urlparse(value)
+    if not value or parsed.scheme or parsed.netloc or not value.startswith("/") or value.startswith("//"):
+        return "/dashboard"
+    return value
 
-    return render_template("login.html")
+
+@app.route("/")
+@app.route("/login")
+def login():
+    next_url = safe_next_url(request.args.get("next"))
+    if session.get("logged_in"):
+        return redirect(next_url)
+
+    return render_template("login.html", next_url=next_url)
 
 
 @app.route("/api/login", methods=["POST"])
@@ -57,6 +69,7 @@ def api_login():
     username = str(data.get("username") or "").strip()
     password = str(data.get("password") or "").strip()
     remember = bool(data.get("remember"))
+    next_url = safe_next_url(data.get("next"))
 
     if not username:
         return jsonify({
@@ -146,6 +159,7 @@ def api_login():
         return jsonify({
             "success": True,
             "message": "Login SSO berhasil.",
+            "redirect_url": next_url,
             "user": {
                 "username": sso_username,
                 "nip": sso_nip,
@@ -166,6 +180,142 @@ def api_login():
             "success": False,
             "message": "Terjadi kesalahan saat proses login SSO."
         }), 500
+
+
+@app.route("/absen-qrcode")
+def absen_qrcode():
+    token = str(request.args.get("token") or "").strip()
+    if not token or len(token) > 150:
+        return render_template(
+            "absen_qrcode.html",
+            token="",
+            error="QR rapat tidak valid."
+        ), 400
+
+    return render_template(
+        "absen_qrcode.html",
+        token=token,
+        logged_in=bool(session.get("logged_in")),
+        nama=session.get("nama"),
+        nip=session.get("nip"),
+    )
+
+
+@app.route("/api/absen-qrcode/info")
+def api_absen_qrcode_info():
+    token = str(request.args.get("token") or "").strip()
+    if not token or len(token) > 150:
+        return jsonify({"status": "error", "message": "Token QR tidak valid."}), 400
+
+    headers = hris_internal_headers()
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/agenda/rapat/attendance-info",
+            params={"token": token},
+            headers=headers,
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan absensi rapat tidak tersedia."
+        }), 502
+
+    try:
+        payload = response.json()
+    except Exception:
+        payload = {
+            "status": "error",
+            "message": "Respons HRIS tidak valid."
+        }
+
+    return jsonify(payload), response.status_code
+
+
+@app.route("/api/absen-qrcode/employee", methods=["POST"])
+@login_required
+def api_absen_qrcode_employee():
+    payload = request.get_json(silent=True) or {}
+    token = str(payload.get("token") or "").strip()
+    if not token:
+        return jsonify({"status": "error", "message": "Token QR wajib diisi."}), 400
+
+    try:
+        response = requests.post(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/agenda/rapat/attendance/employee",
+            json={"token": token},
+            headers=hris_internal_headers(),
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan absensi rapat tidak tersedia."
+        }), 502
+
+    try:
+        payload = response.json()
+    except Exception:
+        payload = {
+            "status": "error",
+            "message": "Respons HRIS tidak valid."
+        }
+
+    return jsonify(payload), response.status_code
+
+
+@app.route("/api/absen-qrcode/guest", methods=["POST"])
+def api_absen_qrcode_guest():
+    payload = request.get_json(silent=True) or {}
+
+    token = str(payload.get("token") or "").strip()
+    name = str(payload.get("name") or "").strip()
+    email = str(payload.get("email") or "").strip()
+    nip_or_finger = str(payload.get("nip_or_finger") or "").strip()
+    signature_data = payload.get("signature_data")
+    attendance_key = str(payload.get("attendance_key") or "").strip()
+
+    if not token or len(token) > 150:
+        return jsonify({"status": "error", "message": "Token QR tidak valid."}), 400
+    if len(name) > 150 or len(email) > 255 or len(nip_or_finger) > 50:
+        return jsonify({"status": "error", "message": "Data tamu terlalu panjang."}), 400
+    if not signature_data or len(str(signature_data)) > 750000:
+        return jsonify({"status": "error", "message": "Tanda tangan tidak valid atau terlalu besar."}), 400
+
+    try:
+        response = requests.post(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/agenda/rapat/attendance/guest",
+            json={
+                "token": token,
+                "name": name,
+                "email": email,
+                "nip_or_finger": nip_or_finger,
+                "signature_data": signature_data,
+                "attendance_key": attendance_key,
+            },
+            headers={
+                "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+            },
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan absensi rapat tidak tersedia."
+        }), 502
+
+    try:
+        payload = response.json()
+    except Exception:
+        payload = {
+            "status": "error",
+            "message": "Respons HRIS tidak valid."
+        }
+
+    return jsonify(payload), response.status_code
 
 
 @app.route("/dashboard")
