@@ -544,6 +544,33 @@ def api_agenda_rapat():
     return jsonify(payload), response.status_code
 
 
+@app.route("/api/calendar/my-agenda")
+@login_required
+def api_calendar_my_agenda():
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/my-agenda",
+            headers=hris_internal_headers(),
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan Agenda Kalender HRIS tidak tersedia."
+        }), 502
+
+    try:
+        payload = response.json()
+    except Exception:
+        return jsonify({
+            "status": "error",
+            "message": "Respons Agenda Kalender HRIS tidak valid."
+        }), 502
+
+    return jsonify(payload), response.status_code
+
+
 @app.route("/api/agenda/rapat/<int:event_id>/notulen")
 @login_required
 def api_agenda_rapat_notulen(event_id):
