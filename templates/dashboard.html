@@ -949,6 +949,41 @@
                 <section class="agenda-group-card">
                     <div class="agenda-group-header">
                         <div class="agenda-group-title">
+                            <div class="agenda-group-icon">🏃</div>
+                            <div>
+                                <h3>KESAMAPTAAN</h3>
+                                <p>Kesamaptaan yang Anda ikuti melalui scan QR.</p>
+                            </div>
+                        </div>
+                        <span id="agendaKesamaptaanCount" class="agenda-group-count">0 kegiatan</span>
+                    </div>
+
+                    <div id="agendaKesamaptaanLoading" class="agenda-portal-loading">
+                        Memuat daftar Kesamaptaan...
+                    </div>
+                    <div id="agendaKesamaptaanError"
+                         class="agenda-portal-error"
+                         hidden></div>
+
+                    <div class="agenda-table-wrap">
+                        <table class="agenda-table">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal / Waktu</th>
+                                    <th>Kegiatan</th>
+                                    <th>Tempat</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agendaKesamaptaanBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="agenda-group-card">
+                    <div class="agenda-group-header">
+                        <div class="agenda-group-title">
                             <div class="agenda-group-icon">📄</div>
                             <div>
                                 <h3>DISPOSISI</h3>
@@ -968,6 +1003,29 @@
                          class="agenda-disposisi-list"></div>
                 </section>
             </section>
+
+            <div id="agendaKesamaptaanModal"
+                 class="agenda-portal-modal"
+                 hidden>
+                <div class="agenda-portal-modal-backdrop"
+                     onclick="closeAgendaKesamaptaanModal()"></div>
+                <div class="agenda-portal-modal-card"
+                     role="dialog"
+                     aria-modal="true"
+                     aria-labelledby="agendaKesamaptaanModalTitle">
+                    <div class="agenda-portal-modal-header">
+                        <div>
+                            <div class="agenda-portal-kicker">DETAIL KESAMAPTAAN</div>
+                            <h3 id="agendaKesamaptaanModalTitle">-</h3>
+                        </div>
+                        <button type="button"
+                                class="agenda-modal-close"
+                                onclick="closeAgendaKesamaptaanModal()">×</button>
+                    </div>
+                    <div id="agendaKesamaptaanModalBody"
+                         class="agenda-portal-modal-body"></div>
+                </div>
+            </div>
 
             <div id="agendaRapatModal"
                  class="agenda-portal-modal"
@@ -1449,6 +1507,8 @@ function agendaStatusBadge(status) {
 
 let agendaRapatRows = [];
 
+let agendaKesamaptaanRows = [];
+
 function renderAgendaRapatRows(rows) {
     const body = document.getElementById("agendaRapatBody");
     const count = document.getElementById("agendaRapatCount");
@@ -1478,6 +1538,35 @@ function renderAgendaRapatRows(rows) {
                 '<button type="button" class="agenda-view-button" ' +
                 'onclick="openAgendaRapatModal(' +
                 Number(item.event_id) + ')">View</button></td>' +
+        '</tr>';
+    }).join("");
+}
+
+function renderAgendaKesamaptaanRows(rows) {
+    const body = document.getElementById("agendaKesamaptaanBody");
+    const count = document.getElementById("agendaKesamaptaanCount");
+
+    count.textContent = rows.length + " kegiatan";
+
+    if (!rows.length) {
+        body.innerHTML =
+            '<tr><td colspan="5" class="agenda-empty-row">' +
+            'Belum ada kegiatan Kesamaptaan yang Anda ikuti.' +
+            '</td></tr>';
+        return;
+    }
+
+    body.innerHTML = rows.map(function (item) {
+        return '<tr>' +
+            '<td><strong>' + agendaFormatDate(item.start) + '</strong>' +
+                '<span>' + agendaFormatTime(item.start) + ' WIB</span></td>' +
+            '<td><strong>' + escapeHtml(item.title || "-") + '</strong></td>' +
+            '<td>' + escapeHtml(item.location || "-") + '</td>' +
+            '<td>' + agendaStatusBadge(item.status) + '</td>' +
+            '<td class="agenda-action-cell">' +
+                '<button type="button" class="agenda-view-button" ' +
+                'onclick="openAgendaKesamaptaanModal(' + Number(item.event_id) + ')">View</button>' +
+            '</td>' +
         '</tr>';
     }).join("");
 }
@@ -1539,6 +1628,37 @@ async function loadAgendaPortal() {
         loading.hidden = true;
     }
 
+    const kesLoading =
+        document.getElementById("agendaKesamaptaanLoading");
+    const kesError =
+        document.getElementById("agendaKesamaptaanError");
+
+    try {
+        const response = await fetch(
+            "/api/agenda/kesamaptaan",
+            { credentials: "same-origin" }
+        );
+        const payload = await response.json();
+
+        if (!response.ok || payload.status !== "success") {
+            throw new Error(
+                payload.message || "Gagal mengambil Agenda Kesamaptaan."
+            );
+        }
+
+        agendaKesamaptaanRows = Array.isArray(payload.data)
+            ? payload.data : [];
+
+        renderAgendaKesamaptaanRows(agendaKesamaptaanRows);
+
+    } catch (errorObject) {
+        kesError.textContent =
+            errorObject.message || "Gagal mengambil Agenda Kesamaptaan.";
+        kesError.hidden = false;
+    } finally {
+        kesLoading.hidden = true;
+    }
+
     const disposisiLoading =
         document.getElementById("agendaDisposisiLoading");
     const disposisiError =
@@ -1566,6 +1686,41 @@ async function loadAgendaPortal() {
     } finally {
         disposisiLoading.hidden = true;
     }
+}
+
+function openAgendaKesamaptaanModal(eventId) {
+    const item = agendaKesamaptaanRows.find(function (row) {
+        return Number(row.event_id) === Number(eventId);
+    });
+    if (!item) return;
+
+    document.getElementById("agendaKesamaptaanModalTitle").textContent =
+        item.title || "Kesamaptaan";
+
+    document.getElementById("agendaKesamaptaanModalBody").innerHTML =
+        '<div class="agenda-detail-grid">' +
+            '<div class="agenda-detail-field"><span>Tanggal / Waktu</span>' +
+                '<strong>' + agendaFormatDate(item.start) + ' · ' +
+                agendaFormatTime(item.start) + ' WIB</strong></div>' +
+            '<div class="agenda-detail-field"><span>Tempat</span>' +
+                '<strong>' + escapeHtml(item.location || '-') + '</strong></div>' +
+            '<div class="agenda-detail-field"><span>Status</span>' +
+                agendaStatusBadge(item.status) + '</div>' +
+        '</div>' +
+        '<div class="agenda-detail-section">' +
+            '<div class="agenda-detail-section-title">Dokumen Kesamaptaan</div>' +
+            '<a class="agenda-notulen-button" href="/api/agenda/kesamaptaan/' +
+                Number(item.event_id) + '/pdf" target="_blank" rel="noopener">' +
+                'View / Download PDF Absensi Kehadiran</a>' +
+        '</div>';
+
+    document.getElementById("agendaKesamaptaanModal").hidden = false;
+    document.body.classList.add("agenda-modal-open");
+}
+
+function closeAgendaKesamaptaanModal() {
+    document.getElementById("agendaKesamaptaanModal").hidden = true;
+    document.body.classList.remove("agenda-modal-open");
 }
 
 function openAgendaRapatModal(eventId) {
