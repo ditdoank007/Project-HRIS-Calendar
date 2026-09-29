@@ -54,7 +54,7 @@
             </a>
 
             <div class="sidebar-menu-group {{ 'open' if active_menu == 'agenda' else '' }}">
-                <a href="/agenda?tab=rapat" class="sidebar-menu-parent {{ 'active' if active_menu == 'agenda' else '' }}"><span class="menu-icon">◆</span><span>AGENDAKU</span><span class="menu-chevron">›</span></a>
+                <a href="/agenda" class="sidebar-menu-parent {{ 'active' if active_menu == 'agenda' else '' }}"><span class="menu-icon">◆</span><span>AGENDAKU</span><span class="menu-chevron">›</span></a>
                 <div class="sidebar-submenu">
                     <a href="/agenda?tab=rapat" class="{{ 'active' if active_menu == 'agenda' and agenda_tab == 'rapat' else '' }}"><span class="submenu-dot"></span><span>RAPAT</span></a>
                     <a href="/agenda?tab=disposisi" class="{{ 'active' if active_menu == 'agenda' and agenda_tab == 'disposisi' else '' }}"><span class="submenu-dot"></span><span>DISPOSISI</span></a>
@@ -897,23 +897,40 @@
 
             </section>
 
-                        {% elif active_menu == "agenda" %}
-            <div class="breadcrumb-card"><strong>AgendaKu / {{ agenda_tab|upper }}</strong></div>
-            <section class="agenda-portal">
-                <div class="agenda-portal-header">
-                    <div><div class="agenda-portal-kicker">AGENDAKU</div><h2>{{ agenda_tab|upper }}</h2><p>{% if agenda_tab == "rapat" %}Agenda rapat yang terhubung dengan HRIS Reborn.{% elif agenda_tab == "disposisi" %}Disposisi yang ditujukan kepada Anda.{% else %}Kesamaptaan yang Anda ikuti melalui scan QR.{% endif %}</p></div>
-                    <div class="agenda-month-controls"><button type="button" id="agendaPrevMonth" class="agenda-month-button">‹</button><strong id="agendaMonthTitle">-</strong><button type="button" id="agendaNextMonth" class="agenda-month-button">›</button></div>
+                                    {% elif active_menu == "agenda" %}
+            <div class="breadcrumb-card"><strong>AgendaKu</strong></div>
+            {% if agenda_tab == "overview" %}
+            <section class="agenda-overview">
+                <div class="agenda-overview-header">
+                    <div><div class="agenda-portal-kicker">AGENDAKU</div><h2>Agenda Kegiatan Saya</h2><p>Ringkasan agenda yang tercatat untuk Anda sejak Januari sampai bulan berjalan.</p></div>
+                    <div class="agenda-overview-period" id="agendaOverviewPeriod">-</div>
                 </div>
-                {% if agenda_tab == "rapat" %}
+                <div id="agendaOverviewLoading" class="agenda-portal-loading">Memuat ringkasan AgendaKu...</div>
+                <div id="agendaOverviewError" class="agenda-portal-error" hidden></div>
+                <div id="agendaOverviewCards" class="agenda-overview-cards" hidden>
+                    <a class="agenda-overview-card agenda-overview-rapat" href="/agenda?tab=rapat"><div class="agenda-overview-card-top"><span class="agenda-overview-icon">👥</span><span>RAPAT</span></div><strong id="agendaOverviewRapatCount">0</strong><small>Total Rapat</small><em>Lihat agenda rapat →</em></a>
+                    <a class="agenda-overview-card agenda-overview-disposisi" href="/agenda?tab=disposisi"><div class="agenda-overview-card-top"><span class="agenda-overview-icon">📄</span><span>DISPOSISI</span></div><strong id="agendaOverviewDisposisiCount">0</strong><small>Total Disposisi</small><em>Lihat disposisi →</em></a>
+                    <a class="agenda-overview-card agenda-overview-kesamaptaan" href="/agenda?tab=kesamaptaan"><div class="agenda-overview-card-top"><span class="agenda-overview-icon">🏃</span><span>KESAMAPTAAN</span></div><strong id="agendaOverviewKesamaptaanCount">0</strong><small>Total Kesamaptaan</small><em>Lihat kesamaptaan →</em></a>
+                </div>
+            </section>
+            {% elif agenda_tab == "rapat" %}
+            <div class="agenda-portal">
+                <div class="agenda-portal-header"><div><div class="agenda-portal-kicker">AGENDAKU</div><h2>RAPAT</h2><p>Agenda rapat yang terhubung dengan HRIS Reborn.</p></div><div class="agenda-month-controls"><button type="button" id="agendaPrevMonth" class="agenda-month-button">‹</button><strong id="agendaMonthTitle">-</strong><button type="button" id="agendaNextMonth" class="agenda-month-button">›</button></div></div>
                 <section class="agenda-group-card"><div class="agenda-group-header"><div class="agenda-group-title"><div class="agenda-group-icon">👥</div><div><h3>RAPAT</h3><p>Agenda rapat dari HRIS Reborn.</p></div></div><span id="agendaRapatCount" class="agenda-group-count">0 rapat</span></div><div id="agendaRapatLoading" class="agenda-portal-loading">Memuat daftar rapat...</div><div id="agendaRapatError" class="agenda-portal-error" hidden></div><div class="agenda-table-wrap"><table class="agenda-table"><thead><tr><th>Tanggal / Waktu</th><th>Agenda Rapat</th><th>Tempat</th><th>Pimpinan</th><th>Peserta</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="agendaRapatBody"></tbody></table></div></section>
                 <div id="agendaRapatModal" class="agenda-portal-modal" hidden><div class="agenda-portal-modal-backdrop" onclick="closeAgendaRapatModal()"></div><div class="agenda-portal-modal-card" role="dialog"><div class="agenda-portal-modal-header"><div><div class="agenda-portal-kicker">DETAIL RAPAT</div><h3 id="agendaRapatModalTitle">-</h3></div><button type="button" class="agenda-modal-close" onclick="closeAgendaRapatModal()">×</button></div><div id="agendaRapatModalBody" class="agenda-portal-modal-body"></div></div></div>
-                {% elif agenda_tab == "disposisi" %}
+            </div>
+            {% elif agenda_tab == "disposisi" %}
+            <div class="agenda-portal">
+                <div class="agenda-portal-header"><div><div class="agenda-portal-kicker">AGENDAKU</div><h2>DISPOSISI</h2><p>Disposisi yang ditujukan kepada Anda.</p></div><div class="agenda-month-controls"><button type="button" id="agendaPrevMonth" class="agenda-month-button">‹</button><strong id="agendaMonthTitle">-</strong><button type="button" id="agendaNextMonth" class="agenda-month-button">›</button></div></div>
                 <section class="agenda-group-card"><div class="agenda-group-header"><div class="agenda-group-title"><div class="agenda-group-icon">📄</div><div><h3>DISPOSISI</h3><p>Disposisi yang ditujukan kepada Anda.</p></div></div><span id="agendaDisposisiCount" class="agenda-group-count">0 disposisi</span></div><div id="agendaDisposisiLoading" class="agenda-portal-loading">Memuat daftar disposisi...</div><div id="agendaDisposisiError" class="agenda-portal-error" hidden></div><div id="agendaDisposisiList" class="agenda-disposisi-list"></div></section>
-                {% else %}
+            </div>
+            {% else %}
+            <div class="agenda-portal">
+                <div class="agenda-portal-header"><div><div class="agenda-portal-kicker">AGENDAKU</div><h2>KESAMAPTAAN</h2><p>Kesamaptaan yang Anda ikuti melalui scan QR.</p></div><div class="agenda-month-controls"><button type="button" id="agendaPrevMonth" class="agenda-month-button">‹</button><strong id="agendaMonthTitle">-</strong><button type="button" id="agendaNextMonth" class="agenda-month-button">›</button></div></div>
                 <section class="agenda-group-card"><div class="agenda-group-header"><div class="agenda-group-title"><div class="agenda-group-icon">🏃</div><div><h3>KESAMAPTAAN</h3><p>Kesamaptaan yang Anda ikuti melalui scan QR.</p></div></div><span id="agendaKesamaptaanCount" class="agenda-group-count">0 kegiatan</span></div><div id="agendaKesamaptaanLoading" class="agenda-portal-loading">Memuat daftar Kesamaptaan...</div><div id="agendaKesamaptaanError" class="agenda-portal-error" hidden></div><div class="agenda-table-wrap"><table class="agenda-table"><thead><tr><th>Tanggal / Waktu</th><th>Kegiatan</th><th>Tempat</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="agendaKesamaptaanBody"></tbody></table></div></section>
                 <div id="agendaKesamaptaanModal" class="agenda-portal-modal" hidden><div class="agenda-portal-modal-backdrop" onclick="closeAgendaKesamaptaanModal()"></div><div class="agenda-portal-modal-card" role="dialog"><div class="agenda-portal-modal-header"><div><div class="agenda-portal-kicker">DETAIL KESAMAPTAAN</div><h3 id="agendaKesamaptaanModalTitle">-</h3></div><button type="button" class="agenda-modal-close" onclick="closeAgendaKesamaptaanModal()">×</button></div><div id="agendaKesamaptaanModalBody" class="agenda-portal-modal-body"></div></div></div>
-                {% endif %}
-            </section>
+            </div>
+            {% endif %}
 
 {% elif not active_menu or active_menu == "dashboard" %}
 
@@ -1348,7 +1365,32 @@ document.getElementById("agendaPrevMonth").addEventListener("click",()=>changeAg
 {% else %}(async()=>{const l=document.getElementById("agendaKesamaptaanLoading"),e=document.getElementById("agendaKesamaptaanError");try{const q=await fetch("/api/agenda/kesamaptaan",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Agenda Kesamaptaan.");agendaKesamaptaanRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();{% endif %}
 refreshAgendaCurrentMonth();
 
-{% elif not active_menu or active_menu == "dashboard" %}
+
+{% if agenda_tab == "overview" %}
+(async function(){
+ const l=document.getElementById("agendaOverviewLoading"),e=document.getElementById("agendaOverviewError"),cards=document.getElementById("agendaOverviewCards"),now=new Date(),year=now.getFullYear(),month=now.getMonth()+1,startKey=year+"-01",endKey=year+"-"+String(month).padStart(2,"0");
+ document.getElementById("agendaOverviewPeriod").textContent="Januari - "+AGENDA_MONTH_NAMES[now.getMonth()]+" "+year;
+ function countToCurrent(rows){return(rows||[]).filter(function(i){const k=agendaRowDate(i);return k>=startKey&&k<=endKey;}).length;}
+ try{
+  const rs=await Promise.all([fetch("/api/agenda/rapat",{credentials:"same-origin"}),fetch("/api/calendar/my-agenda",{credentials:"same-origin"}),fetch("/api/agenda/kesamaptaan",{credentials:"same-origin"})]);
+  const ps=await Promise.all(rs.map(function(r){return r.json();}));
+  if(!rs[0].ok||ps[0].status!=="success")throw Error(ps[0].message||"Gagal mengambil data Rapat.");
+  if(!rs[1].ok||ps[1].status!=="success")throw Error(ps[1].message||"Gagal mengambil data Disposisi.");
+  if(!rs[2].ok||ps[2].status!=="success")throw Error(ps[2].message||"Gagal mengambil data Kesamaptaan.");
+  const disposisi=(ps[1].data||[]).filter(function(i){return String(i.event_type||"").toUpperCase()==="DISPOSISI";});
+  document.getElementById("agendaOverviewRapatCount").textContent=countToCurrent(ps[0].data);
+  document.getElementById("agendaOverviewDisposisiCount").textContent=countToCurrent(disposisi);
+  document.getElementById("agendaOverviewKesamaptaanCount").textContent=countToCurrent(ps[2].data);
+  cards.hidden=false;
+ }catch(x){e.textContent=x.message||"Gagal mengambil ringkasan AgendaKu.";e.hidden=false;}finally{l.hidden=true;}
+})();
+{% else %}
+document.getElementById("agendaPrevMonth").addEventListener("click",function(){changeAgendaMonth(-1);});
+document.getElementById("agendaNextMonth").addEventListener("click",function(){changeAgendaMonth(1);});
+{% if agenda_tab == "rapat" %}(async function(){const l=document.getElementById("agendaRapatLoading"),e=document.getElementById("agendaRapatError");try{const q=await fetch("/api/agenda/rapat",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Agenda Rapat.");agendaRapatRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();
+{% elif agenda_tab == "disposisi" %}(async function(){const l=document.getElementById("agendaDisposisiLoading"),e=document.getElementById("agendaDisposisiError");try{const q=await fetch("/api/calendar/my-agenda",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Disposisi.");agendaDisposisiRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();
+{% else %}(async function(){const l=document.getElementById("agendaKesamaptaanLoading"),e=document.getElementById("agendaKesamaptaanError");try{const q=await fetch("/api/agenda/kesamaptaan",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Agenda Kesamaptaan.");agendaKesamaptaanRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();{% endif %}
+{% endif %}{% elif not active_menu or active_menu == "dashboard" %}
 async function loadDashboardSummary() {
 
     const loading =
