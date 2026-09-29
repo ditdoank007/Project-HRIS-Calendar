@@ -353,10 +353,10 @@ def phone_calendar():
 @app.route("/agenda")
 @login_required
 def agenda():
-    agenda_tab = str(request.args.get("tab") or "rapat").strip().lower()
+    agenda_tab = str(request.args.get("tab") or "overview").strip().lower()
 
-    if agenda_tab not in {"rapat", "disposisi", "kesamaptaan"}:
-        agenda_tab = "rapat"
+    if agenda_tab not in {"overview", "rapat", "disposisi", "kesamaptaan"}:
+        agenda_tab = "overview"
 
     return render_template(
         "dashboard.html",
