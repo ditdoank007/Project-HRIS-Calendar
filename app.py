@@ -509,6 +509,66 @@ def api_calendar_feed_proxy(token):
 
 
 
+@app.route("/api/agenda/kesamaptaan")
+@login_required
+def api_agenda_kesamaptaan():
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/kesamaptaan/agenda",
+            headers=hris_internal_headers(),
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan Kesamaptaan HRIS tidak tersedia."
+        }), 502
+
+    try:
+        payload = response.json()
+    except Exception:
+        payload = {"status": "error", "message": "Respons Kesamaptaan HRIS tidak valid."}
+
+    return jsonify(payload), response.status_code
+
+
+@app.route("/api/agenda/kesamaptaan/<int:event_id>/pdf")
+@login_required
+def api_agenda_kesamaptaan_pdf(event_id):
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/kesamaptaan/{event_id}/pdf",
+            headers=hris_internal_headers(),
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan PDF Kesamaptaan HRIS tidak tersedia."
+        }), 502
+
+    if response.status_code != 200:
+        try:
+            payload = response.json()
+        except Exception:
+            payload = {"status": "error", "message": "PDF Kesamaptaan tidak dapat diakses."}
+        return jsonify(payload), response.status_code
+
+    return Response(
+        response.content,
+        status=200,
+        mimetype=response.headers.get("Content-Type", "application/pdf"),
+        headers={
+            "Content-Disposition": response.headers.get(
+                "Content-Disposition",
+                "inline"
+            )
+        },
+    )
+
+
 @app.route("/api/agenda/rapat")
 @login_required
 def api_agenda_rapat():
