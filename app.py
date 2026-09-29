@@ -853,12 +853,15 @@ def api_dashboard_summary():
             current += timedelta(days=1)
 
     days_passed = max((today - year_start).days, 0)
+    next_year_start = date(year + 1, 1, 1)
+    days_remaining = max((next_year_start - today).days - 1, 0)
 
     return jsonify({
         "status": "success",
         "year": year,
         "today": today.isoformat(),
         "days_passed": days_passed,
+        "days_remaining": days_remaining,
         "nip": nip,
         "nama": session.get("nama"),
         "data": {
