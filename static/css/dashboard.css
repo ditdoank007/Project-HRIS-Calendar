@@ -2604,3 +2604,5 @@ body.agenda-modal-open {
 .agenda-overview-disposisi .agenda-overview-icon{background:#fef3c7}
 .agenda-overview-kesamaptaan .agenda-overview-icon{background:#dcfce7}
 @media(max-width:900px){.agenda-overview-cards{grid-template-columns:1fr}.agenda-overview-header{align-items:flex-start;flex-direction:column}}
+
+.agenda-overview-message{display:block;margin-top:8px;color:#dc2626;font-size:11px;font-weight:800;line-height:1.35;min-height:30px}
