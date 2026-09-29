@@ -2582,3 +2582,25 @@ body.agenda-modal-open {
 .dashboard-next-year strong b {
     color: #dc2626;
 }
+
+
+/* ============================================================
+   AGENDAKU OVERVIEW
+   ============================================================ */
+.agenda-overview{display:flex;flex-direction:column;gap:18px}
+.agenda-overview-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px 26px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 2px 8px rgba(15,23,42,.04)}
+.agenda-overview-header h2{margin:5px 0 4px;color:#111827;font-size:22px;font-weight:800}
+.agenda-overview-header p{margin:0;color:#6b7280;font-size:12px}
+.agenda-overview-period{padding:9px 13px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;color:#374151;font-size:11px;font-weight:800;white-space:nowrap}
+.agenda-overview-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.agenda-overview-card{min-height:190px;padding:22px;display:flex;flex-direction:column;text-decoration:none;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 2px 8px rgba(15,23,42,.04);transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.agenda-overview-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(15,23,42,.08);border-color:#d1d5db}
+.agenda-overview-card-top{display:flex;align-items:center;gap:10px;color:#111827;font-size:12px;font-weight:800;letter-spacing:.5px}
+.agenda-overview-icon{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#fee2e2;font-size:18px}
+.agenda-overview-card>strong{margin-top:22px;color:#111827;font-size:34px;line-height:1}
+.agenda-overview-card>small{margin-top:7px;color:#6b7280;font-size:11px}
+.agenda-overview-card>em{margin-top:auto;padding-top:18px;color:#dc2626;font-size:10px;font-style:normal;font-weight:800}
+.agenda-overview-rapat .agenda-overview-icon{background:#dbeafe}
+.agenda-overview-disposisi .agenda-overview-icon{background:#fef3c7}
+.agenda-overview-kesamaptaan .agenda-overview-icon{background:#dcfce7}
+@media(max-width:900px){.agenda-overview-cards{grid-template-columns:1fr}.agenda-overview-header{align-items:flex-start;flex-direction:column}}
