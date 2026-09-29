@@ -1339,6 +1339,7 @@ async function loadPhoneCalendar() {
 loadPhoneCalendar();
 
 
+
 {% elif active_menu == "agenda" %}
 function escapeHtml(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}
 function agendaFormatDate(v){return v?new Date(v).toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"}):"-";}
@@ -1359,12 +1360,6 @@ function openAgendaRapatModal(id){const i=agendaRapatRows.find(x=>Number(x.event
 function closeAgendaRapatModal(){document.getElementById("agendaRapatModal").hidden=true;document.body.classList.remove("agenda-modal-open");}
 function openAgendaKesamaptaanModal(id){const i=agendaKesamaptaanRows.find(x=>Number(x.event_id)===Number(id));if(!i)return;document.getElementById("agendaKesamaptaanModalTitle").textContent=i.title||"Kesamaptaan";document.getElementById("agendaKesamaptaanModalBody").innerHTML='<div class="agenda-detail-grid"><div class="agenda-detail-field"><span>Tanggal / Waktu</span><strong>'+agendaFormatDate(i.start)+' · '+agendaFormatTime(i.start)+' WIB</strong></div><div class="agenda-detail-field"><span>Tempat</span><strong>'+escapeHtml(i.location||"-")+'</strong></div><div class="agenda-detail-field"><span>Status</span>'+agendaStatusBadge(i.status)+'</div></div><div class="agenda-detail-section"><div class="agenda-detail-section-title">Dokumen Kesamaptaan</div><a class="agenda-notulen-button" href="/api/agenda/kesamaptaan/'+Number(i.event_id)+'/pdf" target="_blank">View / Download PDF Absensi Kehadiran</a></div>';document.getElementById("agendaKesamaptaanModal").hidden=false;document.body.classList.add("agenda-modal-open");}
 function closeAgendaKesamaptaanModal(){document.getElementById("agendaKesamaptaanModal").hidden=true;document.body.classList.remove("agenda-modal-open");}
-document.getElementById("agendaPrevMonth").addEventListener("click",()=>changeAgendaMonth(-1));document.getElementById("agendaNextMonth").addEventListener("click",()=>changeAgendaMonth(1));
-{% if agenda_tab == "rapat" %}(async()=>{const l=document.getElementById("agendaRapatLoading"),e=document.getElementById("agendaRapatError");try{const q=await fetch("/api/agenda/rapat",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Agenda Rapat.");agendaRapatRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();
-{% elif agenda_tab == "disposisi" %}(async()=>{const l=document.getElementById("agendaDisposisiLoading"),e=document.getElementById("agendaDisposisiError");try{const q=await fetch("/api/calendar/my-agenda",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Disposisi.");agendaDisposisiRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();
-{% else %}(async()=>{const l=document.getElementById("agendaKesamaptaanLoading"),e=document.getElementById("agendaKesamaptaanError");try{const q=await fetch("/api/agenda/kesamaptaan",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Agenda Kesamaptaan.");agendaKesamaptaanRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();{% endif %}
-refreshAgendaCurrentMonth();
-
 
 {% if agenda_tab == "overview" %}
 (async function(){
@@ -1390,7 +1385,9 @@ document.getElementById("agendaNextMonth").addEventListener("click",function(){c
 {% if agenda_tab == "rapat" %}(async function(){const l=document.getElementById("agendaRapatLoading"),e=document.getElementById("agendaRapatError");try{const q=await fetch("/api/agenda/rapat",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Agenda Rapat.");agendaRapatRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();
 {% elif agenda_tab == "disposisi" %}(async function(){const l=document.getElementById("agendaDisposisiLoading"),e=document.getElementById("agendaDisposisiError");try{const q=await fetch("/api/calendar/my-agenda",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Disposisi.");agendaDisposisiRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();
 {% else %}(async function(){const l=document.getElementById("agendaKesamaptaanLoading"),e=document.getElementById("agendaKesamaptaanError");try{const q=await fetch("/api/agenda/kesamaptaan",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Agenda Kesamaptaan.");agendaKesamaptaanRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();{% endif %}
-{% endif %}{% elif not active_menu or active_menu == "dashboard" %}
+{% endif %}
+
+{% elif not active_menu or active_menu == "dashboard" %}
 async function loadDashboardSummary() {
 
     const loading =
