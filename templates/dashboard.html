@@ -1044,6 +1044,16 @@
                                 <b id="dashboardYear">-</b>
                             </strong>
                         </div>
+
+                        <div class="dashboard-next-year">
+                            <span>Menuju tahun berikutnya</span>
+
+                            <strong>
+                                <b id="dashboardDaysRemaining">0</b>
+                                hari lagi menuju
+                                <b id="dashboardNextYear">-</b>
+                            </strong>
+                        </div>
                     </div>
 
                     <div class="dashboard-activity-title">
@@ -1666,6 +1676,12 @@ async function loadDashboardSummary() {
         document.getElementById("dashboardYear").textContent =
             payload.year || "-";
 
+        document.getElementById("dashboardDaysRemaining").textContent =
+            Number(payload.days_remaining || 0);
+
+        document.getElementById("dashboardNextYear").textContent =
+            Number(payload.year || 0) + 1;
+
         document.getElementById("dashboardDinasLuar").textContent =
             Number(data.DINAS_LUAR || 0);
 
@@ -2079,6 +2095,10 @@ function renderYear() {
     }
 }
 
+loadCalendar();
+
+{% endif %}
+
 async function logout() {
 
     try {
@@ -2185,6 +2205,8 @@ const sidebarToggle = document.getElementById("sidebarToggle");
 function setSidebarState(minimized) {
     document.body.classList.toggle("sidebar-minimized", minimized);
 
+    if (!sidebarToggle) return;
+
     sidebarToggle.textContent = minimized ? "›" : "‹";
 
     sidebarToggle.title = minimized
@@ -2202,20 +2224,17 @@ function setSidebarState(minimized) {
     );
 }
 
-sidebarToggle.addEventListener("click", () => {
+if (sidebarToggle) {
+    sidebarToggle.addEventListener("click", () => {
+        setSidebarState(
+            !document.body.classList.contains("sidebar-minimized")
+        );
+    });
+
     setSidebarState(
-        !document.body.classList.contains("sidebar-minimized")
+        localStorage.getItem("calendarSidebarMinimized") === "1"
     );
-});
-
-setSidebarState(
-    localStorage.getItem("calendarSidebarMinimized") === "1"
-);
-
-loadCalendar();
-
-
-{% endif %}
+}
 </script>
 
 </body>
