@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendar — Dashboard Pribadi</title>
+    <title>Pegawai — Portal Pribadi</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/dashboard.css') }}">
@@ -20,7 +20,7 @@
                  alt="Basarnas">
 
             <div class="brand-text">
-                <div class="brand-name">CALENDAR</div>
+                <div class="brand-name">PEGAWAI</div>
                 <div class="brand-office">Kantor SAR Surabaya</div>
             </div>
 
@@ -35,11 +35,31 @@
 
         <nav class="sidebar-menu">
 
-            <a href="/dashboard"
-               class="{{ 'active' if active_menu == 'dashboard' or not active_menu else '' }}">
-                <span class="menu-icon">⌂</span>
-                <span>DASHBOARD</span>
-            </a>
+            <div class="sidebar-menu-group dashboard-menu-group open">
+                <a href="https://hris.sarsurabaya.id/dashboard/infografis"
+                   class="sidebar-menu-parent {{ 'active' if active_menu == 'dashboard' or not active_menu else '' }}">
+                    <span class="menu-icon">⌂</span>
+                    <span>DASHBOARD</span>
+                    <span class="menu-chevron" id="dashboardMenuChevron">›</span>
+                </a>
+
+                <div class="sidebar-submenu">
+                    <a href="https://hris.sarsurabaya.id/dashboard/infografis">
+                        <span class="submenu-dot"></span>
+                        <span>Infografis Pegawai</span>
+                    </a>
+
+                    <a href="https://hris.sarsurabaya.id/dashboard/pelanggaran">
+                        <span class="submenu-dot"></span>
+                        <span>Pelanggaran Disiplin</span>
+                    </a>
+
+                    <a href="https://hris.sarsurabaya.id/dashboard/struktur-organisasi">
+                        <span class="submenu-dot"></span>
+                        <span>Struktur Organisasi</span>
+                    </a>
+                </div>
+            </div>
 
             <a href="/calendar"
                class="{{ 'active' if active_menu == 'calendar' else '' }}">
@@ -111,7 +131,7 @@
             </button>
 
             <div class="topbar-title">
-                <div class="page-kicker">CALENDAR INTERNAL</div>
+                <div class="page-kicker">PEGAWAI INTERNAL</div>
                 <h1>Dashboard</h1>
             </div>
 
@@ -1959,6 +1979,24 @@ document.querySelectorAll(".sidebar-menu a").forEach(
         });
     }
 );
+
+const dashboardMenuParent =
+    document.querySelector(".dashboard-menu-group .sidebar-menu-parent");
+
+if (dashboardMenuParent) {
+    dashboardMenuParent.addEventListener("click", function (event) {
+        if (event.target.closest(".menu-chevron")) {
+            event.preventDefault();
+
+            const group =
+                dashboardMenuParent.closest(".sidebar-menu-group");
+
+            if (group) {
+                group.classList.toggle("open");
+            }
+        }
+    });
+}
 
 const accountMenuToggle =
     document.getElementById("accountMenuToggle");
