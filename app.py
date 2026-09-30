@@ -835,6 +835,40 @@ def api_dashboard_summary():
     year = today.year
     year_start = date(year, 1, 1)
 
+    # Identitas pegawai untuk sapaan portal diambil dari Master Pegawai HRIS Reborn.
+    # Jika NIP belum memiliki record master, UI menggunakan fallback "-".
+    profile_name = "-"
+    profile_gender = ""
+
+    try:
+        profile_response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/employee-profile",
+            headers={
+                "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+                "X-Calendar-NIP": nip,
+            },
+            timeout=10,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+
+        if profile_response.status_code == 200:
+            profile_payload = profile_response.json() or {}
+            profile = profile_payload.get("data") or {}
+
+            profile_name = str(
+                profile.get("nama") or "-"
+            ).strip() or "-"
+
+            profile_gender = str(
+                profile.get("jenis_kel") or ""
+            ).strip()
+
+    except (requests.RequestException, ValueError):
+        app.logger.warning(
+            "Dashboard HRIS employee profile unavailable for NIP %s",
+            nip,
+        )
+
     def load_month(month):
         try:
             response = requests.get(
@@ -929,7 +963,8 @@ def api_dashboard_summary():
         "days_passed": days_passed,
         "days_remaining": days_remaining,
         "nip": nip,
-        "nama": session.get("nama"),
+        "nama": profile_name,
+        "jenis_kel": profile_gender,
         "data": {
             "DINAS_LUAR": len(day_sets["DINAS_LUAR"]),
             "SAKIT": len(day_sets["SAKIT"]),
