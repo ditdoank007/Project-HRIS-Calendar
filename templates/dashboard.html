@@ -941,11 +941,10 @@
             <section class="personal-dashboard-card">
 
                 <div class="personal-dashboard-header">
-                    <div class="personal-dashboard-kicker">KALENDAR PRIBADI PEGAWAI</div>
+                    <div class="personal-dashboard-kicker">PORTAL PRIBADI PEGAWAI</div>
 
-                    <h2>
-                        Selamat datang di Kalendar Pribadi Pegawai
-                        Kantor SAR Surabaya
+                    <h2 id="dashboardGreeting">
+                        Menyiapkan portal pribadi...
                     </h2>
 
                     <p id="dashboardWelcomeText">
@@ -1451,11 +1450,45 @@ async function loadDashboardSummary() {
             Number(data.CUTI || 0);
 
         const nama =
-            "{{ (nama or 'Pegawai')|e }}";
+            String(payload.nama || "-").trim() || "-";
+
+        const gender =
+            String(payload.jenis_kel || "").trim().toUpperCase();
+
+        let sapaanGender = "";
+
+        if (nama !== "-") {
+            if (["L", "LAKI-LAKI", "LAKI LAKI", "LAKI"].includes(gender)) {
+                sapaanGender = "mas ";
+            } else if (["P", "PEREMPUAN", "WANITA"].includes(gender)) {
+                sapaanGender = "mbak ";
+            }
+        }
+
+        const hour = Number(payload.hour);
+
+        let waktu = "Malam";
+
+        if (hour >= 5 && hour < 11) {
+            waktu = "Pagi";
+        } else if (hour >= 11 && hour < 15) {
+            waktu = "Siang";
+        } else if (hour >= 15 && hour < 18) {
+            waktu = "Sore";
+        }
+
+        const todayDisplay = String(payload.today || "")
+            .split("-")
+            .reverse()
+            .join("-");
+
+        document.getElementById("dashboardGreeting").textContent =
+            `Selamat ${waktu} ${sapaanGender}${nama} di Portal Pribadi Pegawai
+            Kantor SAR Surabaya`;
 
         document.getElementById("dashboardWelcomeText").textContent =
             `Halo, ${nama}. Berikut ringkasan aktivitas kepegawaian kamu
-            sampai dengan ${payload.today || "hari ini"}.`;
+            sampai dengan ${todayDisplay || "-"}.`;
 
         document.getElementById("dashboardSakitMessage").textContent =
             Number(data.SAKIT || 0) > 0
