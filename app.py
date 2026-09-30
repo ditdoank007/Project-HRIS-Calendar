@@ -828,9 +828,11 @@ def api_dashboard_summary():
             "message": "NIP tidak ditemukan."
         }), 401
 
-    today = datetime_now = __import__("datetime").datetime.now(
+    now_jakarta = __import__("datetime").datetime.now(
         ZoneInfo("Asia/Jakarta")
-    ).date()
+    )
+    today = now_jakarta.date()
+    current_hour = now_jakarta.hour
 
     year = today.year
     year_start = date(year, 1, 1)
@@ -960,6 +962,7 @@ def api_dashboard_summary():
         "status": "success",
         "year": year,
         "today": today.isoformat(),
+        "hour": current_hour,
         "days_passed": days_passed,
         "days_remaining": days_remaining,
         "nip": nip,
