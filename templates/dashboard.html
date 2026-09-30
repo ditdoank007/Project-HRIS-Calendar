@@ -947,6 +947,10 @@
                         Menyiapkan portal pribadi...
                     </h2>
 
+                    <h3 id="dashboardWelcomeTitle">
+                        Menyiapkan sambutan...
+                    </h3>
+
                     <p id="dashboardWelcomeText">
                         Menyiapkan ringkasan aktivitas kamu...
                     </p>
@@ -1483,8 +1487,10 @@ async function loadDashboardSummary() {
             .join("-");
 
         document.getElementById("dashboardGreeting").textContent =
-            `Selamat ${waktu} ${sapaanGender}${nama} di Portal Pribadi Pegawai
-            Kantor SAR Surabaya`;
+            `Selamat ${waktu} ${sapaanGender}${nama}`;
+
+        document.getElementById("dashboardWelcomeTitle").textContent =
+            "Selamat datang di Portal Pribadi Pegawai Kantor SAR Surabaya";
 
         document.getElementById("dashboardWelcomeText").textContent =
             `Halo, ${nama}. Berikut ringkasan aktivitas kepegawaian kamu
