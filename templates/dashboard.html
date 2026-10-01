@@ -36,8 +36,8 @@
 
         <nav class="sidebar-menu">
 
-            <div class="sidebar-menu-group dashboard-menu-group {{ 'open' if active_menu in ['infografis', 'pelanggaran', 'struktur-organisasi'] else '' }}">
-                <a href="https://hris.sarsurabaya.id/dashboard/infografis"
+            <div class="sidebar-menu-group dashboard-menu-group {{ 'open' if active_menu in ['dashboard', 'infografis', 'pelanggaran', 'struktur-organisasi'] or not active_menu else '' }}">
+                <a href="/dashboard"
                    class="sidebar-menu-parent {{ 'active' if active_menu in ['dashboard', 'infografis', 'pelanggaran', 'struktur-organisasi'] or not active_menu else '' }}">
                     <span class="menu-icon">⌂</span>
                     <span>DASHBOARD</span>
