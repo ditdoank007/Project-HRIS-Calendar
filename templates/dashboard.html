@@ -36,9 +36,9 @@
 
         <nav class="sidebar-menu">
 
-            <div class="sidebar-menu-group dashboard-menu-group {{ 'open' if active_menu == 'infografis' else '' }}">
+            <div class="sidebar-menu-group dashboard-menu-group {{ 'open' if active_menu in ['infografis', 'pelanggaran', 'struktur-organisasi'] else '' }}">
                 <a href="https://hris.sarsurabaya.id/dashboard/infografis"
-                   class="sidebar-menu-parent {{ 'active' if active_menu == 'dashboard' or active_menu == 'infografis' or not active_menu else '' }}">
+                   class="sidebar-menu-parent {{ 'active' if active_menu in ['dashboard', 'infografis', 'pelanggaran', 'struktur-organisasi'] or not active_menu else '' }}">
                     <span class="menu-icon">⌂</span>
                     <span>DASHBOARD</span>
                     <span class="menu-chevron" id="dashboardMenuChevron">›</span>
@@ -51,12 +51,14 @@
                         <span>Infografis Pegawai</span>
                     </a>
 
-                    <a href="https://hris.sarsurabaya.id/dashboard/pelanggaran">
+                    <a href="/dashboard/pelanggaran"
+                       class="{{ 'active' if active_menu == 'pelanggaran' else '' }}">
                         <span class="submenu-dot"></span>
                         <span>Pelanggaran Disiplin</span>
                     </a>
 
-                    <a href="https://hris.sarsurabaya.id/dashboard/struktur-organisasi">
+                    <a href="/dashboard/struktur-organisasi"
+                       class="{{ 'active' if active_menu == 'struktur-organisasi' else '' }}">
                         <span class="submenu-dot"></span>
                         <span>Struktur Organisasi</span>
                     </a>
@@ -953,6 +955,69 @@
                 <div id="agendaKesamaptaanModal" class="agenda-portal-modal" hidden><div class="agenda-portal-modal-backdrop" onclick="closeAgendaKesamaptaanModal()"></div><div class="agenda-portal-modal-card" role="dialog"><div class="agenda-portal-modal-header"><div><div class="agenda-portal-kicker">DETAIL KESAMAPTAAN</div><h3 id="agendaKesamaptaanModalTitle">-</h3></div><button type="button" class="agenda-modal-close" onclick="closeAgendaKesamaptaanModal()">×</button></div><div id="agendaKesamaptaanModalBody" class="agenda-portal-modal-body"></div></div></div>
             </div>
             {% endif %}
+
+{% elif active_menu == "pelanggaran" %}
+
+            <div class="breadcrumb-card"><strong>Dashboard / Pelanggaran Disiplin</strong></div>
+            <section class="portal-page">
+                <div class="portal-hero">
+                    <div>
+                        <div class="portal-kicker">DASHBOARD PEGAWAI</div>
+                        <h2>Pelanggaran Disiplin</h2>
+                        <p>Rekap hukuman disiplin berdasarkan jumlah ketidakhadiran hari kerja.</p>
+                    </div>
+                    <select id="pelanggaranYear" class="portal-year-select">
+                        {% for y in range(2012, 2031) %}
+                        <option value="{{ y }}">{{ y }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <section class="portal-card">
+                    <div class="portal-card-toolbar">
+                        <strong>Hukuman Disiplin Pegawai</strong>
+                        <span id="pelanggaranYearLabel">Data tahun -</span>
+                    </div>
+                    <div id="pelanggaranLoading" class="portal-loading">Memuat data dari HRIS Reborn...</div>
+                    <div id="pelanggaranError" class="portal-error" hidden></div>
+                    <div class="portal-table-wrap">
+                        <table class="portal-table">
+                            <thead><tr><th>No</th><th>Nama</th><th>Jumlah Hari</th><th>Kategori Hukuman</th><th>Jenis Hukuman</th><th>Potongan (%)</th><th>Lama Pot</th></tr></thead>
+                            <tbody id="pelanggaranBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+
+            {% elif active_menu == "struktur-organisasi" %}
+
+            <div class="breadcrumb-card"><strong>Dashboard / Struktur Organisasi</strong></div>
+            <section class="portal-page">
+                <div class="portal-hero">
+                    <div>
+                        <div class="portal-kicker">DASHBOARD PEGAWAI</div>
+                        <h2>Struktur Organisasi</h2>
+                        <p>Struktur organisasi berdasarkan Master Jabatan dan pegawai aktif HRIS.</p>
+                    </div>
+                    <div class="portal-badge"><span>HRIS REBORN</span><small>Single Source of Truth</small></div>
+                </div>
+                <section class="portal-card">
+                    <div class="org-portal-toolbar">
+                        <div>
+                            <strong>Struktur Organisasi Kantor SAR Surabaya</strong>
+                            <small>Klik nama jabatan untuk melihat pegawai. Gunakan tombol untuk membuka child tree.</small>
+                        </div>
+                        <div class="org-portal-actions">
+                            <button type="button" id="orgZoomOut" class="portal-action">−</button>
+                            <span id="orgZoomValue">100%</span>
+                            <button type="button" id="orgZoomIn" class="portal-action">+</button>
+                            <button type="button" id="orgZoomReset" class="portal-action portal-action-wide">Reset View</button>
+                        </div>
+                    </div>
+                    <div id="orgLoading" class="portal-loading">Memuat struktur dari HRIS Reborn...</div>
+                    <div id="orgError" class="portal-error" hidden></div>
+                    <div class="org-portal-viewport" id="orgViewport"><div class="org-portal-canvas" id="orgCanvas"><ul class="org-portal-tree" id="orgTreeRoot"></ul></div></div>
+                </section>
+            </section>
 
 {% elif active_menu == "infografis" %}
 
@@ -2092,6 +2157,131 @@ if (dashboardMenuParent) {
     });
 }
 
+{% if active_menu == "pelanggaran" %}
+<script>
+(function () {
+    const select = document.getElementById("pelanggaranYear");
+    const loading = document.getElementById("pelanggaranLoading");
+    const errorBox = document.getElementById("pelanggaranError");
+    const body = document.getElementById("pelanggaranBody");
+    const label = document.getElementById("pelanggaranYearLabel");
+    const currentYear = new Date().getFullYear();
+    select.value = "{{ request.args.get('tahun', '') }}" || String(currentYear);
+
+    function load(year) {
+        loading.hidden = false;
+        errorBox.hidden = true;
+        body.innerHTML = "";
+        fetch("/api/dashboard/pelanggaran?tahun=" + encodeURIComponent(year), {credentials:"same-origin"})
+        .then(r => r.json().then(p => ({ok:r.ok,p:p})))
+        .then(x => {
+            if (!x.ok || x.p.status !== "success") throw new Error(x.p.message || "Data tidak dapat dimuat.");
+            label.textContent = "Data tahun " + x.p.tahun;
+            const rows = x.p.data || [];
+            if (!rows.length) {
+                body.innerHTML = '<tr><td colspan="7" class="portal-empty">Tidak ada data pelanggaran.</td></tr>';
+                return;
+            }
+            rows.forEach(row => {
+                const tr = document.createElement("tr");
+                tr.className = row.row_class || "";
+                [row.no,row.nama,row.hari,row.kategori,row.jenis,row.potongan,row.lama_pot].forEach((v,i) => {
+                    const td = document.createElement("td");
+                    td.textContent = v ?? "-";
+                    if (i !== 1 && i !== 4) td.className = "text-center";
+                    tr.appendChild(td);
+                });
+                body.appendChild(tr);
+            });
+        })
+        .catch(e => {
+            errorBox.hidden = false;
+            errorBox.textContent = e.message;
+        })
+        .finally(() => { loading.hidden = true; });
+    }
+    select.addEventListener("change", () => {
+        const url = new URL(window.location.href);
+        url.searchParams.set("tahun", select.value);
+        window.location.href = url.toString();
+    });
+    load(select.value);
+})();
+</script>
+{% elif active_menu == "struktur-organisasi" %}
+<script>
+(function () {
+    const loading=document.getElementById("orgLoading");
+    const errorBox=document.getElementById("orgError");
+    const root=document.getElementById("orgTreeRoot");
+    const canvas=document.getElementById("orgCanvas");
+    const modal=document.getElementById("orgEmployeeModal");
+    let scale=1;
+
+    function openModal(node, employees) {
+        let box=document.getElementById("orgEmployeeModal");
+        if (!box) {
+            box=document.createElement("div");
+            box.id="orgEmployeeModal";
+            box.className="portal-modal";
+            box.innerHTML='<div class="portal-modal-card"><div class="portal-modal-head"><strong></strong><button type="button">×</button></div><div class="portal-modal-body"></div></div>';
+            document.body.appendChild(box);
+            box.querySelector("button").onclick=()=>box.remove();
+        }
+        box.querySelector(".portal-modal-head strong").textContent=node.name || "Jabatan";
+        const body=box.querySelector(".portal-modal-body");
+        body.innerHTML="";
+        if(!employees.length) body.innerHTML='<div class="portal-empty">Tidak ada pegawai aktif pada jabatan ini.</div>';
+        employees.forEach((item,i)=>{
+            const row=document.createElement("div");
+            row.className="portal-person";
+            row.innerHTML='<span class="portal-person-no">'+(i+1)+'</span><div><strong></strong><small></small></div>';
+            row.querySelector("strong").textContent=item.nama || "-";
+            row.querySelector("small").textContent=item.nip || "-";
+            body.appendChild(row);
+        });
+        box.hidden=false;
+        box.onclick=e=>{if(e.target===box) box.remove();};
+    }
+
+    function nodeEl(node, employeesMap) {
+        const li=document.createElement("li");
+        li.className="org-portal-item";
+        const wrap=document.createElement("div");
+        wrap.className="org-portal-node-wrap";
+        const kids=Array.isArray(node.children)&&node.children.length;
+        const toggle=document.createElement("button");
+        toggle.type="button"; toggle.className="org-toggle"; toggle.textContent=kids?"⌄":"";
+        if(kids) toggle.onclick=e=>{e.stopPropagation();li.classList.toggle("expanded");toggle.textContent=li.classList.contains("expanded")?"⌃":"⌄";};
+        wrap.appendChild(toggle);
+        const btn=document.createElement("button");
+        btn.type="button";
+        const employees=employeesMap[String(node.id)]||[];
+        btn.className="org-node-button "+(node.relation==="functional"?"functional ":"structural ")+(employees.length?"occupied":"empty");
+        btn.textContent=node.name||"-";
+        btn.onclick=()=>openModal(node,employees);
+        wrap.appendChild(btn); li.appendChild(wrap);
+        if(kids){const ul=document.createElement("ul");ul.className="org-portal-children";node.children.forEach(ch=>ul.appendChild(nodeEl(ch,employeesMap)));li.appendChild(ul);}
+        return li;
+    }
+
+    function zoom(v){scale=Math.min(1.5,Math.max(.6,v));canvas.style.transform="scale("+scale+")";canvas.style.transformOrigin="top left";document.getElementById("orgZoomValue").textContent=Math.round(scale*100)+"%";}
+    document.getElementById("orgZoomIn").onclick=()=>zoom(scale+.1);
+    document.getElementById("orgZoomOut").onclick=()=>zoom(scale-.1);
+    document.getElementById("orgZoomReset").onclick=()=>zoom(1);
+
+    fetch("/api/dashboard/struktur-organisasi",{credentials:"same-origin"})
+    .then(r=>r.json().then(p=>({ok:r.ok,p:p})))
+    .then(x=>{
+        if(!x.ok||x.p.status!=="success") throw new Error(x.p.message||"Struktur tidak dapat dimuat.");
+        const d=x.p.data||{};
+        if(d.structure) root.appendChild(nodeEl(d.structure,d.employees_by_jabatan||{}));
+        else root.innerHTML='<li class="portal-empty">Struktur root belum tersedia.</li>';
+        loading.hidden=true;
+    })
+    .catch(e=>{loading.hidden=true;errorBox.hidden=false;errorBox.textContent=e.message;});
+})();
+</script>
 {% if active_menu == "infografis" %}
 (function () {
     const loading = document.getElementById("infografisLoading");
