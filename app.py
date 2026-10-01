@@ -452,6 +452,81 @@ def hris_internal_headers():
     }
 
 
+def _proxy_personal_benefit(path, params):
+    nip = str(session.get("nip") or "").strip()
+    if not nip:
+        return jsonify({
+            "status": "error",
+            "message": "NIP tidak ditemukan."
+        }), 401
+
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}{path}",
+            params=params,
+            headers=hris_internal_headers(),
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan Benefit HRIS tidak tersedia."
+        }), 502
+
+    try:
+        payload = response.json()
+    except Exception:
+        return jsonify({
+            "status": "error",
+            "message": "Respons Benefit HRIS tidak valid."
+        }), 502
+
+    return jsonify(payload), response.status_code
+
+
+@app.route("/api/benefit/tunjangan-kinerja")
+@login_required
+def api_benefit_tunjangan_kinerja():
+    start = str(request.args.get("start") or "").strip()
+    end = str(request.args.get("end") or "").strip()
+
+    if not start or not end:
+        return jsonify({
+            "status": "error",
+            "message": "Periode tunjangan belum lengkap."
+        }), 400
+
+    return _proxy_personal_benefit(
+        "/api/internal/calendar/benefit/tunjangan-kinerja",
+        {"start": start, "end": end},
+    )
+
+
+@app.route("/api/benefit/uang-makan")
+@login_required
+def api_benefit_uang_makan():
+    return _proxy_personal_benefit(
+        "/api/internal/calendar/benefit/uang-makan",
+        {
+            "year": request.args.get("year"),
+            "month": request.args.get("month"),
+        },
+    )
+
+
+@app.route("/api/benefit/uang-siaga")
+@login_required
+def api_benefit_uang_siaga():
+    return _proxy_personal_benefit(
+        "/api/internal/calendar/benefit/uang-siaga",
+        {
+            "year": request.args.get("year"),
+            "month": request.args.get("month"),
+        },
+    )
+
+
 @app.route("/api/phone-calendar-info")
 @login_required
 def api_phone_calendar_info():
