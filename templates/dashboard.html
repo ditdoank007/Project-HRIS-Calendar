@@ -2241,14 +2241,18 @@ if (dashboardMenuParent) {
         box.onclick=e=>{if(e.target===box) box.remove();};
     }
 
-    function nodeEl(node, employeesMap) {
+    function nodeEl(node, employeesMap, expanded=false) {
         const li=document.createElement("li");
         li.className="org-portal-item";
         const wrap=document.createElement("div");
         wrap.className="org-portal-node-wrap";
         const kids=Array.isArray(node.children)&&node.children.length;
         const toggle=document.createElement("button");
-        toggle.type="button"; toggle.className="org-toggle"; toggle.textContent=kids?"⌄":"";
+        toggle.type="button"; toggle.className="org-toggle";
+        if (kids && expanded) {
+            li.classList.add("expanded");
+        }
+        toggle.textContent=kids?(expanded?"⌃":"⌄"):"";
         if(kids) toggle.onclick=e=>{e.stopPropagation();li.classList.toggle("expanded");toggle.textContent=li.classList.contains("expanded")?"⌃":"⌄";};
         wrap.appendChild(toggle);
         const btn=document.createElement("button");
@@ -2258,7 +2262,7 @@ if (dashboardMenuParent) {
         btn.textContent=node.name||"-";
         btn.onclick=()=>openModal(node,employees);
         wrap.appendChild(btn); li.appendChild(wrap);
-        if(kids){const ul=document.createElement("ul");ul.className="org-portal-children";node.children.forEach(ch=>ul.appendChild(nodeEl(ch,employeesMap)));li.appendChild(ul);}
+        if(kids){const ul=document.createElement("ul");ul.className="org-portal-children";node.children.forEach(ch=>ul.appendChild(nodeEl(ch,employeesMap,false)));li.appendChild(ul);}
         return li;
     }
 
@@ -2272,7 +2276,7 @@ if (dashboardMenuParent) {
     .then(x=>{
         if(!x.ok||x.p.status!=="success") throw new Error(x.p.message||"Struktur tidak dapat dimuat.");
         const d=x.p.data||{};
-        if(d.structure) root.appendChild(nodeEl(d.structure,d.employees_by_jabatan||{}));
+        if(d.structure) root.appendChild(nodeEl(d.structure,d.employees_by_jabatan||{},true));
         else root.innerHTML='<li class="portal-empty">Struktur root belum tersedia.</li>';
         loading.hidden=true;
     })
