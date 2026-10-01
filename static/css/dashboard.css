@@ -2803,3 +2803,84 @@ body.agenda-modal-open {
         flex-direction: column;
     }
 }
+
+
+/* ============================================================
+   PORTAL PEGAWAI — PELANGGARAN & STRUKTUR ORGANISASI
+   ============================================================ */
+
+.portal-page { padding: 0; }
+.portal-hero {
+    display:flex; align-items:center; justify-content:space-between; gap:18px;
+    padding:20px 22px; margin-bottom:15px; border-radius:11px;
+    color:#fff; background:linear-gradient(135deg,#17191d 0%,#2b3036 100%);
+    box-shadow:0 8px 22px rgba(15,23,42,.08);
+}
+.portal-kicker { margin-bottom:5px; color:#f6a57f; font-size:9px; font-weight:800; letter-spacing:1.2px; }
+.portal-hero h2 { margin:0; font-size:21px; font-weight:800; }
+.portal-hero p { margin:5px 0 0; color:#cbd0d6; font-size:11px; }
+.portal-year-select { min-width:95px; height:34px; padding:0 10px; border:1px solid rgba(255,255,255,.18); border-radius:7px; background:#fff; color:#111827; font-size:11px; font-weight:700; }
+.portal-badge { min-width:145px; padding:9px 12px; border:1px solid rgba(255,255,255,.12); border-radius:8px; background:rgba(255,255,255,.05); text-align:center; }
+.portal-badge span,.portal-badge small { display:block; }
+.portal-badge span { font-size:10px; font-weight:800; }
+.portal-badge small { margin-top:3px; color:#cbd5e1; font-size:9px; }
+
+.portal-card { overflow:hidden; border:1px solid #e5e7eb; border-radius:10px; background:#fff; box-shadow:0 2px 8px rgba(15,23,42,.04); }
+.portal-card-toolbar { display:flex; justify-content:space-between; gap:10px; padding:14px 17px; border-bottom:1px solid #e5e7eb; }
+.portal-card-toolbar strong { font-size:12px; }
+.portal-card-toolbar span { color:#9ca3af; font-size:10px; }
+.portal-loading { padding:28px; color:#6b7280; text-align:center; font-size:11px; }
+.portal-error { margin:14px; padding:11px 13px; border:1px solid #fecaca; border-radius:7px; background:#fef2f2; color:#b91c1c; font-size:11px; }
+.portal-table-wrap { width:100%; overflow:auto; }
+.portal-table { width:100%; min-width:850px; border-collapse:collapse; font-size:11px; }
+.portal-table th { padding:10px; background:#343a40; color:#fff; text-align:center; font-size:9px; }
+.portal-table td { padding:9px 10px; border-bottom:1px solid #edf0f3; vertical-align:middle; }
+.portal-table tbody tr:hover td { background:#fafafa; }
+.portal-table .text-center { text-align:center; }
+.portal-table tbody tr.alert-error td { color:#dc2626; background:#fff7f7; }
+.portal-table tbody tr.bg-orange-active td { color:#c2410c; background:#fff7ed; }
+.portal-table tbody tr.bg-yellow-gradient td { color:#92400e; background:#fffbeb; }
+.portal-empty { padding:30px 15px; color:#9ca3af; text-align:center; }
+
+.org-portal-toolbar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:15px 17px; border-bottom:1px solid #e5e7eb; }
+.org-portal-toolbar strong { display:block; font-size:12px; }
+.org-portal-toolbar small { display:block; margin-top:4px; color:#9ca3af; font-size:9px; }
+.org-portal-actions { display:flex; align-items:center; gap:5px; }
+.portal-action { min-width:30px; height:30px; padding:0 9px; border:1px solid #d1d5db; border-radius:6px; background:#fff; color:#374151; cursor:pointer; font-size:11px; font-weight:700; }
+.portal-action:hover { border-color:#dc2626; color:#dc2626; }
+.portal-action-wide { min-width:88px; }
+.org-portal-viewport { min-height:520px; overflow:auto; padding:30px; background:#fafbfc; }
+.org-portal-canvas { width:max-content; min-width:100%; transition:transform .15s ease; }
+.org-portal-tree,.org-portal-tree ul { display:flex; justify-content:center; list-style:none; margin:0; padding:0; }
+.org-portal-tree { flex-direction:column; align-items:center; }
+.org-portal-item { position:relative; padding:28px 8px 0; text-align:center; }
+.org-portal-item::before { content:""; position:absolute; top:0; left:50%; width:1px; height:28px; background:#cbd5e1; }
+.org-portal-tree > .org-portal-item::before { display:none; }
+.org-portal-node-wrap { display:flex; align-items:center; justify-content:center; gap:4px; }
+.org-toggle { width:23px; height:23px; padding:0; border:1px solid #d1d5db; border-radius:50%; background:#fff; color:#6b7280; cursor:pointer; font-size:13px; line-height:20px; }
+.org-node-button { min-width:170px; max-width:220px; min-height:48px; padding:8px 12px; border:2px solid #9ca3af; border-radius:9px; background:#fff; color:#1f2937; cursor:pointer; font-size:11px; font-weight:800; box-shadow:0 2px 6px rgba(15,23,42,.05); }
+.org-node-button.structural.occupied { border-color:#2563eb; background:#eff6ff; }
+.org-node-button.structural.empty { border-color:#9ca3af; background:#f3f4f6; color:#6b7280; }
+.org-node-button.functional.occupied { border-color:#16a34a; background:#f0fdf4; }
+.org-node-button.functional.empty { border-color:#9ca3af; background:#f3f4f6; color:#6b7280; }
+.org-portal-children { display:none !important; position:relative; gap:10px; }
+.org-portal-item.expanded > .org-portal-children { display:flex !important; }
+.org-portal-item.expanded > .org-portal-children > .org-portal-item::after { content:""; position:absolute; top:0; left:0; right:0; height:1px; background:#cbd5e1; }
+.portal-modal { position:fixed; inset:0; z-index:3000; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(15,23,42,.48); backdrop-filter:blur(6px); }
+.portal-modal[hidden] { display:none; }
+.portal-modal-card { width:min(560px,100%); max-height:80vh; overflow:hidden; border-radius:12px; background:#fff; box-shadow:0 20px 60px rgba(15,23,42,.25); }
+.portal-modal-head { display:flex; align-items:center; justify-content:space-between; padding:15px 18px; color:#fff; background:#24282e; }
+.portal-modal-head strong { font-size:13px; }
+.portal-modal-head button { width:30px; height:30px; border:1px solid rgba(255,255,255,.2); border-radius:6px; background:transparent; color:#fff; cursor:pointer; font-size:20px; }
+.portal-modal-body { max-height:65vh; overflow:auto; padding:8px 18px 16px; }
+.portal-person { display:flex; align-items:center; gap:10px; padding:10px 3px; border-bottom:1px solid #edf0f3; }
+.portal-person-no { width:27px; height:27px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:#dc2626; color:#fff; font-size:9px; font-weight:800; }
+.portal-person strong,.portal-person small { display:block; }
+.portal-person strong { font-size:11px; }
+.portal-person small { margin-top:2px; color:#9ca3af; font-size:9px; }
+
+@media(max-width:720px) {
+    .portal-hero,.org-portal-toolbar { align-items:flex-start; flex-direction:column; }
+    .org-portal-actions { width:100%; justify-content:flex-end; }
+    .org-portal-viewport { padding:20px 10px; }
+}
