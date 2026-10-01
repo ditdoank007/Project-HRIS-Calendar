@@ -2788,6 +2788,46 @@ body.agenda-modal-open {
     font-size: 9px;
 }
 
+.golongan-modal {
+    position:fixed; inset:0; z-index:2000; display:none;
+    align-items:center; justify-content:center; padding:24px;
+    background:rgba(15,23,42,.48);
+    backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px);
+}
+.golongan-modal.is-open { display:flex; }
+.golongan-modal-dialog {
+    width:min(620px,100%); max-height:min(720px,88vh);
+    display:flex; flex-direction:column; overflow:hidden;
+    border:1px solid rgba(255,255,255,.55); border-radius:16px;
+    background:#fff; box-shadow:0 24px 70px rgba(15,23,42,.28);
+}
+.golongan-modal-head {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:17px 20px; border-bottom:1px solid #edf0f3;
+    background:linear-gradient(135deg,#1b1f24,#30363d); color:#fff;
+}
+.golongan-modal-head h3 { margin:0; font-size:16px; font-weight:750; }
+.golongan-modal-head span { display:block; margin-top:3px; color:#cbd5e1; font-size:10px; }
+.golongan-modal-close {
+    width:34px; height:34px; border:1px solid rgba(255,255,255,.2);
+    border-radius:9px; color:#fff; background:rgba(255,255,255,.08);
+    cursor:pointer; font-size:20px; line-height:1;
+}
+.golongan-modal-body { min-height:0; overflow-y:auto; padding:8px 20px 18px; }
+.golongan-person {
+    display:flex; align-items:center; gap:12px; padding:11px 4px;
+    border-bottom:1px solid #edf0f3;
+}
+.golongan-person:last-child { border-bottom:0; }
+.golongan-person-no {
+    width:28px; min-width:28px; height:28px; display:flex;
+    align-items:center; justify-content:center; border-radius:50%;
+    color:#fff; background:#dc2626; font-size:10px; font-weight:700;
+}
+.golongan-person-name { color:#20252c; font-size:12px; font-weight:700; }
+.golongan-person-nip { margin-top:2px; color:#94a3b8; font-size:10px; }
+.golongan-empty { padding:32px 10px; color:#94a3b8; text-align:center; font-size:12px; }
+
 @media (max-width: 900px) {
     .infografis-stat-grid,
     .infografis-chart-grid {
