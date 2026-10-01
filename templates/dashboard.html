@@ -1109,7 +1109,21 @@
                         Statistik menggunakan populasi operasional HRIS: pegawai aktif dan unit kerja aktif.
                         Pegawai berusia di atas 60 tahun tidak dimasukkan ke statistik usia.
                     </div>
-                </div>
+                
+                    <div class="golongan-modal" id="golonganModal" aria-hidden="true">
+                        <div class="golongan-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="golonganModalTitle">
+                            <div class="golongan-modal-head">
+                                <div>
+                                    <h3 id="golonganModalTitle">Pegawai</h3>
+                                    <span id="golonganModalSubtitle"></span>
+                                </div>
+                                <button type="button" class="golongan-modal-close" id="golonganModalClose" aria-label="Tutup">&times;</button>
+                            </div>
+                            <div class="golongan-modal-body" id="golonganModalBody"></div>
+                        </div>
+                    </div>
+
+</div>
             </section>
 
 {% elif not active_menu or active_menu == "dashboard" %}
@@ -2323,6 +2337,7 @@ if (dashboardMenuParent) {
         const age = data.age_buckets || {};
         const labels = data.golongan_labels || [];
         const counts = data.golongan_counts || {};
+        const golonganEmployees = data.golongan_employees || {};
         const units = data.unit_distribution || [];
 
         document.getElementById("infoAgeNote").textContent =
@@ -2373,11 +2388,79 @@ if (dashboardMenuParent) {
             tooltip:{y:{formatter:value=>value+" pegawai"}}
         });
 
+        const golonganModal = document.getElementById("golonganModal");
+        const golonganModalTitle = document.getElementById("golonganModalTitle");
+        const golonganModalSubtitle = document.getElementById("golonganModalSubtitle");
+        const golonganModalBody = document.getElementById("golonganModalBody");
+
+        function openGolonganModal(label) {
+            const employees = golonganEmployees[label] || [];
+            golonganModalTitle.textContent = "Golongan " + label;
+            golonganModalSubtitle.textContent = employees.length + " pegawai";
+            golonganModalBody.innerHTML = "";
+
+            if (!employees.length) {
+                const empty = document.createElement("div");
+                empty.className = "golongan-empty";
+                empty.textContent = "Tidak ada pegawai pada golongan ini.";
+                golonganModalBody.appendChild(empty);
+            } else {
+                employees.forEach(function (item, index) {
+                    const row = document.createElement("div");
+                    row.className = "golongan-person";
+
+                    const no = document.createElement("div");
+                    no.className = "golongan-person-no";
+                    no.textContent = index + 1;
+
+                    const info = document.createElement("div");
+                    const name = document.createElement("div");
+                    name.className = "golongan-person-name";
+                    name.textContent = item.nama || "-";
+
+                    const nip = document.createElement("div");
+                    nip.className = "golongan-person-nip";
+                    nip.textContent = item.nip || "-";
+
+                    info.appendChild(name);
+                    info.appendChild(nip);
+                    row.appendChild(no);
+                    row.appendChild(info);
+                    golonganModalBody.appendChild(row);
+                });
+            }
+
+            golonganModal.classList.add("is-open");
+            golonganModal.setAttribute("aria-hidden", "false");
+        }
+
+        function closeGolonganModal() {
+            golonganModal.classList.remove("is-open");
+            golonganModal.setAttribute("aria-hidden", "true");
+        }
+
+        document.getElementById("golonganModalClose")?.addEventListener("click", closeGolonganModal);
+        golonganModal?.addEventListener("click", function (event) {
+            if (event.target === golonganModal) closeGolonganModal();
+        });
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") closeGolonganModal();
+        });
+
         renderChart("#infoGolonganChart", {
-            chart:{type:"bar",height:400,toolbar:{show:false},fontFamily:"Inter,Segoe UI,Arial,sans-serif"},
+            chart:{
+                type:"bar",height:400,toolbar:{show:false},
+                fontFamily:"Inter,Segoe UI,Arial,sans-serif",
+                events:{
+                    dataPointSelection:function(event, chartContext, config) {
+                        const index = config.dataPointIndex;
+                        if (index >= 0) openGolonganModal(labels[index]);
+                    }
+                }
+            },
             series:[{name:"Pegawai",data:labels.map(label=>counts[label] || 0)}],
             colors:["#252a31"],
-            plotOptions:{bar:{borderRadius:5,columnWidth:"48%"}},
+            plotOptions:{bar:{borderRadius:5,columnWidth:"48%",cursor:"pointer"}},
             dataLabels:{enabled:true},
             xaxis:{categories:labels},
             yaxis:{min:0,forceNiceScale:true},
