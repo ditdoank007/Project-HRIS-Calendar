@@ -1604,7 +1604,7 @@ async function loadTunjanganKinerja() {
     }
 }
 document.getElementById("benefitTunkinShow").addEventListener("click", loadTunjanganKinerja);
-loadTunjanganKinerja();
+setTimeout(loadTunjanganKinerja, 0);
 
 {% elif active_menu == "benefit-um" %}
 function benefitMoney(value) {
@@ -1635,7 +1635,7 @@ async function loadUangMakan() {
     }
 }
 document.getElementById("benefitUmShow").addEventListener("click", loadUangMakan);
-loadUangMakan();
+setTimeout(loadUangMakan, 0);
 
 {% elif active_menu == "benefit-siaga" %}
 function benefitMoney(value) {
@@ -1677,7 +1677,7 @@ async function loadUangSiaga() {
     }
 }
 document.getElementById("benefitSiagaShow").addEventListener("click", loadUangSiaga);
-loadUangSiaga();
+setTimeout(loadUangSiaga, 0);
 
 {% elif active_menu == "plans" %}
 async function loadSubmissionSummary() {
