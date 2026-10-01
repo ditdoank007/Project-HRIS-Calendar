@@ -2822,7 +2822,7 @@ body.agenda-modal-open {
 .golongan-person-no {
     width:28px; min-width:28px; height:28px; display:flex;
     align-items:center; justify-content:center; border-radius:50%;
-    color:#fff; background:#dc2626; font-size:10px; font-weight:700;
+    color:#fff; background:#eb6831; font-size:10px; font-weight:700;
 }
 .golongan-person-name { color:#20252c; font-size:12px; font-weight:700; }
 .golongan-person-nip { margin-top:2px; color:#94a3b8; font-size:10px; }
