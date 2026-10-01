@@ -410,6 +410,39 @@ def plans():
         active_menu="plans"
     )
 
+@app.route("/benefit/tunjangan-kinerja")
+@login_required
+def benefit_tunjangan_kinerja():
+    return render_template(
+        "dashboard.html",
+        nama=session.get("nama"),
+        nip=session.get("nip"),
+        active_menu="benefit-tunkin"
+    )
+
+
+@app.route("/benefit/uang-makan")
+@login_required
+def benefit_uang_makan():
+    return render_template(
+        "dashboard.html",
+        nama=session.get("nama"),
+        nip=session.get("nip"),
+        active_menu="benefit-um"
+    )
+
+
+@app.route("/benefit/uang-siaga")
+@login_required
+def benefit_uang_siaga():
+    return render_template(
+        "dashboard.html",
+        nama=session.get("nama"),
+        nip=session.get("nip"),
+        active_menu="benefit-siaga"
+    )
+
+
 
 def hris_internal_headers():
     nip = str(session.get("nip") or "").strip()
