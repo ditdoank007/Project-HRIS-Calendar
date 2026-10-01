@@ -2158,7 +2158,6 @@ if (dashboardMenuParent) {
 }
 
 {% if active_menu == "pelanggaran" %}
-<script>
 (function () {
     const select = document.getElementById("pelanggaranYear");
     const loading = document.getElementById("pelanggaranLoading");
@@ -2207,9 +2206,7 @@ if (dashboardMenuParent) {
     });
     load(select.value);
 })();
-</script>
 {% elif active_menu == "struktur-organisasi" %}
-<script>
 (function () {
     const loading=document.getElementById("orgLoading");
     const errorBox=document.getElementById("orgError");
@@ -2281,9 +2278,7 @@ if (dashboardMenuParent) {
     })
     .catch(e=>{loading.hidden=true;errorBox.hidden=false;errorBox.textContent=e.message;});
 })();
-</script>
 {% elif active_menu == "infografis" %}
-<script>
 (function () {
     const loading = document.getElementById("infografisLoading");
     const errorBox = document.getElementById("infografisError");
