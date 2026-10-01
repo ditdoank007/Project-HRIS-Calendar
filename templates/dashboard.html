@@ -35,7 +35,7 @@
 
         <nav class="sidebar-menu">
 
-            <div class="sidebar-menu-group dashboard-menu-group open">
+            <div class="sidebar-menu-group dashboard-menu-group">
                 <a href="https://hris.sarsurabaya.id/dashboard/infografis"
                    class="sidebar-menu-parent {{ 'active' if active_menu == 'dashboard' or not active_menu else '' }}">
                     <span class="menu-icon">⌂</span>
@@ -1513,8 +1513,7 @@ async function loadDashboardSummary() {
             "Selamat datang di Portal Pribadi Pegawai Kantor SAR Surabaya";
 
         document.getElementById("dashboardWelcomeText").textContent =
-            `Halo, ${nama}. Berikut ringkasan aktivitas kepegawaian kamu
-            sampai dengan ${todayDisplay || "-"}.`;
+            `Berikut ringkasan aktivitas kepegawaian kamu sampai dengan ${todayDisplay || "-"}.`;
 
         document.getElementById("dashboardSakitMessage").textContent =
             Number(data.SAKIT || 0) > 0
