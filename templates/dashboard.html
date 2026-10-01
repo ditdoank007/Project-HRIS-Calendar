@@ -254,14 +254,15 @@
                         </div>
                         <small>Akhir periode</small>
                     </div>
-                    <button type="button" class="primary-action-button benefit-filter-button">Tampilkan</button>
+                    <button type="button" id="benefitTunkinShow" class="primary-action-button benefit-filter-button">Tampilkan</button>
                 </div>
+                <div id="benefitTunkinMessage" class="benefit-period-hint" hidden></div>
             </section>
 
             <section class="benefit-summary-grid">
-                <div class="benefit-summary-card"><span>Besaran Tunjangan Kinerja</span><strong>Rp —</strong><small>Menunggu integrasi data HRIS</small></div>
-                <div class="benefit-summary-card"><span>Potongan</span><strong>Rp —</strong><small>TLM, PSW, TA dan komponen terkait</small></div>
-                <div class="benefit-summary-card"><span>Total Diterima</span><strong>Rp —</strong><small>Hasil perhitungan HRIS Reborn</small></div>
+                <div class="benefit-summary-card"><span>Besaran Tunjangan Kinerja</span><strong id="tunkinAllowance">Rp —</strong><small>Master kelas jabatan HRIS Reborn</small></div>
+                <div class="benefit-summary-card"><span>Potongan</span><strong id="tunkinDeduction">Rp —</strong><small id="tunkinDeductionNote">Menunggu perhitungan HRIS</small></div>
+                <div class="benefit-summary-card"><span>Total Diterima</span><strong id="tunkinNet">Rp —</strong><small>Hasil perhitungan HRIS Reborn</small></div>
             </section>
 
             <section class="submission-card benefit-detail-card">
@@ -271,7 +272,7 @@
                 <div class="history-table-wrap">
                     <table class="history-table benefit-table">
                         <thead><tr><th>Tanggal</th><th>TA</th><th>TLM</th><th>PSW</th><th>Dinas Luar</th><th>Cuti</th><th>Sakit</th><th>Total</th></tr></thead>
-                        <tbody><tr><td colspan="8" class="benefit-empty-row">Data akan dimuat dari HRIS Reborn.</td></tr></tbody>
+                        <tbody id="tunkinDetailBody"><tr><td colspan="8" class="benefit-empty-row">Pilih periode lalu tekan Tampilkan.</td></tr></tbody>
                     </table>
                 </div>
             </section>
@@ -290,11 +291,11 @@
                 <div class="benefit-filter-grid benefit-period-select-grid">
                     <div class="form-field">
                         <label>Tahun</label>
-                        <select class="benefit-select benefit-year-select" data-start-year="2015" aria-label="Tahun"></select>
+                        <select id="benefitUmYear" class="benefit-select benefit-year-select" data-start-year="2015" aria-label="Tahun"></select>
                     </div>
                     <div class="form-field">
                         <label>Bulan</label>
-                        <select class="benefit-select benefit-month-select" aria-label="Bulan">
+                        <select id="benefitUmMonth" class="benefit-select benefit-month-select" aria-label="Bulan">
                             <option value="01">Januari</option>
                             <option value="02">Februari</option>
                             <option value="03">Maret</option>
@@ -309,21 +310,22 @@
                             <option value="12">Desember</option>
                         </select>
                     </div>
-                    <button type="button" class="primary-action-button benefit-filter-button">Tampilkan</button>
+                    <button type="button" id="benefitUmShow" class="primary-action-button benefit-filter-button">Tampilkan</button>
                 </div>
+                <div id="benefitUmMessage" class="benefit-period-hint" hidden></div>
             </section>
 
             <section class="benefit-summary-grid benefit-summary-grid-seven">
-                <div class="benefit-summary-card"><span>Hari Kerja</span><strong>—</strong><small>Hari</small></div>
-                <div class="benefit-summary-card"><span>Dinas Luar</span><strong>—</strong><small>Hari</small></div>
-                <div class="benefit-summary-card"><span>Cuti</span><strong>—</strong><small>Hari</small></div>
-                <div class="benefit-summary-card"><span>Ijin</span><strong>—</strong><small>Hari</small></div>
-                <div class="benefit-summary-card"><span>Sakit</span><strong>—</strong><small>Hari</small></div>
-                <div class="benefit-summary-card"><span>Tidak Absen</span><strong>—</strong><small>Hari</small></div>
-                <div class="benefit-summary-card"><span>UM (Hari)</span><strong>—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Hari Kerja</span><strong id="umHariKerja">—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Dinas Luar</span><strong id="umDinasLuar">—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Cuti</span><strong id="umCuti">—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Ijin</span><strong id="umIjin">—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Sakit</span><strong id="umSakit">—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Tidak Absen</span><strong id="umTidakAbsen">—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>UM (Hari)</span><strong id="umHari">—</strong><small>Hari</small></div>
             </section>
 
-            <section class="benefit-payout-card"><div><span>NOMINAL UANG MAKAN</span><strong>Rp —</strong></div><small>Nominal akan mengikuti ketentuan dan hasil perhitungan HRIS Reborn.</small></section>
+            <section class="benefit-payout-card"><div><span>NOMINAL UANG MAKAN</span><strong id="umNominal">Rp —</strong></div><small>Nominal mengikuti master Uang Makan dan hasil perhitungan HRIS Reborn.</small></section>
 
             {% elif active_menu == "benefit-siaga" %}
 
@@ -339,11 +341,11 @@
                 <div class="benefit-filter-grid benefit-period-select-grid">
                     <div class="form-field">
                         <label>Tahun</label>
-                        <select class="benefit-select benefit-year-select" data-start-year="2015" aria-label="Tahun"></select>
+                        <select id="benefitSiagaYear" class="benefit-select benefit-year-select" data-start-year="2015" aria-label="Tahun"></select>
                     </div>
                     <div class="form-field">
                         <label>Bulan</label>
-                        <select class="benefit-select benefit-month-select" aria-label="Bulan">
+                        <select id="benefitSiagaMonth" class="benefit-select benefit-month-select" aria-label="Bulan">
                             <option value="01">Januari</option>
                             <option value="02">Februari</option>
                             <option value="03">Maret</option>
@@ -358,24 +360,25 @@
                             <option value="12">Desember</option>
                         </select>
                     </div>
-                    <button type="button" class="primary-action-button benefit-filter-button">Tampilkan</button>
+                    <button type="button" id="benefitSiagaShow" class="primary-action-button benefit-filter-button">Tampilkan</button>
                 </div>
+                <div id="benefitSiagaMessage" class="benefit-period-hint" hidden></div>
             </section>
 
             <section class="benefit-summary-grid">
-                <div class="benefit-summary-card"><span>Jumlah Siaga/Piket</span><strong>—</strong><small>Periode terpilih</small></div>
-                <div class="benefit-summary-card"><span>Hari Kerja</span><strong>—</strong><small>Hari</small></div>
-                <div class="benefit-summary-card"><span>Hari Libur</span><strong>—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Jumlah Siaga/Piket</span><strong id="siagaJumlah">—</strong><small>Periode terpilih</small></div>
+                <div class="benefit-summary-card"><span>Hari Kerja</span><strong id="siagaHariKerja">—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Hari Libur</span><strong id="siagaHariLibur">—</strong><small>Hari</small></div>
             </section>
 
-            <section class="benefit-payout-card"><div><span>TOTAL UANG SIAGA</span><strong>Rp —</strong></div><small>Perhitungan final mengikuti aturan bisnis HRIS Reborn.</small></section>
+            <section class="benefit-payout-card"><div><span>TOTAL UANG SIAGA</span><strong id="siagaNominal">Rp —</strong></div><small id="siagaPayoutNote">Netto setelah PPh21 sesuai aturan HRIS 2013.</small></section>
 
             <section class="submission-card benefit-detail-card">
                 <div class="history-header"><div><div class="submission-kicker">DETAIL</div><h2>Rincian Siaga / Piket</h2><p>Jadwal dan nominal akan ditampilkan setelah backend terhubung.</p></div></div>
                 <div class="history-table-wrap">
                     <table class="history-table benefit-table">
                         <thead><tr><th>Tanggal</th><th>Shift</th><th>Status</th><th>Nominal</th><th>Keterangan</th></tr></thead>
-                        <tbody><tr><td colspan="5" class="benefit-empty-row">Data akan dimuat dari HRIS Reborn.</td></tr></tbody>
+                        <tbody id="siagaDetailBody"><tr><td colspan="5" class="benefit-empty-row">Pilih periode lalu tekan Tampilkan.</td></tr></tbody>
                     </table>
                 </div>
             </section>
@@ -1547,7 +1550,136 @@
         {% endif %}
 
 <script>
-{% if active_menu == "plans" %}
+{% if active_menu == "benefit-tunkin" %}
+function benefitMoney(value) {
+    return new Intl.NumberFormat("id-ID", {
+        style: "currency", currency: "IDR", maximumFractionDigits: 0
+    }).format(Number(value || 0));
+}
+function benefitDate(value) {
+    return new Date(value + "T00:00:00").toLocaleDateString("id-ID", {
+        day: "2-digit", month: "2-digit", year: "numeric"
+    });
+}
+async function loadTunjanganKinerja() {
+    const start = document.getElementById("benefitStartDate").value;
+    const end = document.getElementById("benefitEndDate").value;
+    const message = document.getElementById("benefitTunkinMessage");
+    const body = document.getElementById("tunkinDetailBody");
+    const button = document.getElementById("benefitTunkinShow");
+    message.hidden = true;
+    button.disabled = true;
+    button.textContent = "Memuat...";
+    try {
+        const q = await fetch("/api/benefit/tunjangan-kinerja?start=" + encodeURIComponent(start) + "&end=" + encodeURIComponent(end), {credentials:"same-origin"});
+        const p = await q.json();
+        if (!q.ok || p.status !== "success") throw new Error(p.message || "Gagal menghitung Tunjangan Kinerja.");
+        if (!p.data) throw new Error(p.message || "Data pegawai tidak tersedia.");
+        const d = p.data;
+        document.getElementById("tunkinAllowance").textContent = benefitMoney(d.tunjangan);
+        document.getElementById("tunkinDeduction").textContent = benefitMoney(d.nilai_potongan);
+        document.getElementById("tunkinDeductionNote").textContent = Number(d.persen_potongan || 0).toFixed(2) + "% total potongan";
+        document.getElementById("tunkinNet").textContent = benefitMoney(d.total_diterima);
+        body.innerHTML = (d.detail || []).map(x => "<tr>" +
+            "<td>" + benefitDate(x.tanggal) + "</td>" +
+            "<td>" + (x.ta ? "1" : "") + "</td>" +
+            "<td>" + (x.tlm_tingkat ? x.tlm_tingkat + (x.tlm_persen ? " (" + x.tlm_persen + "%)" : "") : "") + "</td>" +
+            "<td>" + (x.psw_tingkat ? x.psw_tingkat + (x.psw_persen ? " (" + x.psw_persen + "%)" : "") : "") + "</td>" +
+            "<td>" + (x.dinas_luar ? "✓" : "") + "</td>" +
+            "<td>" + (x.cuti_tingkat ? x.cuti_tingkat + (x.cuti_persen ? " (" + x.cuti_persen + "%)" : "") : "") + "</td>" +
+            "<td>" + (x.sakit_tingkat ? x.sakit_tingkat + (x.sakit_persen ? " (" + x.sakit_persen + "%)" : "") : "") + "</td>" +
+            "<td>" + (x.potongan_persen ? Number(x.potongan_persen).toFixed(2) + "%" : "") + "</td></tr>").join("") ||
+            '<tr><td colspan="8" class="benefit-empty-row">Tidak ada data pada periode efektif.</td></tr>';
+        if (d.effective_period && d.effective_period.end !== d.requested_period.end) {
+            message.textContent = "Periode berjalan dihitung sampai " + benefitDate(d.effective_period.end) + ".";
+            message.hidden = false;
+        }
+    } catch (e) {
+        body.innerHTML = '<tr><td colspan="8" class="benefit-empty-row">' + e.message + '</td></tr>';
+        message.textContent = e.message;
+        message.hidden = false;
+    } finally {
+        button.disabled = false;
+        button.textContent = "Tampilkan";
+    }
+}
+document.getElementById("benefitTunkinShow").addEventListener("click", loadTunjanganKinerja);
+loadTunjanganKinerja();
+
+{% elif active_menu == "benefit-um" %}
+function benefitMoney(value) {
+    return new Intl.NumberFormat("id-ID", {style:"currency", currency:"IDR", maximumFractionDigits:0}).format(Number(value || 0));
+}
+async function loadUangMakan() {
+    const year = document.getElementById("benefitUmYear").value;
+    const month = document.getElementById("benefitUmMonth").value;
+    const message = document.getElementById("benefitUmMessage");
+    const button = document.getElementById("benefitUmShow");
+    message.hidden = true; button.disabled = true; button.textContent = "Memuat...";
+    try {
+        const q = await fetch("/api/benefit/uang-makan?year=" + year + "&month=" + month, {credentials:"same-origin"});
+        const p = await q.json();
+        if (!q.ok || p.status !== "success") throw new Error(p.message || "Gagal menghitung Uang Makan.");
+        if (!p.data) throw new Error(p.message || "Data pegawai tidak tersedia.");
+        const d = p.data;
+        [["umHariKerja",d.hari_kerja],["umDinasLuar",d.dinas_luar],["umCuti",d.cuti],["umIjin",d.ijin],["umSakit",d.sakit],["umTidakAbsen",d.tidak_absen],["umHari",d.um_hari]].forEach(([id,v]) => document.getElementById(id).textContent = Number(v || 0));
+        document.getElementById("umNominal").textContent = benefitMoney(d.nominal);
+        if (d.effective_period && d.effective_period.end !== d.requested_period.end) {
+            message.textContent = "Periode berjalan dihitung sampai " + d.effective_period.end.split("-").reverse().join("-");
+            message.hidden = false;
+        }
+    } catch (e) {
+        message.textContent = e.message; message.hidden = false;
+    } finally {
+        button.disabled = false; button.textContent = "Tampilkan";
+    }
+}
+document.getElementById("benefitUmShow").addEventListener("click", loadUangMakan);
+loadUangMakan();
+
+{% elif active_menu == "benefit-siaga" %}
+function benefitMoney(value) {
+    return new Intl.NumberFormat("id-ID", {style:"currency", currency:"IDR", maximumFractionDigits:0}).format(Number(value || 0));
+}
+async function loadUangSiaga() {
+    const year = document.getElementById("benefitSiagaYear").value;
+    const month = document.getElementById("benefitSiagaMonth").value;
+    const message = document.getElementById("benefitSiagaMessage");
+    const button = document.getElementById("benefitSiagaShow");
+    const body = document.getElementById("siagaDetailBody");
+    message.hidden = true; button.disabled = true; button.textContent = "Memuat...";
+    try {
+        const q = await fetch("/api/benefit/uang-siaga?year=" + year + "&month=" + month, {credentials:"same-origin"});
+        const p = await q.json();
+        if (!q.ok || p.status !== "success") throw new Error(p.message || "Gagal menghitung Uang Siaga.");
+        if (!p.data) throw new Error(p.message || "Data pegawai tidak tersedia.");
+        const d = p.data;
+        document.getElementById("siagaJumlah").textContent = Number(d.jumlah_siaga_piket || 0);
+        document.getElementById("siagaHariKerja").textContent = Number(d.hari_kerja || 0);
+        document.getElementById("siagaHariLibur").textContent = Number(d.hari_libur || 0);
+        document.getElementById("siagaNominal").textContent = benefitMoney(d.total_uang_siaga);
+        body.innerHTML = (d.detail || []).map(x => "<tr>" +
+            "<td>" + x.tanggal.split("-").reverse().join("-") + "</td>" +
+            "<td>" + (x.shift || "-") + "</td>" +
+            "<td>" + (x.status || "-") + "</td>" +
+            "<td>" + benefitMoney(x.netto) + "</td>" +
+            "<td>" + (x.keterangan || "-") + (x.pph21 ? " · PPh21 " + benefitMoney(x.pph21) : "") + "</td></tr>").join("") ||
+            '<tr><td colspan="5" class="benefit-empty-row">Belum ada piket siaga yang memenuhi syarat pembayaran.</td></tr>';
+        if (d.effective_period && d.effective_period.end !== d.requested_period.end) {
+            message.textContent = "Periode berjalan dihitung sampai " + d.effective_period.end.split("-").reverse().join("-");
+            message.hidden = false;
+        }
+    } catch (e) {
+        body.innerHTML = '<tr><td colspan="5" class="benefit-empty-row">' + e.message + '</td></tr>';
+        message.textContent = e.message; message.hidden = false;
+    } finally {
+        button.disabled = false; button.textContent = "Tampilkan";
+    }
+}
+document.getElementById("benefitSiagaShow").addEventListener("click", loadUangSiaga);
+loadUangSiaga();
+
+{% elif active_menu == "plans" %}
 async function loadSubmissionSummary() {
 
     const loading =
