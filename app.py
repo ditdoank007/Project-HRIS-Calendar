@@ -339,6 +339,28 @@ def dashboard_infografis_page():
     )
 
 
+@app.route("/dashboard/pelanggaran")
+@login_required
+def dashboard_pelanggaran_page():
+    return render_template(
+        "dashboard.html",
+        nama=session.get("nama"),
+        nip=session.get("nip"),
+        active_menu="pelanggaran"
+    )
+
+
+@app.route("/dashboard/struktur-organisasi")
+@login_required
+def dashboard_struktur_organisasi_page():
+    return render_template(
+        "dashboard.html",
+        nama=session.get("nama"),
+        nip=session.get("nip"),
+        active_menu="struktur-organisasi"
+    )
+
+
 @app.route("/calendar")
 @login_required
 def calendar_page():
@@ -807,6 +829,46 @@ def api_submission_summary():
         "year": year,
         "data": summary,
     })
+
+
+@app.route("/api/dashboard/pelanggaran")
+@login_required
+def api_dashboard_pelanggaran():
+    tahun = request.args.get("tahun") or str(__import__("datetime").datetime.now().year)
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/pelanggaran",
+            params={"tahun": tahun},
+            headers=hris_internal_headers(),
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({"status":"error","message":"Layanan Pelanggaran HRIS tidak tersedia."}), 502
+    try:
+        payload = response.json()
+    except Exception:
+        return jsonify({"status":"error","message":"Respons Pelanggaran HRIS tidak valid."}), 502
+    return jsonify(payload), response.status_code
+
+
+@app.route("/api/dashboard/struktur-organisasi")
+@login_required
+def api_dashboard_struktur_organisasi():
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/struktur-organisasi",
+            headers=hris_internal_headers(),
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({"status":"error","message":"Layanan Struktur Organisasi HRIS tidak tersedia."}), 502
+    try:
+        payload = response.json()
+    except Exception:
+        return jsonify({"status":"error","message":"Respons Struktur Organisasi HRIS tidak valid."}), 502
+    return jsonify(payload), response.status_code
 
 
 @app.route("/api/dashboard/infografis")
