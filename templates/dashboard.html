@@ -36,16 +36,17 @@
 
         <nav class="sidebar-menu">
 
-            <div class="sidebar-menu-group dashboard-menu-group">
+            <div class="sidebar-menu-group dashboard-menu-group {{ 'open' if active_menu == 'infografis' else '' }}">
                 <a href="https://hris.sarsurabaya.id/dashboard/infografis"
-                   class="sidebar-menu-parent {{ 'active' if active_menu == 'dashboard' or not active_menu else '' }}">
+                   class="sidebar-menu-parent {{ 'active' if active_menu == 'dashboard' or active_menu == 'infografis' or not active_menu else '' }}">
                     <span class="menu-icon">⌂</span>
                     <span>DASHBOARD</span>
                     <span class="menu-chevron" id="dashboardMenuChevron">›</span>
                 </a>
 
                 <div class="sidebar-submenu">
-                    <a href="/dashboard/infografis">
+                    <a href="/dashboard/infografis"
+                       class="{{ 'active' if active_menu == 'infografis' else '' }}">
                         <span class="submenu-dot"></span>
                         <span>Infografis Pegawai</span>
                     </a>
