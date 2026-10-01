@@ -2282,7 +2282,8 @@ if (dashboardMenuParent) {
     .catch(e=>{loading.hidden=true;errorBox.hidden=false;errorBox.textContent=e.message;});
 })();
 </script>
-{% if active_menu == "infografis" %}
+{% elif active_menu == "infografis" %}
+<script>
 (function () {
     const loading = document.getElementById("infografisLoading");
     const errorBox = document.getElementById("infografisError");
