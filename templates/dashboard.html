@@ -235,19 +235,11 @@
                 <div class="benefit-filter-grid benefit-period-select-grid">
                     <div class="form-field">
                         <label>Tahun</label>
-                        <select class="benefit-select">
-                            <option value="2026" selected>2026</option>
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                            <option value="2022">2022</option>
-                            <option value="2021">2021</option>
-                            <option value="2020">2020</option>
-                        </select>
+                        <select class="benefit-select benefit-year-select" data-start-year="2015" aria-label="Tahun"></select>
                     </div>
                     <div class="form-field">
                         <label>Bulan</label>
-                        <select class="benefit-select">
+                        <select class="benefit-select benefit-month-select" aria-label="Bulan">
                             <option value="01">Januari</option>
                             <option value="02">Februari</option>
                             <option value="03">Maret</option>
@@ -298,19 +290,11 @@
                 <div class="benefit-filter-grid benefit-period-select-grid">
                     <div class="form-field">
                         <label>Tahun</label>
-                        <select class="benefit-select">
-                            <option value="2026" selected>2026</option>
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                            <option value="2022">2022</option>
-                            <option value="2021">2021</option>
-                            <option value="2020">2020</option>
-                        </select>
+                        <select class="benefit-select benefit-year-select" data-start-year="2015" aria-label="Tahun"></select>
                     </div>
                     <div class="form-field">
                         <label>Bulan</label>
-                        <select class="benefit-select">
+                        <select class="benefit-select benefit-month-select" aria-label="Bulan">
                             <option value="01">Januari</option>
                             <option value="02">Februari</option>
                             <option value="03">Maret</option>
@@ -2752,5 +2736,27 @@ if (sidebarToggle) {
 }
 </script>
 
+<script>
+(function () {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
+
+    document.querySelectorAll(".benefit-year-select").forEach(function (select) {
+        const startYear = Number(select.dataset.startYear || 2015);
+        for (let year = currentYear; year >= startYear; year -= 1) {
+            const option = document.createElement("option");
+            option.value = String(year);
+            option.textContent = String(year);
+            if (year === currentYear) option.selected = true;
+            select.appendChild(option);
+        }
+    });
+
+    document.querySelectorAll(".benefit-month-select").forEach(function (select) {
+        select.value = currentMonth;
+    });
+})();
+</script>
 </body>
 </html>
