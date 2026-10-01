@@ -3012,3 +3012,237 @@ body.agenda-modal-open {
     .org-portal-actions { width:100%; justify-content:flex-end; }
     .org-portal-viewport { padding:20px 10px; }
 }
+
+
+/* =========================================================
+   BENEFITKU UI — prototype only
+   ========================================================= */
+
+.benefit-hero-card {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    padding:22px 24px;
+    margin-bottom:14px;
+    border-radius:12px;
+    color:#fff;
+    background:linear-gradient(135deg,#1b1f24 0%,#30363d 100%);
+    box-shadow:0 8px 22px rgba(15,23,42,.10);
+}
+
+.benefit-kicker {
+    margin-bottom:5px;
+    color:#f4a37c;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.12em;
+}
+
+.benefit-hero-card h2 {
+    margin:0;
+    font-size:20px;
+    line-height:1.2;
+}
+
+.benefit-hero-card p {
+    margin:7px 0 0;
+    color:#cbd5e1;
+    font-size:11px;
+}
+
+.benefit-source-badge {
+    min-width:150px;
+    padding:10px 13px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:9px;
+    background:rgba(255,255,255,.07);
+    text-align:center;
+}
+
+.benefit-source-badge strong {
+    display:block;
+    font-size:10px;
+    letter-spacing:.05em;
+}
+
+.benefit-source-badge span {
+    display:block;
+    margin-top:3px;
+    color:#cbd5e1;
+    font-size:9px;
+}
+
+.benefit-filter-card {
+    padding:18px 20px;
+    margin-bottom:14px;
+    border:1px solid #e7ebef;
+    border-radius:12px;
+    background:#fff;
+    box-shadow:0 4px 14px rgba(15,23,42,.04);
+}
+
+.benefit-section-title > span {
+    color:#eb6831;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.1em;
+}
+
+.benefit-section-title h3 {
+    margin:4px 0 14px;
+    color:#252a31;
+    font-size:14px;
+}
+
+.benefit-filter-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr auto;
+    align-items:end;
+    gap:14px;
+}
+
+.benefit-filter-grid.benefit-filter-month {
+    grid-template-columns:minmax(220px,360px) auto;
+}
+
+.benefit-filter-button {
+    min-width:120px;
+    height:40px;
+}
+
+.benefit-summary-grid {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:14px;
+}
+
+.benefit-summary-grid-seven {
+    grid-template-columns:repeat(4,minmax(0,1fr));
+}
+
+.benefit-summary-card {
+    min-height:105px;
+    padding:16px 18px;
+    border:1px solid #e7ebef;
+    border-radius:12px;
+    background:#fff;
+    box-shadow:0 4px 14px rgba(15,23,42,.04);
+}
+
+.benefit-summary-card span {
+    display:block;
+    color:#64748b;
+    font-size:10px;
+    font-weight:700;
+    line-height:1.35;
+}
+
+.benefit-summary-card strong {
+    display:block;
+    margin-top:12px;
+    color:#252a31;
+    font-size:21px;
+    line-height:1;
+}
+
+.benefit-summary-card small {
+    display:block;
+    margin-top:8px;
+    color:#94a3b8;
+    font-size:9px;
+}
+
+.benefit-payout-card {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    padding:18px 20px;
+    margin-bottom:14px;
+    border-left:4px solid #eb6831;
+    border-radius:10px;
+    background:#fff;
+    box-shadow:0 4px 14px rgba(15,23,42,.05);
+}
+
+.benefit-payout-card span {
+    display:block;
+    color:#64748b;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.08em;
+}
+
+.benefit-payout-card strong {
+    display:block;
+    margin-top:7px;
+    color:#252a31;
+    font-size:24px;
+}
+
+.benefit-payout-card small {
+    max-width:360px;
+    color:#94a3b8;
+    font-size:10px;
+    line-height:1.5;
+    text-align:right;
+}
+
+.benefit-detail-card {
+    overflow:hidden;
+}
+
+.benefit-table th {
+    white-space:nowrap;
+}
+
+.benefit-empty-row {
+    padding:34px 16px !important;
+    color:#94a3b8;
+    text-align:center !important;
+    font-size:11px;
+}
+
+@media (max-width: 900px) {
+    .benefit-hero-card {
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .benefit-source-badge {
+        width:100%;
+    }
+
+    .benefit-filter-grid,
+    .benefit-filter-grid.benefit-filter-month {
+        grid-template-columns:1fr;
+    }
+
+    .benefit-summary-grid,
+    .benefit-summary-grid-seven {
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    .benefit-filter-button {
+        width:100%;
+    }
+
+    .benefit-payout-card {
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .benefit-payout-card small {
+        max-width:none;
+        text-align:left;
+    }
+}
+
+@media (max-width: 560px) {
+    .benefit-summary-grid,
+    .benefit-summary-grid-seven {
+        grid-template-columns:1fr;
+    }
+}
