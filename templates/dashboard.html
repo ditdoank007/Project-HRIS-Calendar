@@ -44,7 +44,7 @@
                 </a>
 
                 <div class="sidebar-submenu">
-                    <a href="https://hris.sarsurabaya.id/dashboard/infografis">
+                    <a href="/dashboard/infografis">
                         <span class="submenu-dot"></span>
                         <span>Infografis Pegawai</span>
                     </a>
@@ -132,7 +132,7 @@
 
             <div class="topbar-title">
                 <div class="page-kicker">PEGAWAI INTERNAL</div>
-                <h1>Dashboard</h1>
+                <h1>{{ "Infografis Pegawai" if active_menu == "infografis" else "Dashboard" }}</h1>
             </div>
 
             <div class="topbar-actions">
@@ -951,6 +951,99 @@
                 <div id="agendaKesamaptaanModal" class="agenda-portal-modal" hidden><div class="agenda-portal-modal-backdrop" onclick="closeAgendaKesamaptaanModal()"></div><div class="agenda-portal-modal-card" role="dialog"><div class="agenda-portal-modal-header"><div><div class="agenda-portal-kicker">DETAIL KESAMAPTAAN</div><h3 id="agendaKesamaptaanModalTitle">-</h3></div><button type="button" class="agenda-modal-close" onclick="closeAgendaKesamaptaanModal()">×</button></div><div id="agendaKesamaptaanModalBody" class="agenda-portal-modal-body"></div></div></div>
             </div>
             {% endif %}
+
+{% elif active_menu == "infografis" %}
+
+            <div class="breadcrumb-card">
+                <strong>Dashboard / Infografis Pegawai</strong>
+            </div>
+
+            <section class="infografis-portal">
+                <div class="infografis-portal-hero">
+                    <div>
+                        <div class="infografis-portal-kicker">DASHBOARD PEGAWAI</div>
+                        <h2>Infografis Pegawai</h2>
+                        <p>Ringkasan data pegawai operasional Kantor SAR Surabaya yang bersumber dari HRIS Reborn.</p>
+                    </div>
+                    <div class="infografis-portal-badge">
+                        <span>HRIS REBORN</span>
+                        <small>Single Source of Truth</small>
+                    </div>
+                </div>
+
+                <div id="infografisLoading" class="infografis-loading">
+                    Memuat data infografis dari HRIS Reborn...
+                </div>
+
+                <div id="infografisError" class="infografis-error" hidden></div>
+
+                <div id="infografisContent" hidden>
+                    <div class="infografis-stat-grid">
+                        <article class="infografis-stat-card">
+                            <span>PEGAWAI AKTIF</span>
+                            <strong id="infoTotal">0</strong>
+                            <small>Unit kerja aktif · usia maksimal 60 tahun</small>
+                        </article>
+                        <article class="infografis-stat-card">
+                            <span>PNS</span>
+                            <strong id="infoPns">0</strong>
+                            <small>Bagian dari populasi operasional</small>
+                        </article>
+                        <article class="infografis-stat-card">
+                            <span>NON PNS</span>
+                            <strong id="infoNonPns">0</strong>
+                            <small>Bagian dari populasi operasional</small>
+                        </article>
+                    </div>
+
+                    <div class="infografis-chart-grid">
+                        <article class="infografis-chart-card">
+                            <div class="infografis-chart-head">
+                                <h3>Komposisi Jenis Kelamin</h3>
+                                <span>Pegawai aktif</span>
+                            </div>
+                            <div class="infografis-chart-body"><div id="infoGenderChart"></div></div>
+                        </article>
+
+                        <article class="infografis-chart-card">
+                            <div class="infografis-chart-head">
+                                <h3>Status Kepegawaian</h3>
+                                <span>PNS dan Non PNS</span>
+                            </div>
+                            <div class="infografis-chart-body"><div id="infoStatusChart"></div></div>
+                        </article>
+
+                        <article class="infografis-chart-card wide">
+                            <div class="infografis-chart-head">
+                                <h3>Distribusi Usia</h3>
+                                <span id="infoAgeNote">-</span>
+                            </div>
+                            <div class="infografis-chart-body"><div id="infoAgeChart"></div></div>
+                        </article>
+
+                        <article class="infografis-chart-card wide">
+                            <div class="infografis-chart-head">
+                                <h3>Distribusi Golongan</h3>
+                                <span>Golongan II/a s/d IV/e</span>
+                            </div>
+                            <div class="infografis-chart-body"><div id="infoGolonganChart"></div></div>
+                        </article>
+
+                        <article class="infografis-chart-card wide">
+                            <div class="infografis-chart-head">
+                                <h3>Distribusi Pegawai per Unit Kerja</h3>
+                                <span>Hanya unit kerja aktif</span>
+                            </div>
+                            <div class="infografis-chart-body"><div id="infoUnitChart"></div></div>
+                        </article>
+                    </div>
+
+                    <div class="infografis-footnote">
+                        Statistik menggunakan populasi operasional HRIS: pegawai aktif dan unit kerja aktif.
+                        Pegawai berusia di atas 60 tahun tidak dimasukkan ke statistik usia.
+                    </div>
+                </div>
+            </section>
 
 {% elif not active_menu or active_menu == "dashboard" %}
 
@@ -1996,6 +2089,134 @@ if (dashboardMenuParent) {
         }
     });
 }
+
+{% if active_menu == "infografis" %}
+(function () {
+    const loading = document.getElementById("infografisLoading");
+    const errorBox = document.getElementById("infografisError");
+    const content = document.getElementById("infografisContent");
+
+    function showError(message) {
+        loading.hidden = true;
+        errorBox.hidden = false;
+        errorBox.textContent = message;
+    }
+
+    function renderChart(selector, options) {
+        const element = document.querySelector(selector);
+        if (!element || typeof ApexCharts === "undefined") return;
+        new ApexCharts(element, options).render();
+    }
+
+    fetch("/api/dashboard/infografis", {
+        credentials: "same-origin"
+    })
+    .then(function (response) {
+        return response.json().then(function (payload) {
+            if (!response.ok || payload.status !== "success") {
+                throw new Error(payload.message || "Data infografis tidak dapat dimuat.");
+            }
+            return payload;
+        });
+    })
+    .then(function (payload) {
+        const data = payload.data || {};
+
+        document.getElementById("infoTotal").textContent = data.total ?? 0;
+        document.getElementById("infoPns").textContent = data.pns ?? 0;
+        document.getElementById("infoNonPns").textContent = data.non_pns ?? 0;
+
+        const gender = data.gender_counts || {};
+        const status = data.status_counts || {};
+        const age = data.age_buckets || {};
+        const labels = data.golongan_labels || [];
+        const counts = data.golongan_counts || {};
+        const units = data.unit_distribution || [];
+
+        document.getElementById("infoAgeNote").textContent =
+            data.age_unknown
+                ? data.age_unknown + " data tanpa tanggal lahir"
+                : "Tanggal lahir tersedia";
+
+        if (typeof ApexCharts === "undefined") {
+            throw new Error("Komponen grafik tidak tersedia.");
+        }
+
+        renderChart("#infoGenderChart", {
+            chart:{type:"donut",height:290,toolbar:{show:false},fontFamily:"Inter,Segoe UI,Arial,sans-serif"},
+            series:[gender["Laki-laki"] || 0,gender["Perempuan"] || 0,gender["Belum diisi"] || 0],
+            labels:["Laki-laki","Perempuan","Belum diisi"],
+            colors:["#eb6831","#252a31","#8b949e"],
+            legend:{position:"bottom",fontSize:"11px"},
+            dataLabels:{enabled:true},
+            stroke:{width:2,colors:["#fff"]},
+            plotOptions:{pie:{donut:{size:"72%",labels:{show:true,total:{show:true,label:"Total"}}}}}
+        });
+
+        renderChart("#infoStatusChart", {
+            chart:{type:"donut",height:290,toolbar:{show:false},fontFamily:"Inter,Segoe UI,Arial,sans-serif"},
+            series:[status["PNS"] || 0,status["Non PNS"] || 0,status["Lainnya"] || 0],
+            labels:["PNS","Non PNS","Lainnya"],
+            colors:["#252a31","#eb6831","#8b949e"],
+            legend:{position:"bottom",fontSize:"11px"},
+            dataLabels:{enabled:true},
+            stroke:{width:2,colors:["#fff"]},
+            plotOptions:{pie:{donut:{size:"72%",labels:{show:true,total:{show:true,label:"Total"}}}}}
+        });
+
+        renderChart("#infoAgeChart", {
+            chart:{type:"bar",height:320,toolbar:{show:false},fontFamily:"Inter,Segoe UI,Arial,sans-serif"},
+            series:[{name:"Pegawai",data:[
+                age["<=20 Tahun"] || 0,
+                age["21 s/d 30 Tahun"] || 0,
+                age["31 s/d 40 Tahun"] || 0,
+                age["41 s/d 50 Tahun"] || 0,
+                age["51 s/d 60 Tahun"] || 0
+            ]}],
+            colors:["#eb6831"],
+            xaxis:{categories:["<=20 Tahun","21 s/d 30 Tahun","31 s/d 40 Tahun","41 s/d 50 Tahun","51 s/d 60 Tahun"]},
+            plotOptions:{bar:{borderRadius:5,columnWidth:"48%"}},
+            dataLabels:{enabled:true},
+            grid:{borderColor:"#edf0f3"},
+            tooltip:{y:{formatter:value=>value+" pegawai"}}
+        });
+
+        renderChart("#infoGolonganChart", {
+            chart:{type:"bar",height:400,toolbar:{show:false},fontFamily:"Inter,Segoe UI,Arial,sans-serif"},
+            series:[{name:"Pegawai",data:labels.map(label=>counts[label] || 0)}],
+            colors:["#252a31"],
+            plotOptions:{bar:{borderRadius:5,columnWidth:"48%"}},
+            dataLabels:{enabled:true},
+            xaxis:{categories:labels},
+            yaxis:{min:0,forceNiceScale:true},
+            grid:{borderColor:"#edf0f3"},
+            tooltip:{y:{formatter:value=>value+" pegawai"}}
+        });
+
+        const unitNames = units.map(item => item.name);
+        const unitTotals = units.map(item => item.total);
+
+        renderChart("#infoUnitChart", {
+            chart:{type:"bar",height:Math.max(360,units.length*42),toolbar:{show:false},fontFamily:"Inter,Segoe UI,Arial,sans-serif"},
+            series:[{name:"Pegawai",data:unitTotals}],
+            colors:["#252a31"],
+            plotOptions:{bar:{horizontal:true,borderRadius:5,barHeight:"58%"}},
+            dataLabels:{enabled:true},
+            xaxis:{categories:unitNames,min:0,forceNiceScale:true},
+            yaxis:{labels:{maxWidth:280}},
+            grid:{borderColor:"#edf0f3"},
+            tooltip:{y:{formatter:value=>value+" pegawai"}}
+        });
+
+        loading.hidden = true;
+        content.hidden = false;
+    })
+    .catch(function (error) {
+        console.error("[Infografis]", error);
+        showError(error.message || "Infografis tidak dapat dimuat.");
+    });
+})();
+{% endif %}
 
 const accountMenuToggle =
     document.getElementById("accountMenuToggle");
