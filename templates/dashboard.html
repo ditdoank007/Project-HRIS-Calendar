@@ -115,6 +115,32 @@
                 </div>
             </div>
 
+            <div class="sidebar-menu-group {{ 'open' if active_menu in ['benefit', 'benefit-tunkin', 'benefit-um', 'benefit-siaga'] else '' }}">
+                <a href="/benefit/tunjangan-kinerja"
+                   class="sidebar-menu-parent {{ 'active' if active_menu in ['benefit', 'benefit-tunkin', 'benefit-um', 'benefit-siaga'] else '' }}">
+                    <span class="menu-icon">▣</span>
+                    <span>BENEFITKU</span>
+                    <span class="menu-chevron">›</span>
+                </a>
+                <div class="sidebar-submenu">
+                    <a href="/benefit/tunjangan-kinerja"
+                       class="{{ 'active' if active_menu == 'benefit-tunkin' else '' }}">
+                        <span class="submenu-dot"></span>
+                        <span>Tunjangan Kinerja</span>
+                    </a>
+                    <a href="/benefit/uang-makan"
+                       class="{{ 'active' if active_menu == 'benefit-um' else '' }}">
+                        <span class="submenu-dot"></span>
+                        <span>Uang Makan</span>
+                    </a>
+                    <a href="/benefit/uang-siaga"
+                       class="{{ 'active' if active_menu == 'benefit-siaga' else '' }}">
+                        <span class="submenu-dot"></span>
+                        <span>Uang Siaga</span>
+                    </a>
+                </div>
+            </div>
+
         </nav>
 
     </aside>
@@ -136,7 +162,15 @@
 
             <div class="topbar-title">
                 <div class="page-kicker">PEGAWAI INTERNAL</div>
-                <h1>{{ "Infografis Pegawai" if active_menu == "infografis" else "Dashboard" }}</h1>
+                <h1>{{
+                "Infografis Pegawai" if active_menu == "infografis"
+                else "Pelanggaran Disiplin" if active_menu == "pelanggaran"
+                else "Struktur Organisasi" if active_menu == "struktur-organisasi"
+                else "Tunjangan Kinerja" if active_menu == "benefit-tunkin"
+                else "Uang Makan" if active_menu == "benefit-um"
+                else "Uang Siaga" if active_menu == "benefit-siaga"
+                else "Dashboard"
+            }}</h1>
             </div>
 
             <div class="topbar-actions">
@@ -183,7 +217,111 @@
 
         <section class="dashboard-content">
 
-            {% if active_menu == "cuti" %}
+            {% if active_menu == "benefit-tunkin" %}
+
+            <div class="breadcrumb-card"><strong>Benefitku / Tunjangan Kinerja</strong></div>
+
+            <section class="benefit-hero-card">
+                <div>
+                    <div class="benefit-kicker">BENEFITKU</div>
+                    <h2>Tunjangan Kinerja</h2>
+                    <p>Informasi tunjangan kinerja pribadi berdasarkan data HRIS.</p>
+                </div>
+                <div class="benefit-source-badge"><strong>HRIS REBORN</strong><span>Single Source of Truth</span></div>
+            </section>
+
+            <section class="benefit-filter-card">
+                <div class="benefit-section-title"><span>PERIODE</span><h3>Pilih periode tunjangan</h3></div>
+                <div class="benefit-filter-grid">
+                    <div class="form-field"><label>Periode Mulai</label><input type="date" value="2026-08-26"></div>
+                    <div class="form-field"><label>Periode Selesai</label><input type="date" value="2026-09-25"></div>
+                    <button type="button" class="primary-action-button benefit-filter-button">Tampilkan</button>
+                </div>
+            </section>
+
+            <section class="benefit-summary-grid">
+                <div class="benefit-summary-card"><span>Besaran Tunjangan Kinerja</span><strong>Rp —</strong><small>Menunggu integrasi data HRIS</small></div>
+                <div class="benefit-summary-card"><span>Potongan</span><strong>Rp —</strong><small>TLM, PSW, TA dan komponen terkait</small></div>
+                <div class="benefit-summary-card"><span>Total Diterima</span><strong>Rp —</strong><small>Hasil perhitungan HRIS Reborn</small></div>
+            </section>
+
+            <section class="submission-card benefit-detail-card">
+                <div class="history-header">
+                    <div><div class="submission-kicker">DETAIL</div><h2>Rincian Tunjangan Kinerja</h2><p>Rincian per tanggal akan ditampilkan setelah backend terhubung.</p></div>
+                </div>
+                <div class="history-table-wrap">
+                    <table class="history-table benefit-table">
+                        <thead><tr><th>Tanggal</th><th>TA</th><th>TLM</th><th>PSW</th><th>Dinas Luar</th><th>Cuti</th><th>Sakit</th><th>Total</th></tr></thead>
+                        <tbody><tr><td colspan="8" class="benefit-empty-row">Data akan dimuat dari HRIS Reborn.</td></tr></tbody>
+                    </table>
+                </div>
+            </section>
+
+            {% elif active_menu == "benefit-um" %}
+
+            <div class="breadcrumb-card"><strong>Benefitku / Uang Makan</strong></div>
+
+            <section class="benefit-hero-card">
+                <div><div class="benefit-kicker">BENEFITKU</div><h2>Uang Makan</h2><p>Rekap uang makan berdasarkan data absensi HRIS.</p></div>
+                <div class="benefit-source-badge"><strong>HRIS REBORN</strong><span>Single Source of Truth</span></div>
+            </section>
+
+            <section class="benefit-filter-card">
+                <div class="benefit-section-title"><span>PERIODE</span><h3>Pilih bulan</h3></div>
+                <div class="benefit-filter-grid benefit-filter-month">
+                    <div class="form-field"><label>Bulan</label><input type="month" value="2026-09"></div>
+                    <button type="button" class="primary-action-button benefit-filter-button">Tampilkan</button>
+                </div>
+            </section>
+
+            <section class="benefit-summary-grid benefit-summary-grid-seven">
+                <div class="benefit-summary-card"><span>Hari Kerja</span><strong>—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Dinas Luar</span><strong>—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Cuti</span><strong>—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Ijin</span><strong>—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Sakit</span><strong>—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Tidak Absen</span><strong>—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>UM (Hari)</span><strong>—</strong><small>Hari</small></div>
+            </section>
+
+            <section class="benefit-payout-card"><div><span>NOMINAL UANG MAKAN</span><strong>Rp —</strong></div><small>Nominal akan mengikuti ketentuan dan hasil perhitungan HRIS Reborn.</small></section>
+
+            {% elif active_menu == "benefit-siaga" %}
+
+            <div class="breadcrumb-card"><strong>Benefitku / Uang Siaga</strong></div>
+
+            <section class="benefit-hero-card">
+                <div><div class="benefit-kicker">BENEFITKU</div><h2>Uang Siaga</h2><p>Informasi tunjangan siaga/piket pribadi berdasarkan data HRIS.</p></div>
+                <div class="benefit-source-badge"><strong>HRIS REBORN</strong><span>Single Source of Truth</span></div>
+            </section>
+
+            <section class="benefit-filter-card">
+                <div class="benefit-section-title"><span>PERIODE</span><h3>Pilih bulan</h3></div>
+                <div class="benefit-filter-grid benefit-filter-month">
+                    <div class="form-field"><label>Bulan</label><input type="month" value="2026-09"></div>
+                    <button type="button" class="primary-action-button benefit-filter-button">Tampilkan</button>
+                </div>
+            </section>
+
+            <section class="benefit-summary-grid">
+                <div class="benefit-summary-card"><span>Jumlah Siaga/Piket</span><strong>—</strong><small>Periode terpilih</small></div>
+                <div class="benefit-summary-card"><span>Hari Kerja</span><strong>—</strong><small>Hari</small></div>
+                <div class="benefit-summary-card"><span>Hari Libur</span><strong>—</strong><small>Hari</small></div>
+            </section>
+
+            <section class="benefit-payout-card"><div><span>TOTAL UANG SIAGA</span><strong>Rp —</strong></div><small>Perhitungan final mengikuti aturan bisnis HRIS Reborn.</small></section>
+
+            <section class="submission-card benefit-detail-card">
+                <div class="history-header"><div><div class="submission-kicker">DETAIL</div><h2>Rincian Siaga / Piket</h2><p>Jadwal dan nominal akan ditampilkan setelah backend terhubung.</p></div></div>
+                <div class="history-table-wrap">
+                    <table class="history-table benefit-table">
+                        <thead><tr><th>Tanggal</th><th>Shift</th><th>Status</th><th>Nominal</th><th>Keterangan</th></tr></thead>
+                        <tbody><tr><td colspan="5" class="benefit-empty-row">Data akan dimuat dari HRIS Reborn.</td></tr></tbody>
+                    </table>
+                </div>
+            </section>
+
+            {% elif active_menu == "cuti" %}
 
             <div class="breadcrumb-card">
                 <strong>Pengajuanku / Cuti</strong>
@@ -2153,23 +2291,17 @@ document.querySelectorAll(".sidebar-menu a").forEach(
     }
 );
 
-const dashboardMenuParent =
-    document.querySelector(".dashboard-menu-group .sidebar-menu-parent");
-
-if (dashboardMenuParent) {
-    dashboardMenuParent.addEventListener("click", function (event) {
-        if (event.target.closest(".menu-chevron")) {
-            event.preventDefault();
-
-            const group =
-                dashboardMenuParent.closest(".sidebar-menu-group");
-
-            if (group) {
-                group.classList.toggle("open");
+document.querySelectorAll(".sidebar-menu-group .sidebar-menu-parent").forEach(
+    function (menuParent) {
+        menuParent.addEventListener("click", function (event) {
+            if (event.target.closest(".menu-chevron")) {
+                event.preventDefault();
+                const group = menuParent.closest(".sidebar-menu-group");
+                if (group) group.classList.toggle("open");
             }
-        }
-    });
-}
+        });
+    }
+);
 
 {% if active_menu == "pelanggaran" %}
 (function () {
