@@ -2606,3 +2606,200 @@ body.agenda-modal-open {
 @media(max-width:900px){.agenda-overview-cards{grid-template-columns:1fr}.agenda-overview-header{align-items:flex-start;flex-direction:column}}
 
 .agenda-overview-message{display:block;margin-top:8px;color:#dc2626;font-size:11px;font-weight:800;line-height:1.35;min-height:30px}
+
+
+/* ============================================================
+   PORTAL PEGAWAI — INFOGRAFIS
+   ============================================================ */
+
+.infografis-portal {
+    padding: 0;
+}
+
+.infografis-portal-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 24px;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    color: #fff;
+    background: linear-gradient(135deg, #17191d 0%, #24282e 65%, #3a3f46 100%);
+    box-shadow: 0 8px 24px rgba(15,23,42,.10);
+}
+
+.infografis-portal-kicker {
+    margin-bottom: 5px;
+    color: #f6a57f;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+.infografis-portal-hero h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.infografis-portal-hero p {
+    margin: 6px 0 0;
+    color: #cbd0d6;
+    font-size: 11px;
+}
+
+.infografis-portal-badge {
+    min-width: 145px;
+    padding: 10px 13px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 9px;
+    background: rgba(255,255,255,.05);
+    text-align: center;
+}
+
+.infografis-portal-badge span {
+    display: block;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.infografis-portal-badge small {
+    display: block;
+    margin-top: 3px;
+    color: #cbd5e1;
+    font-size: 9px;
+}
+
+.infografis-loading {
+    padding: 40px 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    color: #6b7280;
+    text-align: center;
+    font-size: 12px;
+}
+
+.infografis-error {
+    padding: 12px 14px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 11px;
+}
+
+.infografis-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.infografis-stat-card {
+    position: relative;
+    overflow: hidden;
+    padding: 17px 19px;
+    border: 1px solid #e5e7eb;
+    border-radius: 11px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(15,23,42,.04);
+}
+
+.infografis-stat-card::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: #dc2626;
+}
+
+.infografis-stat-card span {
+    color: #7b8490;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.infografis-stat-card strong {
+    display: block;
+    margin-top: 4px;
+    color: #1b2027;
+    font-size: 28px;
+    line-height: 1;
+}
+
+.infografis-stat-card small {
+    display: block;
+    margin-top: 7px;
+    color: #a0a7af;
+    font-size: 9px;
+}
+
+.infografis-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.infografis-chart-card {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-radius: 11px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(15,23,42,.04);
+}
+
+.infografis-chart-card.wide {
+    grid-column: 1 / -1;
+}
+
+.infografis-chart-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 17px;
+    border-bottom: 1px solid #edf0f3;
+}
+
+.infografis-chart-head h3 {
+    margin: 0;
+    color: #20252c;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.infografis-chart-head span {
+    color: #9aa2ab;
+    font-size: 9px;
+}
+
+.infografis-chart-body {
+    padding: 8px 12px 14px;
+}
+
+.infografis-footnote {
+    margin-top: 12px;
+    color: #8d96a0;
+    font-size: 9px;
+}
+
+@media (max-width: 900px) {
+    .infografis-stat-grid,
+    .infografis-chart-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .infografis-chart-card.wide {
+        grid-column: auto;
+    }
+
+    .infografis-portal-hero {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
