@@ -328,6 +328,17 @@ def dashboard():
     )
 
 
+@app.route("/dashboard/infografis")
+@login_required
+def dashboard_infografis_page():
+    return render_template(
+        "dashboard.html",
+        nama=session.get("nama"),
+        nip=session.get("nip"),
+        active_menu="infografis"
+    )
+
+
 @app.route("/calendar")
 @login_required
 def calendar_page():
@@ -796,6 +807,33 @@ def api_submission_summary():
         "year": year,
         "data": summary,
     })
+
+
+@app.route("/api/dashboard/infografis")
+@login_required
+def api_dashboard_infografis():
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/infografis",
+            headers=hris_internal_headers(),
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan Infografis HRIS tidak tersedia."
+        }), 502
+
+    try:
+        payload = response.json()
+    except Exception:
+        return jsonify({
+            "status": "error",
+            "message": "Respons Infografis HRIS tidak valid."
+        }), 502
+
+    return jsonify(payload), response.status_code
 
 
 @app.route("/api/dashboard-summary")
