@@ -680,6 +680,47 @@ def api_agenda_kesamaptaan():
     return jsonify(payload), response.status_code
 
 
+@app.route("/api/agenda/piket-siaga/pdf")
+@login_required
+def api_agenda_piket_siaga_pdf():
+    key = str(request.args.get("key") or "").strip()
+    if not key or len(key) > 200:
+        return jsonify({"status": "error", "message": "Dokumen Piket Siaga tidak valid."}), 400
+
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/piket-siaga/pdf",
+            params={"key": key},
+            headers=hris_internal_headers(),
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan PDF Piket Siaga HRIS tidak tersedia."
+        }), 502
+
+    if response.status_code != 200:
+        try:
+            payload = response.json()
+        except Exception:
+            payload = {"status": "error", "message": "PDF Piket Siaga tidak dapat diakses."}
+        return jsonify(payload), response.status_code
+
+    return Response(
+        response.content,
+        status=200,
+        mimetype=response.headers.get("Content-Type", "application/pdf"),
+        headers={
+            "Content-Disposition": response.headers.get(
+                "Content-Disposition",
+                "inline"
+            )
+        },
+    )
+
+
 @app.route("/api/agenda/kesamaptaan/<int:event_id>/pdf")
 @login_required
 def api_agenda_kesamaptaan_pdf(event_id):
