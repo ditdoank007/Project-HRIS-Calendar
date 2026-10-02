@@ -317,7 +317,6 @@
 
             <section class="benefit-summary-grid benefit-summary-grid-seven">
                 <div class="benefit-summary-card"><span>Golongan</span><strong id="umGolongan">—</strong><small>Data Pegawai</small></div>
-                <div class="benefit-summary-card"><span>ID Master</span><strong id="umMasterId">—</strong><small>MF_TUNJANGAN</small></div>
                 <div class="benefit-summary-card"><span>Hari Kerja</span><strong id="umHariKerja">—</strong><small>Hari</small></div>
                 <div class="benefit-summary-card"><span>Dinas Luar</span><strong id="umDinasLuar">—</strong><small>Hari</small></div>
                 <div class="benefit-summary-card"><span>Cuti</span><strong id="umCuti">—</strong><small>Hari</small></div>
@@ -332,7 +331,7 @@
                     <span>NOMINAL UANG MAKAN / HARI</span>
                     <strong id="umNominal">Rp —</strong>
                 </div>
-                <small id="umPayoutNote">Nominal mengikuti Golongan dan ID Master Uang Makan yang berlaku pada periode terpilih.</small>
+                <small id="umPayoutNote">Nominal mengikuti Golongan dan tarif Uang Makan yang berlaku pada periode terpilih.</small>
             </section>
 
             <section class="benefit-payout-card">
@@ -1639,14 +1638,12 @@ async function loadUangMakan() {
         if (!p.data) throw new Error(p.message || "Data pegawai tidak tersedia.");
         const d = p.data;
         document.getElementById("umGolongan").textContent = d.golongan || "-";
-        document.getElementById("umMasterId").textContent = d.id_tunjangan || "-";
         [["umHariKerja",d.hari_kerja],["umDinasLuar",d.dinas_luar],["umCuti",d.cuti],["umIjin",d.ijin],["umSakit",d.sakit],["umTidakAbsen",d.tidak_absen],["umHari",d.um_hari]].forEach(([id,v]) => document.getElementById(id).textContent = Number(v || 0));
         document.getElementById("umNominal").textContent = benefitMoney(d.nominal_per_hari);
         document.getElementById("umTotalNominal").textContent = benefitMoney(d.nominal);
         document.getElementById("umPayoutNote").textContent =
             "Golongan " + (d.golongan || "-") +
-            " menggunakan ID Master " + (d.id_tunjangan || "-") +
-            " untuk periode yang dipilih.";
+            " menggunakan tarif Uang Makan yang berlaku untuk periode yang dipilih.";
         if (d.effective_period && d.effective_period.end !== d.requested_period.end) {
             message.textContent = "Periode berjalan dihitung sampai " + d.effective_period.end.split("-").reverse().join("-");
             message.hidden = false;
