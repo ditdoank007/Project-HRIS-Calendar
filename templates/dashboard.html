@@ -2303,6 +2303,13 @@ function renderAgenda(date) {
         item.className = "agenda-item";
 
         const type = eventType(event);
+        const pdfLink = (
+            type === "PIKET_SIAGA" &&
+            event.pdf_available &&
+            event.pdf_url
+        )
+            ? `<a class="agenda-notulen-button" href="${event.pdf_url}" target="_blank" rel="noopener">Buka / Download PDF Absensi Kehadiran</a>`
+            : "";
 
         item.innerHTML = `
             <div class="agenda-accent event-${type
@@ -2317,6 +2324,7 @@ function renderAgenda(date) {
                     ""
                 )}</span>
                 <small>${escapeHtml(eventDate(event))}</small>
+                ${pdfLink}
             </div>
         `;
 
