@@ -2108,6 +2108,21 @@ function eventDate(event) {
     ).substring(0, 10);
 }
 
+function eventEndDate(event) {
+    return String(
+        event.end_date ||
+        event.end ||
+        event.tanggal_akhir ||
+        eventDate(event)
+    ).substring(0, 10);
+}
+
+function eventOccursOnDate(event, key) {
+    const start = eventDate(event);
+    const end = eventEndDate(event) || start;
+    return !!start && start <= key && key <= end;
+}
+
 function eventType(event) {
     return String(
         event.event_type ||
@@ -2249,7 +2264,7 @@ function renderMonth() {
         cell.appendChild(number);
 
         const dayEvents = sortedEvents(
-            events.filter(event => eventDate(event) === key)
+            events.filter(event => eventOccursOnDate(event, key))
         );
 
         if (dayEvents.length) {
@@ -2418,9 +2433,16 @@ function renderYear() {
         const prefix =
             `${year}-${String(month + 1).padStart(2, "0")}`;
 
-        const count = events.filter(event =>
-            eventDate(event).startsWith(prefix)
-        ).length;
+        const monthStart = `${prefix}-01`;
+        const nextMonth = month === 11
+            ? `${year + 1}-01-01`
+            : `${year}-${String(month + 2).padStart(2, "0")}-01`;
+
+        const count = events.filter(event => {
+            const start = eventDate(event);
+            const end = eventEndDate(event) || start;
+            return start < nextMonth && end >= monthStart;
+        }).length;
 
         card.innerHTML = `
             <strong>${MONTH_NAMES[month]}</strong>
