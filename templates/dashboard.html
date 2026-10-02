@@ -2324,13 +2324,13 @@ function renderAgenda(date) {
         item.className = "agenda-item";
 
         const type = eventType(event);
-        const pdfLink = (
-            type === "PIKET_SIAGA" &&
-            event.pdf_available &&
-            event.pdf_url
-        )
-            ? `<a class="agenda-notulen-button" href="${event.pdf_url}" target="_blank" rel="noopener">Buka / Download PDF Absensi Kehadiran</a>`
-            : "";
+        let pdfLink = "";
+
+        if (type === "PIKET_SIAGA" && event.pdf_available && event.pdf_url) {
+            pdfLink = `<a class="agenda-notulen-button" href="${event.pdf_url}" target="_blank" rel="noopener">Buka / Download PDF Absensi Kehadiran</a>`;
+        } else if (type === "DINAS_LUAR" && event.pdf_available && event.pdf_url) {
+            pdfLink = `<a class="agenda-notulen-button" href="${event.pdf_url}" target="_blank" rel="noopener">View / Download SPRIN</a>`;
+        }
 
         item.innerHTML = `
             <div class="agenda-accent event-${type
