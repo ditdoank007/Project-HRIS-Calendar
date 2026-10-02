@@ -629,6 +629,56 @@ def api_personal_calendar():
         }), 502
 
 
+@app.route("/api/agenda/dinas-luar/pdf")
+@login_required
+def api_agenda_dinas_luar_pdf():
+    import requests
+    from config import Config
+
+    guid_sprin = str(request.args.get("guid_sprin") or "").strip()
+    if not guid_sprin or len(guid_sprin) > 150:
+        return jsonify({
+            "status": "error",
+            "message": "SPRIN Dinas Luar tidak valid."
+        }), 400
+
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/dinas-luar/pdf",
+            params={"guid_sprin": guid_sprin},
+            headers=hris_internal_headers(),
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan SPRIN Dinas Luar HRIS tidak tersedia."
+        }), 502
+
+    if response.status_code != 200:
+        try:
+            payload = response.json()
+        except Exception:
+            payload = {
+                "status": "error",
+                "message": "SPRIN Dinas Luar tidak dapat diakses."
+            }
+        return jsonify(payload), response.status_code
+
+    return Response(
+        response.content,
+        status=200,
+        mimetype=response.headers.get("Content-Type", "application/pdf"),
+        headers={
+            "Content-Disposition": response.headers.get(
+                "Content-Disposition",
+                "inline"
+            )
+        },
+    )
+
+
 @app.route("/api/calendar/<token>.ics")
 def api_calendar_feed_proxy(token):
 
