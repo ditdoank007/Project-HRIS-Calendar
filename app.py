@@ -698,10 +698,19 @@ def api_calendar_feed_proxy(token):
     if response.status_code != 200:
         return "Calendar feed unavailable", response.status_code
 
+    # Calendar subscription must always be revalidated by consumers such as
+    # Google Calendar. Do not allow this proxy response to be stored as a
+    # reusable/stale calendar snapshot.
     return Response(
         response.content,
         status=200,
-        mimetype="text/calendar"
+        mimetype="text/calendar",
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Vary": "*",
+        },
     )
 
 
