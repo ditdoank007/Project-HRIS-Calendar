@@ -2413,15 +2413,54 @@ if (accountMenuToggle && accountMenuDropdown) {
     }
     window.clearCalendarSignature=()=>{const c=$("calendarSignatureCanvas");c.getContext("2d").clearRect(0,0,c.width,c.height);};
     window.saveCalendarSignature=async function(){
-        const c=$("calendarSignatureCanvas"),r=await fetch("/api/profilku/signature",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({signature:c.toDataURL("image/png")})});
-        const p=await r.json(); if(!r.ok||!p.success)return alertMsg(p.message||"Gagal menyimpan tanda tangan.",false);
-        modal("calendarSignatureModal",false);
-        const signatureUrl="/api/profilku/signature?v="+Date.now();
-        $("calendarSignaturePreview").src=signatureUrl;
-        $("calendarSignaturePreview").style.display="block";
-        $("calendarSignatureEmpty").style.display="none";
-        alertMsg("Tanda tangan berhasil disimpan dan menggantikan yang lama.");
+        const canvas = $("calendarSignatureCanvas");
+        if (!canvas) return alertMsg("Canvas tanda tangan tidak ditemukan.", false);
+
+        const ctx = canvas.getContext("2d");
+        const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let hasInk = false;
+        for (let i = 3; i < pixels.length; i += 4) {
+            if (pixels[i] > 0) {
+                hasInk = true;
+                break;
+            }
+        }
+        if (!hasInk) return alertMsg("Tanda tangan belum dibuat.", false);
+
+        try {
+            const signature = canvas.toDataURL("image/png");
+            const response = await fetch("/api/profilku/signature", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({signature})
+            });
+
+            let payload = {};
+            try {
+                payload = await response.json();
+            } catch (parseError) {
+                throw new Error("Respons server tanda tangan tidak valid.");
+            }
+
+            if (!response.ok || !payload.success) {
+                throw new Error(payload.message || "Perubahan tanda tangan tidak valid.");
+            }
+
+            // Tutup modal hanya setelah server benar-benar mengonfirmasi berhasil.
+            modal("calendarSignatureModal", false);
+
+            const signatureUrl = "/api/profilku/signature?v=" + Date.now();
+            $("calendarSignaturePreview").src = signatureUrl;
+            $("calendarSignaturePreview").style.display = "block";
+            $("calendarSignatureEmpty").style.display = "none";
+
+            alertMsg("Perubahan tanda tangan berhasil disimpan.", true);
+        } catch (errorObject) {
+            console.error("Gagal menyimpan tanda tangan:", errorObject);
+            alertMsg(errorObject.message || "Gagal menyimpan perubahan tanda tangan.", false);
+        }
     };
+
     loadProfile().catch(e=>alertMsg(e.message,false));
 })();
 </script>
