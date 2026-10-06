@@ -1188,6 +1188,11 @@
                     <h2>Riwayat Rekam Medis</h2>
                     <p>Riwayat pemeriksaan kesehatan yang pernah kamu ikuti di HRIS Reborn.</p>
                 </div>
+                <div class="medical-history-month-controls">
+                    <button type="button" id="medicalPrevMonth" class="agenda-month-button" aria-label="Bulan sebelumnya">‹</button>
+                    <strong id="medicalMonthTitle">-</strong>
+                    <button type="button" id="medicalNextMonth" class="agenda-month-button" aria-label="Bulan berikutnya">›</button>
+                </div>
                 <div class="medical-history-total" id="medicalHistoryTotal">0 pemeriksaan</div>
             </div>
 
@@ -1200,7 +1205,7 @@
             <div id="medicalHistoryEmpty" class="medical-history-empty" hidden>
                 <div class="medical-empty-icon">+</div>
                 <strong>Belum ada riwayat Rekam Medis</strong>
-                <span>Hasil pemeriksaan yang sudah selesai akan tampil di halaman ini.</span>
+                <span id="medicalHistoryEmptyText">Hasil pemeriksaan yang sudah selesai akan tampil pada bulan ini.</span>
             </div>
 
             <div id="medicalHistoryTableWrap" class="medical-history-table-wrap" hidden>
@@ -2112,6 +2117,8 @@ const medicalHistoryTotal = document.getElementById("medicalHistoryTotal");
 const medicalDetailModal = document.getElementById("medicalDetailModal");
 
 let medicalHistory = [];
+let medicalCurrentDate = new Date();
+const MEDICAL_MONTH_NAMES = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 
 function medicalEscape(value) {
     return String(value ?? "")
@@ -2124,15 +2131,10 @@ function medicalEscape(value) {
 
 function medicalWibDateTime(value) {
     if (!value) return "-";
-
     const raw = String(value);
-    const iso = /[zZ]|[+-]\d{2}:?\d{2}$/.test(raw)
-        ? raw
-        : raw + "+07:00";
-
+    const iso = /[zZ]|[+-]\d{2}:?\d{2}$/.test(raw) ? raw : raw + "+07:00";
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return "-";
-
     return new Intl.DateTimeFormat("id-ID", {
         timeZone: "Asia/Jakarta",
         day: "2-digit",
@@ -2145,10 +2147,8 @@ function medicalWibDateTime(value) {
 
 function medicalDate(value) {
     if (!value) return "-";
-
     const parts = String(value).split("-");
     if (parts.length !== 3) return value;
-
     const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
     return new Intl.DateTimeFormat("id-ID", {
         day: "2-digit",
@@ -2159,15 +2159,8 @@ function medicalDate(value) {
 
 function medicalResultBadge(value) {
     const result = String(value || "").toUpperCase();
-
-    if (result === "FIT") {
-        return '<span class="medical-result-badge medical-result-fit">FIT</span>';
-    }
-
-    if (result === "UNFIT") {
-        return '<span class="medical-result-badge medical-result-unfit">UNFIT</span>';
-    }
-
+    if (result === "FIT") return '<span class="medical-result-badge medical-result-fit">FIT</span>';
+    if (result === "UNFIT") return '<span class="medical-result-badge medical-result-unfit">UNFIT</span>';
     return '<span class="medical-result-badge medical-result-empty">-</span>';
 }
 
@@ -2176,17 +2169,84 @@ function medicalSetText(id, value) {
     if (element) element.textContent = value || "-";
 }
 
+function medicalRowMonth(item) {
+    return String(item.tanggal || item.pemeriksaan_at || "").substring(0, 7);
+}
+
+function medicalMonthKey(date) {
+    return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0");
+}
+
+function medicalRowsForCurrentMonth() {
+    const key = medicalMonthKey(medicalCurrentDate);
+    return medicalHistory.filter((item) => medicalRowMonth(item) === key);
+}
+
+function updateMedicalMonthTitle() {
+    const title = document.getElementById("medicalMonthTitle");
+    if (title) {
+        title.textContent = MEDICAL_MONTH_NAMES[medicalCurrentDate.getMonth()] + " " + medicalCurrentDate.getFullYear();
+    }
+}
+
+function renderMedicalHistory() {
+    updateMedicalMonthTitle();
+
+    const rows = medicalRowsForCurrentMonth();
+    medicalHistoryTotal.textContent = rows.length + " pemeriksaan";
+    medicalHistoryBody.innerHTML = "";
+
+    if (!rows.length) {
+        medicalHistoryTableWrap.hidden = true;
+        medicalHistoryEmpty.hidden = false;
+        const emptyText = document.getElementById("medicalHistoryEmptyText");
+        if (emptyText) {
+            emptyText.textContent = "Belum ada pemeriksaan Rekam Medis pada " +
+                MEDICAL_MONTH_NAMES[medicalCurrentDate.getMonth()] + " " +
+                medicalCurrentDate.getFullYear() + ".";
+        }
+        return;
+    }
+
+    medicalHistoryEmpty.hidden = true;
+    medicalHistoryTableWrap.hidden = false;
+
+    medicalHistoryBody.innerHTML = rows.map((item, index) => {
+        const originalIndex = medicalHistory.indexOf(item);
+        return '<tr>' +
+            '<td>' + (index + 1) + '</td>' +
+            '<td><strong>' + medicalEscape(medicalDate(item.tanggal)) + '</strong></td>' +
+            '<td>' + medicalEscape(item.jam || "-") + ' WIB</td>' +
+            '<td><strong class="medical-history-title">' + medicalEscape(item.judul || "-") + '</strong><small>' + medicalEscape(item.status_pemeriksaan || "SELESAI") + '</small></td>' +
+            '<td>' + medicalEscape(item.lokasi || "-") + '</td>' +
+            '<td>' + medicalResultBadge(item.hasil_kebugaran) + '</td>' +
+            '<td><button type="button" class="medical-detail-button" data-medical-detail="' + originalIndex + '">Detail</button></td>' +
+            '</tr>';
+    }).join("");
+
+    medicalHistoryBody.querySelectorAll("[data-medical-detail]").forEach((button) => {
+        button.addEventListener("click", () => {
+            openMedicalDetail(Number(button.dataset.medicalDetail));
+        });
+    });
+}
+
+function changeMedicalMonth(offset) {
+    medicalCurrentDate = new Date(
+        medicalCurrentDate.getFullYear(),
+        medicalCurrentDate.getMonth() + offset,
+        1
+    );
+    renderMedicalHistory();
+}
+
 function openMedicalDetail(index) {
     const item = medicalHistory[index];
     if (!item) return;
-
     medicalSetText("medicalDetailTitle", item.judul || "Rekam Medis");
     medicalSetText("medicalDetailActivity", item.judul);
     medicalSetText("medicalDetailLocation", item.lokasi || "Kantor SAR Surabaya");
-    medicalSetText(
-        "medicalDetailSchedule",
-        medicalDate(item.tanggal) + " • " + (item.jam || "-") + " WIB"
-    );
+    medicalSetText("medicalDetailSchedule", medicalDate(item.tanggal) + " • " + (item.jam || "-") + " WIB");
     medicalSetText("medicalDetailExamAt", medicalWibDateTime(item.pemeriksaan_at));
     medicalSetText("medicalDetailBloodPressure", item.tekanan_darah);
     medicalSetText("medicalDetailPulse", item.nadi ? item.nadi + " / menit" : "-");
@@ -2197,7 +2257,6 @@ function openMedicalDetail(index) {
     medicalSetText("medicalDetailComplaint", item.keluhan || "-");
     medicalSetText("medicalDetailAction", item.tindakan || "-");
     medicalSetText("medicalDetailExaminer", item.pemeriksa || "-");
-
     medicalDetailModal.hidden = false;
     document.body.classList.add("medical-modal-open");
 }
@@ -2211,6 +2270,9 @@ document.querySelectorAll("[data-medical-close]").forEach((element) => {
     element.addEventListener("click", closeMedicalDetail);
 });
 
+document.getElementById("medicalPrevMonth").addEventListener("click", () => changeMedicalMonth(-1));
+document.getElementById("medicalNextMonth").addEventListener("click", () => changeMedicalMonth(1));
+
 async function loadMedicalHistory() {
     medicalHistoryLoading.hidden = false;
     medicalHistoryError.hidden = true;
@@ -2218,58 +2280,31 @@ async function loadMedicalHistory() {
     medicalHistoryTableWrap.hidden = true;
 
     try {
-        const response = await fetch(
-            "/api/rekam-medisku",
-            { credentials: "same-origin" }
-        );
-
+        const response = await fetch("/api/rekam-medisku", { credentials: "same-origin" });
         const payload = await response.json();
 
         if (!response.ok || payload.status !== "success") {
-            throw new Error(
-                payload.message || "Gagal mengambil riwayat Rekam Medis."
-            );
+            throw new Error(payload.message || "Gagal mengambil riwayat Rekam Medis.");
         }
 
-        medicalHistory = Array.isArray(payload.data)
-            ? payload.data
-            : [];
+        medicalHistory = Array.isArray(payload.data) ? payload.data : [];
 
-        medicalHistoryTotal.textContent =
-            medicalHistory.length + " pemeriksaan";
-
-        if (!medicalHistory.length) {
-            medicalHistoryEmpty.hidden = false;
-            return;
+        // Seperti Kesamaptaan: jika bulan berjalan kosong, buka bulan pemeriksaan terbaru.
+        if (medicalHistory.length && !medicalRowsForCurrentMonth().length) {
+            const latest = medicalHistory
+                .slice()
+                .sort((a, b) => String(b.tanggal || b.pemeriksaan_at || "").localeCompare(String(a.tanggal || a.pemeriksaan_at || "")))[0];
+            const latestDate = String(latest.tanggal || latest.pemeriksaan_at || "").substring(0, 10);
+            const parts = latestDate.split("-").map(Number);
+            if (parts.length >= 2 && parts[0] && parts[1]) {
+                medicalCurrentDate = new Date(parts[0], parts[1] - 1, 1);
+            }
         }
 
-        medicalHistoryBody.innerHTML = medicalHistory.map((item, index) => {
-            return '<tr>' +
-                '<td>' + (index + 1) + '</td>' +
-                '<td><strong>' + medicalEscape(medicalDate(item.tanggal)) + '</strong></td>' +
-                '<td>' + medicalEscape(item.jam || "-") + ' WIB</td>' +
-                '<td><strong class="medical-history-title">' + medicalEscape(item.judul || "-") + '</strong><small>' + medicalEscape(item.status_pemeriksaan || "SELESAI") + '</small></td>' +
-                '<td>' + medicalEscape(item.lokasi || "-") + '</td>' +
-                '<td>' + medicalResultBadge(item.hasil_kebugaran) + '</td>' +
-                '<td><button type="button" class="medical-detail-button" data-medical-detail="' + index + '">Detail</button></td>' +
-                '</tr>';
-        }).join("");
-
-        medicalHistoryBody
-            .querySelectorAll("[data-medical-detail]")
-            .forEach((button) => {
-                button.addEventListener("click", () => {
-                    openMedicalDetail(Number(button.dataset.medicalDetail));
-                });
-            });
-
-        medicalHistoryTableWrap.hidden = false;
-
+        renderMedicalHistory();
     } catch (errorObject) {
-        medicalHistoryError.textContent =
-            errorObject.message || "Gagal mengambil riwayat Rekam Medis.";
+        medicalHistoryError.textContent = errorObject.message || "Gagal mengambil riwayat Rekam Medis.";
         medicalHistoryError.hidden = false;
-
     } finally {
         medicalHistoryLoading.hidden = true;
     }
