@@ -37,7 +37,7 @@ input:focus{outline:2px solid #fee2e2;border-color:#dc2626}.gender{display:flex;
 
 <section id="choices" class="hidden">
 <button class="choice" id="employeeChoice"><strong>👤 Pegawai Kantor SAR Surabaya</strong><span>Gunakan login SSO BDIP. Tidak perlu mengisi nama atau NIP.</span></button>
-<button class="choice" id="guestChoice"><strong>👥 Non Pegawai / Peserta</strong><span>Isi nama, NIK 16 digit, jenis kelamin, instansi/organisasi, email, nomor handphone, dan tanda tangan.</span></button>
+<button class="choice" id="guestChoice"><strong>👤 Non Pegawai Kantor SAR Surabaya</strong><span>Silahkan Klik Untuk Melanjutkan Pendaftaran Rekam Medis Peserta</span></button>
 </section>
 
 <section id="employeeSection" class="hidden">
@@ -47,7 +47,7 @@ input:focus{outline:2px solid #fee2e2;border-color:#dc2626}.gender{display:flex;
 </section>
 
 <section id="guestSection" class="hidden">
-<div class="notice info">Form ini khusus peserta yang bukan Pegawai Kantor SAR Surabaya.</div>
+<div class="notice info">Silahkan isi data dengan benar untuk melanjutkan pendaftaran Rekam Medis Peserta.</div>
 <label for="guestName">Nama Lengkap *</label><input id="guestName" maxlength="150" autocomplete="name" placeholder="Nama lengkap">
 <label for="guestNik">NIK *</label><input id="guestNik" maxlength="16" inputmode="numeric" autocomplete="off" placeholder="16 digit NIK">
 <label>Jenis Kelamin *</label>
@@ -81,7 +81,11 @@ function showError(message){loading.classList.add("hidden");errorBox.textContent
 function formatDate(value){if(!value)return "-";const d=new Date(value);if(Number.isNaN(d.getTime()))return value;return new Intl.DateTimeFormat("id-ID",{dateStyle:"full",timeStyle:"short"}).format(d)+" WIB"}
 function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]))}
 function renderEvent(data){eventBox.innerHTML="<strong>"+escapeHtml(data.title||"-")+"</strong><span>"+escapeHtml(formatDate(data.start))+"</span><span>Tempat: "+escapeHtml(data.location||"-")+"</span>";eventBox.classList.remove("hidden")}
-function showSuccess(message){choices.classList.add("hidden");employeeSection.classList.add("hidden");guestSection.classList.add("hidden");errorBox.classList.add("hidden");loading.classList.add("hidden");successSection.classList.remove("hidden");document.getElementById("successMessage").textContent=message||"Pendaftaran berhasil dicatat."}
+function showSuccess(message){choices.classList.add("hidden");employeeSection.classList.add("hidden");guestSection.classList.add("hidden");errorBox.classList.add("hidden");loading.classList.add("hidden");successSection.classList.remove("hidden");document.getElementById("successMessage").textContent=message||"Pendaftaran berhasil dicatat."}function titleCaseId(value){
+ return String(value||"").replace(/\s+/g," ").trim().split(" ").filter(Boolean).map(word=>word.charAt(0).toUpperCase()+word.slice(1).toLowerCase()).join(" ");
+}
+function validEmail(value){return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(value||"").trim())}
+
 
 async function loadInfo(){
  try{
@@ -123,7 +127,7 @@ document.getElementById("employeeAttend").addEventListener("click",async()=>{
  try{
   const response=await fetch("/api/rekam-medis-qrcode/employee",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token})});
   const result=await response.json();if(!response.ok||result.status!=="success")throw new Error(result.message||"Pendaftaran gagal.");
-  showSuccess(result.message);
+  showSuccess("Silahkan menunggu antrian untuk pemeriksaan rekam medis.");
  }catch(e){button.disabled=false;button.textContent="DAFTAR PEMERIKSAAN";const msg=document.getElementById("employeeMessage");msg.textContent=e.message;msg.className="notice danger";msg.classList.remove("hidden")}
 });
 
@@ -136,14 +140,24 @@ canvas.addEventListener("pointermove",e=>{if(!drawing)return;const p=point(e);ct
 document.getElementById("clearSignature").addEventListener("click",()=>{resizeCanvas();hasSignature=false});
 window.addEventListener("resize",()=>{if(!guestSection.classList.contains("hidden"))resizeCanvas()});
 
+document.getElementById("guestName").addEventListener("input",function(){this.value=titleCaseId(this.value)});
+document.getElementById("guestInstansi").addEventListener("input",function(){this.value=titleCaseId(this.value)});
+document.getElementById("guestNik").addEventListener("input",function(){this.value=this.value.replace(/[^0-9]/g,"").slice(0,16)});
 document.getElementById("guestAttend").addEventListener("click",async()=>{
  const button=document.getElementById("guestAttend");
- const name=document.getElementById("guestName").value.trim(),nik=document.getElementById("guestNik").value.trim(),instansi=document.getElementById("guestInstansi").value.trim(),email=document.getElementById("guestEmail").value.trim(),phone=document.getElementById("guestPhone").value.trim(),gender=document.querySelector('input[name="gender"]:checked')?.value||"";
+ const name=titleCaseId(document.getElementById("guestName").value);
+ const nik=document.getElementById("guestNik").value.trim();
+ const instansi=titleCaseId(document.getElementById("guestInstansi").value);
+ const email=document.getElementById("guestEmail").value.trim();
+ const phone=document.getElementById("guestPhone").value.trim();
+ const gender=document.querySelector('input[name="gender"]:checked')?.value||"";
+ document.getElementById("guestName").value=name;
+ document.getElementById("guestInstansi").value=instansi;
  if(!name)return alert("Nama Lengkap wajib diisi.");
  if(!/^\d{16}$/.test(nik))return alert("NIK wajib 16 digit angka.");
  if(!gender)return alert("Jenis kelamin wajib dipilih.");
  if(!instansi)return alert("Instansi / Organisasi wajib diisi.");
- if(!email)return alert("Email wajib diisi.");
+ if(!validEmail(email))return alert("Format Email aktif tidak valid.");
  if(!phone)return alert("No. Handphone wajib diisi.");
  if(!hasSignature)return alert("Tanda tangan wajib diisi.");
  button.disabled=true;button.textContent="Menyimpan...";
