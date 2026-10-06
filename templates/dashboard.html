@@ -1175,213 +1175,7 @@
             </div>
             {% endif %}
 
-        {% elif active_menu == "agenda" %}
-            <div class="breadcrumb-card"><strong>AgendaKu</strong></div>
-            {% if agenda_tab == "overview" %}
-            <section class="agenda-overview">
-                <div class="agenda-overview-header">
-                    <div><div class="agenda-portal-kicker">AGENDAKU</div><h2>Agenda Kegiatan Saya</h2><p>Ringkasan agenda yang tercatat untuk Anda sejak Januari sampai bulan berjalan.</p></div>
-                    <div class="agenda-overview-period" id="agendaOverviewPeriod">-</div>
-                </div>
-                <div id="agendaOverviewLoading" class="agenda-portal-loading">Memuat ringkasan AgendaKu...</div>
-                <div id="agendaOverviewError" class="agenda-portal-error" hidden></div>
-                <div id="agendaOverviewCards" class="agenda-overview-cards" hidden>
-                    <a class="agenda-overview-card agenda-overview-rapat" href="/agenda?tab=rapat"><div class="agenda-overview-card-top"><span class="agenda-overview-icon">👥</span><span>RAPAT</span></div><strong id="agendaOverviewRapatCount">—</strong><small>Total Rapat</small><span id="agendaOverviewRapatMessage" class="agenda-overview-message">Memuat...</span><em>Lihat agenda rapat →</em></a>
-                    <a class="agenda-overview-card agenda-overview-disposisi" href="/agenda?tab=disposisi"><div class="agenda-overview-card-top"><span class="agenda-overview-icon">📄</span><span>DISPOSISI</span></div><strong id="agendaOverviewDisposisiCount">—</strong><small>Total Disposisi</small><span id="agendaOverviewDisposisiMessage" class="agenda-overview-message">Memuat...</span><em>Lihat disposisi →</em></a>
-                    <a class="agenda-overview-card agenda-overview-kesamaptaan" href="/agenda?tab=kesamaptaan"><div class="agenda-overview-card-top"><span class="agenda-overview-icon">🏃</span><span>KESAMAPTAAN</span></div><strong id="agendaOverviewKesamaptaanCount">—</strong><small>Total Kesamaptaan</small><span id="agendaOverviewKesamaptaanMessage" class="agenda-overview-message">Memuat...</span><em>Lihat kesamaptaan →</em></a>
-                </div>
-            </section>
-            {% elif agenda_tab == "rapat" %}
-            <div class="agenda-portal">
-                <div class="agenda-portal-header"><div><div class="agenda-portal-kicker">AGENDAKU</div><h2>RAPAT</h2><p>Agenda rapat yang terhubung dengan HRIS Reborn.</p></div><div class="agenda-month-controls"><button type="button" id="agendaPrevMonth" class="agenda-month-button">‹</button><strong id="agendaMonthTitle">-</strong><button type="button" id="agendaNextMonth" class="agenda-month-button">›</button></div></div>
-                <section class="agenda-group-card"><div class="agenda-group-header"><div class="agenda-group-title"><div class="agenda-group-icon">👥</div><div><h3>RAPAT</h3><p>Agenda rapat dari HRIS Reborn.</p></div></div><span id="agendaRapatCount" class="agenda-group-count">0 rapat</span></div><div id="agendaRapatLoading" class="agenda-portal-loading">Memuat daftar rapat...</div><div id="agendaRapatError" class="agenda-portal-error" hidden></div><div class="agenda-table-wrap"><table class="agenda-table"><thead><tr><th>Tanggal / Waktu</th><th>Agenda Rapat</th><th>Tempat</th><th>Pimpinan</th><th>Peserta</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="agendaRapatBody"></tbody></table></div></section>
-                <div id="agendaRapatModal" class="agenda-portal-modal" hidden><div class="agenda-portal-modal-backdrop" onclick="closeAgendaRapatModal()"></div><div class="agenda-portal-modal-card" role="dialog"><div class="agenda-portal-modal-header"><div><div class="agenda-portal-kicker">DETAIL RAPAT</div><h3 id="agendaRapatModalTitle">-</h3></div><button type="button" class="agenda-modal-close" onclick="closeAgendaRapatModal()">×</button></div><div id="agendaRapatModalBody" class="agenda-portal-modal-body"></div></div></div>
-            </div>
-            {% elif agenda_tab == "disposisi" %}
-            <div class="agenda-portal">
-                <div class="agenda-portal-header"><div><div class="agenda-portal-kicker">AGENDAKU</div><h2>DISPOSISI</h2><p>Disposisi yang ditujukan kepada Anda.</p></div><div class="agenda-month-controls"><button type="button" id="agendaPrevMonth" class="agenda-month-button">‹</button><strong id="agendaMonthTitle">-</strong><button type="button" id="agendaNextMonth" class="agenda-month-button">›</button></div></div>
-                <section class="agenda-group-card"><div class="agenda-group-header"><div class="agenda-group-title"><div class="agenda-group-icon">📄</div><div><h3>DISPOSISI</h3><p>Disposisi yang ditujukan kepada Anda.</p></div></div><span id="agendaDisposisiCount" class="agenda-group-count">0 disposisi</span></div><div id="agendaDisposisiLoading" class="agenda-portal-loading">Memuat daftar disposisi...</div><div id="agendaDisposisiError" class="agenda-portal-error" hidden></div><div id="agendaDisposisiList" class="agenda-disposisi-list"></div></section>
-            </div>
-            {% else %}
-            <div class="agenda-portal">
-                <div class="agenda-portal-header"><div><div class="agenda-portal-kicker">AGENDAKU</div><h2>KESAMAPTAAN</h2><p>Kesamaptaan yang Anda ikuti melalui scan QR.</p></div><div class="agenda-month-controls"><button type="button" id="agendaPrevMonth" class="agenda-month-button">‹</button><strong id="agendaMonthTitle">-</strong><button type="button" id="agendaNextMonth" class="agenda-month-button">›</button></div></div>
-                <section class="agenda-group-card"><div class="agenda-group-header"><div class="agenda-group-title"><div class="agenda-group-icon">🏃</div><div><h3>KESAMAPTAAN</h3><p>Kesamaptaan yang Anda ikuti melalui scan QR.</p></div></div><span id="agendaKesamaptaanCount" class="agenda-group-count">0 kegiatan</span></div><div id="agendaKesamaptaanLoading" class="agenda-portal-loading">Memuat daftar Kesamaptaan...</div><div id="agendaKesamaptaanError" class="agenda-portal-error" hidden></div><div class="agenda-table-wrap"><table class="agenda-table"><thead><tr><th>Tanggal / Waktu</th><th>Kegiatan</th><th>Tempat</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="agendaKesamaptaanBody"></tbody></table></div></section>
-                <div id="agendaKesamaptaanModal" class="agenda-portal-modal" hidden><div class="agenda-portal-modal-backdrop" onclick="closeAgendaKesamaptaanModal()"></div><div class="agenda-portal-modal-card" role="dialog"><div class="agenda-portal-modal-header"><div><div class="agenda-portal-kicker">DETAIL KESAMAPTAAN</div><h3 id="agendaKesamaptaanModalTitle">-</h3></div><button type="button" class="agenda-modal-close" onclick="closeAgendaKesamaptaanModal()">×</button></div><div id="agendaKesamaptaanModalBody" class="agenda-portal-modal-body"></div></div></div>
-            </div>
-            {% endif %}
-
-{% elif active_menu == "pelanggaran" %}
-
-            <div class="breadcrumb-card"><strong>Dashboard / Pelanggaran Disiplin</strong></div>
-            <section class="portal-page">
-                <div class="portal-hero">
-                    <div>
-                        <div class="portal-kicker">DASHBOARD PEGAWAI</div>
-                        <h2>Pelanggaran Disiplin</h2>
-                        <p>Rekap hukuman disiplin berdasarkan jumlah ketidakhadiran hari kerja.</p>
-                    </div>
-                    <select id="pelanggaranYear" class="portal-year-select">
-                        {% for y in range(2012, 2031) %}
-                        <option value="{{ y }}">{{ y }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <section class="portal-card">
-                    <div class="portal-card-toolbar">
-                        <strong>Hukuman Disiplin Pegawai</strong>
-                        <span id="pelanggaranYearLabel">Data tahun -</span>
-                    </div>
-                    <div id="pelanggaranLoading" class="portal-loading">Memuat data dari HRIS Reborn...</div>
-                    <div id="pelanggaranError" class="portal-error" hidden></div>
-                    <div class="portal-table-wrap">
-                        <table class="portal-table">
-                            <thead><tr><th>No</th><th>Nama</th><th>Jumlah Hari</th><th>Kategori Hukuman</th><th>Jenis Hukuman</th><th>Potongan (%)</th><th>Lama Pot</th></tr></thead>
-                            <tbody id="pelanggaranBody"></tbody>
-                        </table>
-                    </div>
-                </section>
-            </section>
-
-            {% elif active_menu == "struktur-organisasi" %}
-
-            <div class="breadcrumb-card"><strong>Dashboard / Struktur Organisasi</strong></div>
-            <section class="portal-page">
-                <div class="portal-hero">
-                    <div>
-                        <div class="portal-kicker">DASHBOARD PEGAWAI</div>
-                        <h2>Struktur Organisasi</h2>
-                        <p>Struktur organisasi berdasarkan Master Jabatan dan pegawai aktif HRIS.</p>
-                    </div>
-                    <div class="portal-badge"><span>HRIS REBORN</span><small>Single Source of Truth</small></div>
-                </div>
-                <section class="portal-card">
-                    <div class="org-portal-toolbar">
-                        <div>
-                            <strong>Struktur Organisasi Kantor SAR Surabaya</strong>
-                            <small>Klik nama jabatan untuk melihat pegawai. Gunakan tombol untuk membuka child tree.</small>
-                        </div>
-                        <div class="org-portal-actions">
-                            <button type="button" id="orgZoomOut" class="portal-action">−</button>
-                            <span id="orgZoomValue">100%</span>
-                            <button type="button" id="orgZoomIn" class="portal-action">+</button>
-                            <button type="button" id="orgZoomReset" class="portal-action portal-action-wide">Reset View</button>
-                        </div>
-                    </div>
-                    <div id="orgLoading" class="portal-loading">Memuat struktur dari HRIS Reborn...</div>
-                    <div id="orgError" class="portal-error" hidden></div>
-                    <div class="org-portal-viewport" id="orgViewport"><div class="org-portal-canvas" id="orgCanvas"><ul class="org-portal-tree" id="orgTreeRoot"></ul></div></div>
-                </section>
-            </section>
-
-{% elif active_menu == "infografis" %}
-
-            <div class="breadcrumb-card">
-                <strong>Dashboard / Infografis Pegawai</strong>
-            </div>
-
-            <section class="infografis-portal">
-                <div class="infografis-portal-hero">
-                    <div>
-                        <div class="infografis-portal-kicker">DASHBOARD PEGAWAI</div>
-                        <h2>Infografis Pegawai</h2>
-                        <p>Ringkasan data pegawai operasional Kantor SAR Surabaya yang bersumber dari HRIS Reborn.</p>
-                    </div>
-                    <div class="infografis-portal-badge">
-                        <span>HRIS REBORN</span>
-                        <small>Single Source of Truth</small>
-                    </div>
-                </div>
-
-                <div id="infografisLoading" class="infografis-loading">
-                    Memuat data infografis dari HRIS Reborn...
-                </div>
-
-                <div id="infografisError" class="infografis-error" hidden></div>
-
-                <div id="infografisContent" hidden>
-                    <div class="infografis-stat-grid">
-                        <article class="infografis-stat-card">
-                            <span>PEGAWAI AKTIF</span>
-                            <strong id="infoTotal">0</strong>
-                            <small>Unit kerja aktif · usia maksimal 60 tahun</small>
-                        </article>
-                        <article class="infografis-stat-card">
-                            <span>PNS</span>
-                            <strong id="infoPns">0</strong>
-                            <small>Bagian dari populasi operasional</small>
-                        </article>
-                        <article class="infografis-stat-card">
-                            <span>NON PNS</span>
-                            <strong id="infoNonPns">0</strong>
-                            <small>Bagian dari populasi operasional</small>
-                        </article>
-                    </div>
-
-                    <div class="infografis-chart-grid">
-                        <article class="infografis-chart-card">
-                            <div class="infografis-chart-head">
-                                <h3>Komposisi Jenis Kelamin</h3>
-                                <span>Pegawai aktif</span>
-                            </div>
-                            <div class="infografis-chart-body"><div id="infoGenderChart"></div></div>
-                        </article>
-
-                        <article class="infografis-chart-card">
-                            <div class="infografis-chart-head">
-                                <h3>Status Kepegawaian</h3>
-                                <span>PNS dan Non PNS</span>
-                            </div>
-                            <div class="infografis-chart-body"><div id="infoStatusChart"></div></div>
-                        </article>
-
-                        <article class="infografis-chart-card wide">
-                            <div class="infografis-chart-head">
-                                <h3>Distribusi Usia</h3>
-                                <span id="infoAgeNote">-</span>
-                            </div>
-                            <div class="infografis-chart-body"><div id="infoAgeChart"></div></div>
-                        </article>
-
-                        <article class="infografis-chart-card wide">
-                            <div class="infografis-chart-head">
-                                <h3>Distribusi Golongan</h3>
-                                <span>Golongan II/a s/d IV/e</span>
-                            </div>
-                            <div class="infografis-chart-body"><div id="infoGolonganChart"></div></div>
-                        </article>
-
-                        <article class="infografis-chart-card wide">
-                            <div class="infografis-chart-head">
-                                <h3>Distribusi Pegawai per Unit Kerja</h3>
-                                <span>Hanya unit kerja aktif</span>
-                            </div>
-                            <div class="infografis-chart-body"><div id="infoUnitChart"></div></div>
-                        </article>
-                    </div>
-
-                    <div class="infografis-footnote">
-                        Statistik menggunakan populasi operasional HRIS: pegawai aktif dan unit kerja aktif.
-                        Pegawai berusia di atas 60 tahun tidak dimasukkan ke statistik usia.
-                    </div>
-                
-                    <div class="golongan-modal" id="golonganModal" aria-hidden="true">
-                        <div class="golongan-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="golonganModalTitle">
-                            <div class="golongan-modal-head">
-                                <div>
-                                    <h3 id="golonganModalTitle">Pegawai</h3>
-                                    <span id="golonganModalSubtitle"></span>
-                                </div>
-                                <button type="button" class="golongan-modal-close" id="golonganModalClose" aria-label="Tutup">&times;</button>
-                            </div>
-                            <div class="golongan-modal-body" id="golonganModalBody"></div>
-                        </div>
-                    </div>
-
-</div>
-            </section>
-
-
-{% elif active_menu == "rekam_medisku" %}
+        {% elif active_menu == "rekam_medisku" %}
 
         <div class="breadcrumb-card">
             <strong>Rekam Medisku</strong>
@@ -2252,6 +2046,62 @@ function renderYear() {
 
 loadCalendar();
 
+{% elif active_menu == "agenda" %}
+function escapeHtml(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}
+function agendaFormatDate(v){return v?new Date(v).toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"}):"-";}
+function agendaFormatTime(v){return v?new Date(v).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit",hour12:false}):"-";}
+function agendaStatusBadge(s){const x=String(s||"-"),c=x==="SELESAI"?"agenda-status-selesai":x==="BATAL"?"agenda-status-batal":"agenda-status-terjadwal";return '<span class="agenda-status-badge '+c+'">'+escapeHtml(x)+"</span>";}
+const AGENDA_MONTH_NAMES=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+let agendaCurrentDate=new Date(),agendaRapatRows=[],agendaKesamaptaanRows=[],agendaDisposisiRows=[];
+function agendaMonthKey(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");}
+function agendaRowDate(i){return String(i.start||i.start_date||i.tanggal||i.date||"").substring(0,7);}
+function agendaRowsForCurrentMonth(r){const k=agendaMonthKey(agendaCurrentDate);return(r||[]).filter(i=>agendaRowDate(i)===k);}
+function updateAgendaMonthTitle(){document.getElementById("agendaMonthTitle").textContent=AGENDA_MONTH_NAMES[agendaCurrentDate.getMonth()]+" "+agendaCurrentDate.getFullYear();}
+function renderAgendaRapatRows(r){const b=document.getElementById("agendaRapatBody"),c=document.getElementById("agendaRapatCount");c.textContent=r.length+" rapat";b.innerHTML=r.length?r.map(i=>'<tr><td><strong>'+agendaFormatDate(i.start)+'</strong><span>'+agendaFormatTime(i.start)+' - '+agendaFormatTime(i.end)+' WIB</span></td><td><strong>'+escapeHtml(i.title||"-")+'</strong></td><td>'+escapeHtml(i.location||"-")+'</td><td>'+escapeHtml(i.organizer_name||"-")+'</td><td class="agenda-count-cell">'+Number(i.attendance_count||0)+' orang</td><td>'+agendaStatusBadge(i.status)+'</td><td class="agenda-action-cell"><button type="button" class="agenda-view-button" onclick="openAgendaRapatModal('+Number(i.event_id)+')">View</button></td></tr>').join(""):'<tr><td colspan="7" class="agenda-empty-row">Belum ada agenda rapat pada bulan ini.</td></tr>';}
+function renderAgendaKesamaptaanRows(r){const b=document.getElementById("agendaKesamaptaanBody"),c=document.getElementById("agendaKesamaptaanCount");c.textContent=r.length+" kegiatan";b.innerHTML=r.length?r.map(i=>'<tr><td><strong>'+agendaFormatDate(i.start)+'</strong><span>'+agendaFormatTime(i.start)+' WIB</span></td><td><strong>'+escapeHtml(i.title||"-")+'</strong></td><td>'+escapeHtml(i.location||"-")+'</td><td>'+agendaStatusBadge(i.status)+'</td><td class="agenda-action-cell"><button type="button" class="agenda-view-button" onclick="openAgendaKesamaptaanModal('+Number(i.event_id)+')">View</button></td></tr>').join(""):'<tr><td colspan="5" class="agenda-empty-row">Belum ada kegiatan Kesamaptaan pada bulan ini.</td></tr>';}
+function renderAgendaDisposisi(r){const l=document.getElementById("agendaDisposisiList"),c=document.getElementById("agendaDisposisiCount"),f=(r||[]).filter(i=>String(i.event_type||"").toUpperCase()==="DISPOSISI");c.textContent=f.length+" disposisi";l.innerHTML=f.length?f.map(i=>'<div class="agenda-disposisi-item"><div><strong>'+escapeHtml(i.title||"-")+'</strong><span>'+agendaFormatDate(i.start_date)+'</span><small>'+escapeHtml(i.location||i.description||"")+'</small></div>'+agendaStatusBadge(i.status)+'</div>').join(""):'<div class="agenda-empty-card">Belum ada disposisi pada bulan ini.</div>';}
+function refreshAgendaCurrentMonth(){updateAgendaMonthTitle();{% if agenda_tab == "rapat" %}renderAgendaRapatRows(agendaRowsForCurrentMonth(agendaRapatRows));{% elif agenda_tab == "disposisi" %}renderAgendaDisposisi(agendaRowsForCurrentMonth(agendaDisposisiRows));{% else %}renderAgendaKesamaptaanRows(agendaRowsForCurrentMonth(agendaKesamaptaanRows));{% endif %}}
+function changeAgendaMonth(n){agendaCurrentDate=new Date(agendaCurrentDate.getFullYear(),agendaCurrentDate.getMonth()+n,1);refreshAgendaCurrentMonth();}
+function openAgendaRapatModal(id){const i=agendaRapatRows.find(x=>Number(x.event_id)===Number(id));if(!i)return;document.getElementById("agendaRapatModalTitle").textContent=i.title||"-";const a=Array.isArray(i.attendance)?i.attendance:[];const ah=a.length?'<div class="agenda-detail-attendance">'+a.map((p,n)=>'<div class="agenda-attendance-row"><span>'+(n+1)+'.</span><strong>'+escapeHtml(p.nama||p.nip||"-")+'<small>'+escapeHtml(String(p.attendee_type||"").toUpperCase()==="NON_PEGAWAI"?"Non Pegawai":"Pegawai")+'</small></strong><small>'+escapeHtml(p.nip||"-")+'</small></div>').join("")+'</div>':'<div class="agenda-detail-empty">Belum ada peserta yang tercatat hadir.</div>';const nh=i.notulen_available?'<a class="agenda-notulen-button" href="/api/agenda/rapat/'+Number(i.event_id)+'/notulen" target="_blank">Buka / Download Notulen PDF</a>':'<div class="agenda-detail-empty">Notulen belum tersedia.</div>';document.getElementById("agendaRapatModalBody").innerHTML='<div class="agenda-detail-grid"><div class="agenda-detail-field"><span>Tanggal / Waktu</span><strong>'+agendaFormatDate(i.start)+' · '+agendaFormatTime(i.start)+' - '+agendaFormatTime(i.end)+' WIB</strong></div><div class="agenda-detail-field"><span>Tempat</span><strong>'+escapeHtml(i.location||"-")+'</strong></div><div class="agenda-detail-field"><span>Pimpinan Rapat</span><strong>'+escapeHtml(i.organizer_name||"-")+'</strong></div><div class="agenda-detail-field"><span>Status</span>'+agendaStatusBadge(i.status)+'</div></div><div class="agenda-detail-section"><div class="agenda-detail-section-title">Kehadiran · '+Number(i.attendance_count||0)+' orang</div>'+ah+'</div><div class="agenda-detail-section"><div class="agenda-detail-section-title">Notulen Rapat</div>'+nh+'</div>';document.getElementById("agendaRapatModal").hidden=false;document.body.classList.add("agenda-modal-open");}
+function closeAgendaRapatModal(){document.getElementById("agendaRapatModal").hidden=true;document.body.classList.remove("agenda-modal-open");}
+function openAgendaKesamaptaanModal(id){const i=agendaKesamaptaanRows.find(x=>Number(x.event_id)===Number(id));if(!i)return;document.getElementById("agendaKesamaptaanModalTitle").textContent=i.title||"Kesamaptaan";document.getElementById("agendaKesamaptaanModalBody").innerHTML='<div class="agenda-detail-grid"><div class="agenda-detail-field"><span>Tanggal / Waktu</span><strong>'+agendaFormatDate(i.start)+' · '+agendaFormatTime(i.start)+' WIB</strong></div><div class="agenda-detail-field"><span>Tempat</span><strong>'+escapeHtml(i.location||"-")+'</strong></div><div class="agenda-detail-field"><span>Status</span>'+agendaStatusBadge(i.status)+'</div></div><div class="agenda-detail-section"><div class="agenda-detail-section-title">Dokumen Kesamaptaan</div><a class="agenda-notulen-button" href="/api/agenda/kesamaptaan/'+Number(i.event_id)+'/pdf" target="_blank">View / Download PDF Absensi Kehadiran</a></div>';document.getElementById("agendaKesamaptaanModal").hidden=false;document.body.classList.add("agenda-modal-open");}
+function closeAgendaKesamaptaanModal(){document.getElementById("agendaKesamaptaanModal").hidden=true;document.body.classList.remove("agenda-modal-open");}
+
+{% if agenda_tab == "overview" %}
+(async function(){
+ const l=document.getElementById("agendaOverviewLoading"),e=document.getElementById("agendaOverviewError"),cards=document.getElementById("agendaOverviewCards"),now=new Date(),year=now.getFullYear(),month=now.getMonth()+1,startKey=year+"-01",endKey=year+"-"+String(month).padStart(2,"0");
+ document.getElementById("agendaOverviewPeriod").textContent="Januari - "+AGENDA_MONTH_NAMES[now.getMonth()]+" "+year;
+ function countToCurrent(rows){return(rows||[]).filter(function(i){const k=agendaRowDate(i);return k>=startKey&&k<=endKey;}).length;}
+ function setCard(kind,n,msg){document.getElementById("agendaOverview"+kind+"Count").textContent=n;document.getElementById("agendaOverview"+kind+"Message").textContent=msg;}
+ function rapatMsg(n){return n>10?"Rapat teruuuus!!!":"Ayolah kumpul kita";}
+ function disposisiMsg(n){return n>20?"Kamu lagi kamu lagi":"Sepi job ya?";}
+ function kesamaptaanMsg(n){if(n<10)return"Ingat lemak, olahraga donk";if(n>50)return"Situ atlit, rajin amat";return"Gas terus, jangan kendor!";}
+ async function load(endpoint,kind,msgFn){
+   try{
+     const q=await fetch(endpoint,{credentials:"same-origin"}),p=await q.json();
+     if(!q.ok||p.status!=="success")throw Error(p.message||"Data tidak tersedia.");
+     let rows=Array.isArray(p.data)?p.data:[];
+     if(kind==="Disposisi")rows=rows.filter(function(i){return String(i.event_type||"").toUpperCase()==="DISPOSISI";});
+     const n=countToCurrent(rows);
+     setCard(kind,n,msgFn(n));
+   }catch(x){
+     setCard(kind,"—","Data belum tersedia");
+     const note=document.getElementById("agendaOverviewError");
+     note.textContent=(note.textContent?note.textContent+" ":"")+kind+": "+(x.message||"Gagal mengambil data.");
+     note.hidden=false;
+   }
+ }
+ cards.hidden=false;l.hidden=true;
+ await Promise.all([load("/api/agenda/rapat","Rapat",rapatMsg),load("/api/calendar/my-agenda","Disposisi",disposisiMsg),load("/api/agenda/kesamaptaan","Kesamaptaan",kesamaptaanMsg)]);
+})();
+{% else %}
+document.getElementById("agendaPrevMonth").addEventListener("click",function(){changeAgendaMonth(-1);});
+document.getElementById("agendaNextMonth").addEventListener("click",function(){changeAgendaMonth(1);});
+{% if agenda_tab == "rapat" %}(async function(){const l=document.getElementById("agendaRapatLoading"),e=document.getElementById("agendaRapatError");try{const q=await fetch("/api/agenda/rapat",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Agenda Rapat.");agendaRapatRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();
+{% elif agenda_tab == "disposisi" %}(async function(){const l=document.getElementById("agendaDisposisiLoading"),e=document.getElementById("agendaDisposisiError");try{const q=await fetch("/api/calendar/my-agenda",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Disposisi.");agendaDisposisiRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();
+{% else %}(async function(){const l=document.getElementById("agendaKesamaptaanLoading"),e=document.getElementById("agendaKesamaptaanError");try{const q=await fetch("/api/agenda/kesamaptaan",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Agenda Kesamaptaan.");agendaKesamaptaanRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();{% endif %}
+{% endif %}
+
 {% elif active_menu == "rekam_medisku" %}
 const medicalHistoryLoading = document.getElementById("medicalHistoryLoading");
 const medicalHistoryError = document.getElementById("medicalHistoryError");
@@ -2711,210 +2561,4 @@ if (accountMenuToggle && accountMenuDropdown) {
 </script>
 {% endif %}
 </body>
-</html>{% elif active_menu == "agenda" %}
-            <div class="breadcrumb-card"><strong>AgendaKu</strong></div>
-            {% if agenda_tab == "overview" %}
-            <section class="agenda-overview">
-                <div class="agenda-overview-header">
-                    <div><div class="agenda-portal-kicker">AGENDAKU</div><h2>Agenda Kegiatan Saya</h2><p>Ringkasan agenda yang tercatat untuk Anda sejak Januari sampai bulan berjalan.</p></div>
-                    <div class="agenda-overview-period" id="agendaOverviewPeriod">-</div>
-                </div>
-                <div id="agendaOverviewLoading" class="agenda-portal-loading">Memuat ringkasan AgendaKu...</div>
-                <div id="agendaOverviewError" class="agenda-portal-error" hidden></div>
-                <div id="agendaOverviewCards" class="agenda-overview-cards" hidden>
-                    <a class="agenda-overview-card agenda-overview-rapat" href="/agenda?tab=rapat"><div class="agenda-overview-card-top"><span class="agenda-overview-icon">👥</span><span>RAPAT</span></div><strong id="agendaOverviewRapatCount">—</strong><small>Total Rapat</small><span id="agendaOverviewRapatMessage" class="agenda-overview-message">Memuat...</span><em>Lihat agenda rapat →</em></a>
-                    <a class="agenda-overview-card agenda-overview-disposisi" href="/agenda?tab=disposisi"><div class="agenda-overview-card-top"><span class="agenda-overview-icon">📄</span><span>DISPOSISI</span></div><strong id="agendaOverviewDisposisiCount">—</strong><small>Total Disposisi</small><span id="agendaOverviewDisposisiMessage" class="agenda-overview-message">Memuat...</span><em>Lihat disposisi →</em></a>
-                    <a class="agenda-overview-card agenda-overview-kesamaptaan" href="/agenda?tab=kesamaptaan"><div class="agenda-overview-card-top"><span class="agenda-overview-icon">🏃</span><span>KESAMAPTAAN</span></div><strong id="agendaOverviewKesamaptaanCount">—</strong><small>Total Kesamaptaan</small><span id="agendaOverviewKesamaptaanMessage" class="agenda-overview-message">Memuat...</span><em>Lihat kesamaptaan →</em></a>
-                </div>
-            </section>
-            {% elif agenda_tab == "rapat" %}
-            <div class="agenda-portal">
-                <div class="agenda-portal-header"><div><div class="agenda-portal-kicker">AGENDAKU</div><h2>RAPAT</h2><p>Agenda rapat yang terhubung dengan HRIS Reborn.</p></div><div class="agenda-month-controls"><button type="button" id="agendaPrevMonth" class="agenda-month-button">‹</button><strong id="agendaMonthTitle">-</strong><button type="button" id="agendaNextMonth" class="agenda-month-button">›</button></div></div>
-                <section class="agenda-group-card"><div class="agenda-group-header"><div class="agenda-group-title"><div class="agenda-group-icon">👥</div><div><h3>RAPAT</h3><p>Agenda rapat dari HRIS Reborn.</p></div></div><span id="agendaRapatCount" class="agenda-group-count">0 rapat</span></div><div id="agendaRapatLoading" class="agenda-portal-loading">Memuat daftar rapat...</div><div id="agendaRapatError" class="agenda-portal-error" hidden></div><div class="agenda-table-wrap"><table class="agenda-table"><thead><tr><th>Tanggal / Waktu</th><th>Agenda Rapat</th><th>Tempat</th><th>Pimpinan</th><th>Peserta</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="agendaRapatBody"></tbody></table></div></section>
-                <div id="agendaRapatModal" class="agenda-portal-modal" hidden><div class="agenda-portal-modal-backdrop" onclick="closeAgendaRapatModal()"></div><div class="agenda-portal-modal-card" role="dialog"><div class="agenda-portal-modal-header"><div><div class="agenda-portal-kicker">DETAIL RAPAT</div><h3 id="agendaRapatModalTitle">-</h3></div><button type="button" class="agenda-modal-close" onclick="closeAgendaRapatModal()">×</button></div><div id="agendaRapatModalBody" class="agenda-portal-modal-body"></div></div></div>
-            </div>
-            {% elif agenda_tab == "disposisi" %}
-            <div class="agenda-portal">
-                <div class="agenda-portal-header"><div><div class="agenda-portal-kicker">AGENDAKU</div><h2>DISPOSISI</h2><p>Disposisi yang ditujukan kepada Anda.</p></div><div class="agenda-month-controls"><button type="button" id="agendaPrevMonth" class="agenda-month-button">‹</button><strong id="agendaMonthTitle">-</strong><button type="button" id="agendaNextMonth" class="agenda-month-button">›</button></div></div>
-                <section class="agenda-group-card"><div class="agenda-group-header"><div class="agenda-group-title"><div class="agenda-group-icon">📄</div><div><h3>DISPOSISI</h3><p>Disposisi yang ditujukan kepada Anda.</p></div></div><span id="agendaDisposisiCount" class="agenda-group-count">0 disposisi</span></div><div id="agendaDisposisiLoading" class="agenda-portal-loading">Memuat daftar disposisi...</div><div id="agendaDisposisiError" class="agenda-portal-error" hidden></div><div id="agendaDisposisiList" class="agenda-disposisi-list"></div></section>
-            </div>
-            {% else %}
-            <div class="agenda-portal">
-                <div class="agenda-portal-header"><div><div class="agenda-portal-kicker">AGENDAKU</div><h2>KESAMAPTAAN</h2><p>Kesamaptaan yang Anda ikuti melalui scan QR.</p></div><div class="agenda-month-controls"><button type="button" id="agendaPrevMonth" class="agenda-month-button">‹</button><strong id="agendaMonthTitle">-</strong><button type="button" id="agendaNextMonth" class="agenda-month-button">›</button></div></div>
-                <section class="agenda-group-card"><div class="agenda-group-header"><div class="agenda-group-title"><div class="agenda-group-icon">🏃</div><div><h3>KESAMAPTAAN</h3><p>Kesamaptaan yang Anda ikuti melalui scan QR.</p></div></div><span id="agendaKesamaptaanCount" class="agenda-group-count">0 kegiatan</span></div><div id="agendaKesamaptaanLoading" class="agenda-portal-loading">Memuat daftar Kesamaptaan...</div><div id="agendaKesamaptaanError" class="agenda-portal-error" hidden></div><div class="agenda-table-wrap"><table class="agenda-table"><thead><tr><th>Tanggal / Waktu</th><th>Kegiatan</th><th>Tempat</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="agendaKesamaptaanBody"></tbody></table></div></section>
-                <div id="agendaKesamaptaanModal" class="agenda-portal-modal" hidden><div class="agenda-portal-modal-backdrop" onclick="closeAgendaKesamaptaanModal()"></div><div class="agenda-portal-modal-card" role="dialog"><div class="agenda-portal-modal-header"><div><div class="agenda-portal-kicker">DETAIL KESAMAPTAAN</div><h3 id="agendaKesamaptaanModalTitle">-</h3></div><button type="button" class="agenda-modal-close" onclick="closeAgendaKesamaptaanModal()">×</button></div><div id="agendaKesamaptaanModalBody" class="agenda-portal-modal-body"></div></div></div>
-            </div>
-            {% endif %}
-
-{% elif active_menu == "pelanggaran" %}
-
-            <div class="breadcrumb-card"><strong>Dashboard / Pelanggaran Disiplin</strong></div>
-            <section class="portal-page">
-                <div class="portal-hero">
-                    <div>
-                        <div class="portal-kicker">DASHBOARD PEGAWAI</div>
-                        <h2>Pelanggaran Disiplin</h2>
-                        <p>Rekap hukuman disiplin berdasarkan jumlah ketidakhadiran hari kerja.</p>
-                    </div>
-                    <select id="pelanggaranYear" class="portal-year-select">
-                        {% for y in range(2012, 2031) %}
-                        <option value="{{ y }}">{{ y }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <section class="portal-card">
-                    <div class="portal-card-toolbar">
-                        <strong>Hukuman Disiplin Pegawai</strong>
-                        <span id="pelanggaranYearLabel">Data tahun -</span>
-                    </div>
-                    <div id="pelanggaranLoading" class="portal-loading">Memuat data dari HRIS Reborn...</div>
-                    <div id="pelanggaranError" class="portal-error" hidden></div>
-                    <div class="portal-table-wrap">
-                        <table class="portal-table">
-                            <thead><tr><th>No</th><th>Nama</th><th>Jumlah Hari</th><th>Kategori Hukuman</th><th>Jenis Hukuman</th><th>Potongan (%)</th><th>Lama Pot</th></tr></thead>
-                            <tbody id="pelanggaranBody"></tbody>
-                        </table>
-                    </div>
-                </section>
-            </section>
-
-            {% elif active_menu == "struktur-organisasi" %}
-
-            <div class="breadcrumb-card"><strong>Dashboard / Struktur Organisasi</strong></div>
-            <section class="portal-page">
-                <div class="portal-hero">
-                    <div>
-                        <div class="portal-kicker">DASHBOARD PEGAWAI</div>
-                        <h2>Struktur Organisasi</h2>
-                        <p>Struktur organisasi berdasarkan Master Jabatan dan pegawai aktif HRIS.</p>
-                    </div>
-                    <div class="portal-badge"><span>HRIS REBORN</span><small>Single Source of Truth</small></div>
-                </div>
-                <section class="portal-card">
-                    <div class="org-portal-toolbar">
-                        <div>
-                            <strong>Struktur Organisasi Kantor SAR Surabaya</strong>
-                            <small>Klik nama jabatan untuk melihat pegawai. Gunakan tombol untuk membuka child tree.</small>
-                        </div>
-                        <div class="org-portal-actions">
-                            <button type="button" id="orgZoomOut" class="portal-action">−</button>
-                            <span id="orgZoomValue">100%</span>
-                            <button type="button" id="orgZoomIn" class="portal-action">+</button>
-                            <button type="button" id="orgZoomReset" class="portal-action portal-action-wide">Reset View</button>
-                        </div>
-                    </div>
-                    <div id="orgLoading" class="portal-loading">Memuat struktur dari HRIS Reborn...</div>
-                    <div id="orgError" class="portal-error" hidden></div>
-                    <div class="org-portal-viewport" id="orgViewport"><div class="org-portal-canvas" id="orgCanvas"><ul class="org-portal-tree" id="orgTreeRoot"></ul></div></div>
-                </section>
-            </section>
-
-{% elif active_menu == "infografis" %}
-
-            <div class="breadcrumb-card">
-                <strong>Dashboard / Infografis Pegawai</strong>
-            </div>
-
-            <section class="infografis-portal">
-                <div class="infografis-portal-hero">
-                    <div>
-                        <div class="infografis-portal-kicker">DASHBOARD PEGAWAI</div>
-                        <h2>Infografis Pegawai</h2>
-                        <p>Ringkasan data pegawai operasional Kantor SAR Surabaya yang bersumber dari HRIS Reborn.</p>
-                    </div>
-                    <div class="infografis-portal-badge">
-                        <span>HRIS REBORN</span>
-                        <small>Single Source of Truth</small>
-                    </div>
-                </div>
-
-                <div id="infografisLoading" class="infografis-loading">
-                    Memuat data infografis dari HRIS Reborn...
-                </div>
-
-                <div id="infografisError" class="infografis-error" hidden></div>
-
-                <div id="infografisContent" hidden>
-                    <div class="infografis-stat-grid">
-                        <article class="infografis-stat-card">
-                            <span>PEGAWAI AKTIF</span>
-                            <strong id="infoTotal">0</strong>
-                            <small>Unit kerja aktif · usia maksimal 60 tahun</small>
-                        </article>
-                        <article class="infografis-stat-card">
-                            <span>PNS</span>
-                            <strong id="infoPns">0</strong>
-                            <small>Bagian dari populasi operasional</small>
-                        </article>
-                        <article class="infografis-stat-card">
-                            <span>NON PNS</span>
-                            <strong id="infoNonPns">0</strong>
-                            <small>Bagian dari populasi operasional</small>
-                        </article>
-                    </div>
-
-                    <div class="infografis-chart-grid">
-                        <article class="infografis-chart-card">
-                            <div class="infografis-chart-head">
-                                <h3>Komposisi Jenis Kelamin</h3>
-                                <span>Pegawai aktif</span>
-                            </div>
-                            <div class="infografis-chart-body"><div id="infoGenderChart"></div></div>
-                        </article>
-
-                        <article class="infografis-chart-card">
-                            <div class="infografis-chart-head">
-                                <h3>Status Kepegawaian</h3>
-                                <span>PNS dan Non PNS</span>
-                            </div>
-                            <div class="infografis-chart-body"><div id="infoStatusChart"></div></div>
-                        </article>
-
-                        <article class="infografis-chart-card wide">
-                            <div class="infografis-chart-head">
-                                <h3>Distribusi Usia</h3>
-                                <span id="infoAgeNote">-</span>
-                            </div>
-                            <div class="infografis-chart-body"><div id="infoAgeChart"></div></div>
-                        </article>
-
-                        <article class="infografis-chart-card wide">
-                            <div class="infografis-chart-head">
-                                <h3>Distribusi Golongan</h3>
-                                <span>Golongan II/a s/d IV/e</span>
-                            </div>
-                            <div class="infografis-chart-body"><div id="infoGolonganChart"></div></div>
-                        </article>
-
-                        <article class="infografis-chart-card wide">
-                            <div class="infografis-chart-head">
-                                <h3>Distribusi Pegawai per Unit Kerja</h3>
-                                <span>Hanya unit kerja aktif</span>
-                            </div>
-                            <div class="infografis-chart-body"><div id="infoUnitChart"></div></div>
-                        </article>
-                    </div>
-
-                    <div class="infografis-footnote">
-                        Statistik menggunakan populasi operasional HRIS: pegawai aktif dan unit kerja aktif.
-                        Pegawai berusia di atas 60 tahun tidak dimasukkan ke statistik usia.
-                    </div>
-                
-                    <div class="golongan-modal" id="golonganModal" aria-hidden="true">
-                        <div class="golongan-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="golonganModalTitle">
-                            <div class="golongan-modal-head">
-                                <div>
-                                    <h3 id="golonganModalTitle">Pegawai</h3>
-                                    <span id="golonganModalSubtitle"></span>
-                                </div>
-                                <button type="button" class="golongan-modal-close" id="golonganModalClose" aria-label="Tutup">&times;</button>
-                            </div>
-                            <div class="golongan-modal-body" id="golonganModalBody"></div>
-                        </div>
-                    </div>
-
-</div>
-            </section>
-
-
-
+</html>
