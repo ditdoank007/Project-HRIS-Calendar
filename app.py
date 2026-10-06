@@ -406,12 +406,19 @@ def phone_calendar():
 @app.route("/agenda")
 @login_required
 def agenda():
+    agenda_tab = str(request.args.get("tab") or "overview").strip().lower()
+
+    if agenda_tab not in {"overview", "rapat", "disposisi", "kesamaptaan"}:
+        agenda_tab = "overview"
+
     return render_template(
         "dashboard.html",
         nama=session.get("nama"),
         nip=session.get("nip"),
-        active_menu="agenda"
+        active_menu="agenda",
+        agenda_tab=agenda_tab
     )
+
 
 
 @app.route("/plans")
@@ -757,6 +764,57 @@ def api_personal_calendar():
         }), 502
 
 
+@app.route("/api/agenda/dinas-luar/pdf")
+@login_required
+def api_agenda_dinas_luar_pdf():
+    import requests
+    from config import Config
+
+    guid_sprin = str(request.args.get("guid_sprin") or "").strip()
+    if not guid_sprin or len(guid_sprin) > 150:
+        return jsonify({
+            "status": "error",
+            "message": "SPRIN Dinas Luar tidak valid."
+        }), 400
+
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/dinas-luar/pdf",
+            params={"guid_sprin": guid_sprin},
+            headers=hris_internal_headers(),
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan SPRIN Dinas Luar HRIS tidak tersedia."
+        }), 502
+
+    if response.status_code != 200:
+        try:
+            payload = response.json()
+        except Exception:
+            payload = {
+                "status": "error",
+                "message": "SPRIN Dinas Luar tidak dapat diakses."
+            }
+        return jsonify(payload), response.status_code
+
+    return Response(
+        response.content,
+        status=200,
+        mimetype=response.headers.get("Content-Type", "application/pdf"),
+        headers={
+            "Content-Disposition": response.headers.get(
+                "Content-Disposition",
+                "inline"
+            )
+        },
+    )
+
+
+
 @app.route("/api/calendar/<token>.ics")
 def api_calendar_feed_proxy(token):
 
@@ -802,4 +860,45 @@ def health():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80)
+    app.run(host="0.0.0.0", port=80)def hris_internal_headers():
+    nip = str(session.get("nip") or "").strip()
+    return {
+        "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+        "X-Calendar-NIP": nip,
+    }
+
+
+def _proxy_personal_benefit(path, params):
+    nip = str(session.get("nip") or "").strip()
+    if not nip:
+        return jsonify({
+            "status": "error",
+            "message": "NIP tidak ditemukan."
+        }), 401
+
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}{path}",
+            params=params,
+            headers=hris_internal_headers(),
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({
+            "status": "error",
+            "message": "Layanan Benefit HRIS tidak tersedia."
+        }), 502
+
+    try:
+        payload = response.json()
+    except Exception:
+        return jsonify({
+            "status": "error",
+            "message": "Respons Benefit HRIS tidak valid."
+        }), 502
+
+    return jsonify(payload), response.status_code
+
+
+
