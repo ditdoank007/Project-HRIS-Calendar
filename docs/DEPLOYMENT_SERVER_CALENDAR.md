@@ -80,7 +80,20 @@ WantedBy=multi-user.target
 - WSGI target: `app:app`
 - Working directory: `/opt/calendar/app`
 
-## 4. Standard Deployment Procedure
+## 4. Privilege Model
+
+The current production service runs as `root`, and the server environment does **not** have the `sudo` command installed.
+
+Therefore, when logged in as `root`, use `systemctl` directly:
+
+```bash
+systemctl restart calendar.service
+systemctl status calendar.service --no-pager
+```
+
+Do **not** prefix commands with `sudo` on this server.
+
+## 5. Standard Deployment Procedure
 
 When GitHub contains the required change:
 
@@ -93,8 +106,8 @@ git log -1 --oneline
 
 git pull origin feature/pengajuanku-sidebar
 
-sudo systemctl restart calendar.service
-sudo systemctl status calendar.service --no-pager
+systemctl restart calendar.service
+systemctl status calendar.service --no-pager
 
 journalctl -u calendar.service -n 80 --no-pager
 ```
@@ -118,7 +131,7 @@ Expected executable:
 /opt/calendar/venv/bin/gunicorn
 ```
 
-## 5. Mandatory Diagnostics Before Giving Deployment CLI
+## 6. Mandatory Diagnostics Before Giving Deployment CLI
 
 If there is any uncertainty about the server layout, run these commands first:
 
@@ -137,7 +150,7 @@ ps -ef | grep -E "gunicorn|calendar" | grep -v grep
 
 Do not infer the Git path from the application root. Read `WorkingDirectory`, `ExecStart`, and the actual `.git` location.
 
-## 6. Configuration
+## 7. Configuration
 
 The application root has:
 
@@ -159,7 +172,7 @@ The virtual environment is:
 
 Do not commit production secrets from `.env` to GitHub.
 
-## 7. Current HRIS Internal API Integration
+## 8. Current HRIS Internal API Integration
 
 HRIS-Calendar communicates with HRIS Reborn through the internal API.
 
@@ -191,7 +204,7 @@ X-Calendar-NIP
 
 The browser-facing Calendar endpoint requires the logged-in user's session/NIP.
 
-## 8. Current Rekam Medisku Deployment State
+## 9. Current Rekam Medisku Deployment State
 
 The feature is implemented on branch:
 
@@ -219,7 +232,7 @@ Recent GitHub commits:
 - `fc33855d58f4830ddc384131ed514b358ec87038`
   - `style: add Rekam Medisku history and detail UI`
 
-## 9. HRIS Backend Dependency
+## 10. HRIS Backend Dependency
 
 HRIS Reborn repository:
 
@@ -253,7 +266,7 @@ Relevant HRIS fix commit:
 - `f2876c04b47a7b9f4363aafec4a3fc729b6d34fe`
   - `fix: import calendar rekam medis history route`
 
-## 10. Current Verified Rekam Medis Data Flow
+## 11. Current Verified Rekam Medis Data Flow
 
 A known test employee:
 
@@ -288,7 +301,7 @@ Therefore, if Calendar shows no data, first distinguish:
 
 Do not immediately modify HRIS if the HRIS endpoint itself is already verified.
 
-## 11. New Chat Operating Rule
+## 12. New Chat Operating Rule
 
 When a new HRIS-Calendar chat starts, use this file as the first deployment reference.
 
@@ -310,7 +323,7 @@ If these facts are already documented here and no server evidence indicates a ch
 
 If a command fails because the documented architecture appears to have changed, inspect the server and then update this file in GitHub so the same mistake is not repeated in future chats.
 
-## 12. Do Not Do This
+## 13. Do Not Do This
 
 Never blindly run:
 
@@ -328,7 +341,7 @@ Never blindly:
 - discard local production changes with `git reset --hard`
 - restart a service before confirming the deployed working tree
 
-## 13. Quick Reference
+## 14. Quick Reference
 
 | Item | Value |
 |---|---|
