@@ -258,6 +258,18 @@
                 </div>
             </section>
 
+            <section class="profile-panel profile-signature-panel">
+                <div class="profile-panel-head">
+                    <strong>Tanda Tanganmu :</strong>
+                    <span class="status-badge status-ok">NIP.png</span>
+                </div>
+                <div class="profile-panel-body profile-signature-body">
+                    <div id="calendarSignatureEmpty" class="profile-signature-empty">Belum ada tanda tangan tersimpan.</div>
+                    <img id="calendarSignaturePreview" class="profile-signature-preview" alt="Tanda tangan pegawai" style="display:none;">
+                    <small>Tanda tangan terbaru akan menggantikan file sebelumnya dengan nama NIP.png.</small>
+                </div>
+            </section>
+
             <div class="profile-modal" id="calendarPhotoModal">
                 <div class="profile-modal-box">
                     <div class="profile-modal-head"><strong>Ganti Foto Profil</strong><button onclick="closeCalendarModal('calendarPhotoModal')">×</button></div>
@@ -2363,6 +2375,15 @@ if (accountMenuToggle && accountMenuDropdown) {
         $("cpNoTelp").value=d.no_telp||""; $("cpEmail").value=d.email||""; $("cpAlamat").value=d.alamat||"";
         $("cpKelurahan").value=d.kelurahan||""; $("cpKecamatan").value=d.kecamatan||""; $("cpKota").value=d.kota||"";
         if(d.photo_url){ const u="/api/profilku/photo?v="+Date.now(); $("calendarProfileAvatar").src=u; $("calendarProfileAvatar").style.display="block"; $("calendarProfileFallback").style.display="none"; $("calendarPhotoPreview").src=u; }
+        const signatureUrl="/api/profilku/signature?v="+Date.now();
+        if(d.signature_exists){
+            $("calendarSignaturePreview").src=signatureUrl;
+            $("calendarSignaturePreview").style.display="block";
+            $("calendarSignatureEmpty").style.display="none";
+        } else {
+            $("calendarSignaturePreview").style.display="none";
+            $("calendarSignatureEmpty").style.display="block";
+        }
     }
     window.saveCalendarProfile=async function(){
         const r=await fetch("/api/profilku",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({
@@ -2394,7 +2415,12 @@ if (accountMenuToggle && accountMenuDropdown) {
     window.saveCalendarSignature=async function(){
         const c=$("calendarSignatureCanvas"),r=await fetch("/api/profilku/signature",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({signature:c.toDataURL("image/png")})});
         const p=await r.json(); if(!r.ok||!p.success)return alertMsg(p.message||"Gagal menyimpan tanda tangan.",false);
-        modal("calendarSignatureModal",false); alertMsg("Tanda tangan berhasil disimpan.");
+        modal("calendarSignatureModal",false);
+        const signatureUrl="/api/profilku/signature?v="+Date.now();
+        $("calendarSignaturePreview").src=signatureUrl;
+        $("calendarSignaturePreview").style.display="block";
+        $("calendarSignatureEmpty").style.display="none";
+        alertMsg("Tanda tangan berhasil disimpan dan menggantikan yang lama.");
     };
     loadProfile().catch(e=>alertMsg(e.message,false));
 })();
