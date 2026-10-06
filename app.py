@@ -353,6 +353,28 @@ def api_profilku_password():
         return jsonify({"success": False, "message": "Gagal mengubah password."}), 502
 
 
+@app.route("/api/profilku/signature")
+@login_required
+def api_profilku_signature_file():
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/profile-signature",
+            headers=_hris_profile_headers(),
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+        if response.status_code != 200:
+            return ("", response.status_code)
+        return Response(
+            response.content,
+            status=200,
+            content_type="image/png",
+            headers={"Cache-Control": "no-store"},
+        )
+    except requests.RequestException:
+        return ("", 502)
+
+
 @app.route("/api/profilku/signature", methods=["POST"])
 @login_required
 def api_profilku_signature():
