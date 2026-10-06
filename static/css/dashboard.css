@@ -2076,6 +2076,27 @@ body.sidebar-minimized .user-card {
     font-size: 11px;
 }
 
+.medical-history-month-controls {
+    min-height: 36px;
+    padding: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f9fafb;
+    white-space: nowrap;
+}
+
+.medical-history-month-controls strong {
+    min-width: 128px;
+    padding: 0 10px;
+    color: #374151;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: center;
+}
+
 .medical-history-total {
     min-height: 32px;
     padding: 0 12px;
