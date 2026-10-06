@@ -1506,11 +1506,12 @@ const priority = {
     "DINAS_LUAR": 1,
     "PIKET SIAGA": 2,
     "PIKET_SIAGA": 2,
-    "CUTI": 3,
-    "SAKIT": 4,
-    "IJIN": 5,
-    "WFH": 6,
-    "LIBUR": 7
+    "REKAM_MEDIS": 3,
+    "CUTI": 4,
+    "SAKIT": 5,
+    "IJIN": 6,
+    "WFH": 7,
+    "LIBUR": 8
 };
 
 let currentDate = new Date();
@@ -1764,7 +1765,7 @@ function renderAgenda(date) {
                     event.keterangan ||
                     ""
                 )}</span>
-                <small>${escapeHtml(eventDate(event))}</small>
+                <small>${escapeHtml(eventDate(event))}${event.start && String(event.start).includes("T") ? " • " + escapeHtml(String(event.start).substring(11, 16)) + " WIB" : ""}</small>
             </div>
         `;
 
