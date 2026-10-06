@@ -142,7 +142,7 @@ window.addEventListener("resize",()=>{if(!guestSection.classList.contains("hidde
 
 document.getElementById("guestName").addEventListener("input",function(){this.value=titleCaseId(this.value)});
 document.getElementById("guestInstansi").addEventListener("input",function(){this.value=titleCaseId(this.value)});
-document.getElementById("guestNik").addEventListener("input",function(){this.value=this.value.replace(/[^0-9]/g,"").slice(0,16)});
+document.getElementById("guestNik").addEventListener("input",function(){this.setCustomValidity("");});
 document.getElementById("guestAttend").addEventListener("click",async()=>{
  const button=document.getElementById("guestAttend");
  const name=titleCaseId(document.getElementById("guestName").value);
