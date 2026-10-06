@@ -94,6 +94,12 @@
                 </div>
             </div>
 
+            <a href="/profilku"
+               class="{{ 'active' if active_menu == 'profilku' else '' }}">
+                <span class="menu-icon">♙</span>
+                <span>PROFILKU</span>
+            </a>
+
         </nav>
 
     </aside>
@@ -116,7 +122,7 @@
             <div class="topbar-title">
                 <div class="page-kicker">CALENDAR INTERNAL</div>
                 <h1>
-                    {{ "Kalender Saya" if active_menu == "calendar" else "Rekam Medisku" if active_menu == "rekam_medisku" else "Dashboard" }}
+                    {{ "Kalender Saya" if active_menu == "calendar" else "Rekam Medisku" if active_menu == "rekam_medisku" else "Profilku" if active_menu == "profilku" else "Dashboard" }}
                 </h1>
             </div>
 
@@ -127,8 +133,11 @@
                             class="account-menu-toggle"
                             aria-expanded="false"
                             aria-label="Buka menu akun">
-                        <span class="account-avatar">
-                            {{ (nama or "Pegawai")[:1]|upper }}
+                        <span class="account-avatar" style="overflow:hidden;padding:0;">
+                            <img src="/api/profilku/photo?v={{ session.get('nip') }}"
+                                 alt="Foto profil"
+                                 style="width:100%;height:100%;object-fit:cover;"
+                                 onerror="this.style.display='none'; this.parentElement.textContent='{{ (nama or "Pegawai")[:1]|upper }}';">
                         </span>
 
                         <span class="account-name">
@@ -164,7 +173,122 @@
 
         <section class="dashboard-content">
 
-            {% if active_menu == "cuti" %}
+            {% if active_menu == "profilku" %}
+            <div class="breadcrumb-card"><strong>Profilku</strong></div>
+
+            <section class="profile-card">
+                <div class="profile-hero">
+                    <div class="profile-identity">
+                        <span class="profile-avatar-large" id="calendarProfileFallback">{{ (nama or "Pegawai")[:1]|upper }}</span>
+                        <img id="calendarProfileAvatar" class="profile-avatar-large" alt="Foto profil" style="display:none;">
+                        <div>
+                            <div class="submission-kicker">PROFIL PEGAWAI</div>
+                            <h2 id="calendarProfileName">{{ nama or "Pegawai" }}</h2>
+                            <p id="calendarProfileMeta">{{ nip or "" }}</p>
+                        </div>
+                    </div>
+                    <div class="profile-tools">
+                        <button class="calendar-action-button secondary" onclick="openCalendarPhotoModal()">Ganti Foto Profil</button>
+                        <button class="calendar-action-button secondary" onclick="openCalendarPasswordModal()">Reset Password</button>
+                        <button class="calendar-action-button secondary" onclick="openCalendarSignatureModal()">Ganti Tanda Tangan</button>
+                    </div>
+                </div>
+
+                <div id="calendarProfileAlert" class="calendar-profile-alert"></div>
+
+                <div class="profile-grid">
+                    <section class="profile-panel">
+                        <div class="profile-panel-head"><strong>Identitas Pegawai</strong></div>
+                        <div class="profile-panel-body">
+                            <div class="profile-row"><span>Nama Lengkap</span><b id="cpNama">-</b></div>
+                            <div class="profile-row"><span>NIP</span><b id="cpNip">-</b></div>
+                            <div class="profile-row"><span>Finger ID</span><b id="cpFinger">-</b></div>
+                            <div class="profile-row"><span>Pangkat</span><b id="cpPangkat">-</b></div>
+                            <div class="profile-row"><span>Golongan</span><b id="cpGol">-</b></div>
+                            <div class="profile-row"><span>Jabatan</span><b id="cpJabatan">-</b></div>
+                            <div class="profile-row"><span>Unit Kerja</span><b id="cpUnit">-</b></div>
+                            <div class="profile-row"><span>Eselon</span><b id="cpEselon">-</b></div>
+                        </div>
+                    </section>
+
+                    <section class="profile-panel">
+                        <div class="profile-panel-head"><strong>Data Pribadi</strong></div>
+                        <div class="profile-panel-body">
+                            <div class="profile-row"><span>Tanggal Lahir</span><b id="cpTglLahir">-</b></div>
+                            <div class="profile-row"><span>Jenis Kelamin</span><b id="cpJenisKel">-</b></div>
+                            <div class="profile-row"><span>Status Perkawinan</span><b id="cpStatusKawin">-</b></div>
+                            <div class="profile-row"><span>Agama</span><b id="cpAgama">-</b></div>
+                            <div class="profile-row"><span>No. KTP</span><b id="cpKtp">-</b></div>
+                            <div class="profile-row"><span>No. NPWP</span><b id="cpNpwp">-</b></div>
+                        </div>
+                    </section>
+
+                    <section class="profile-panel">
+                        <div class="profile-panel-head"><strong>Kontak & Alamat</strong><span class="status-badge status-ok">DAPAT DIUBAH</span></div>
+                        <div class="profile-panel-body">
+                            <label class="profile-edit-row"><span>No. Telp</span><input id="cpNoTelp" type="tel"></label>
+                            <label class="profile-edit-row"><span>e-Mail</span><input id="cpEmail" type="email"></label>
+                            <label class="profile-edit-row"><span>Alamat</span><input id="cpAlamat"></label>
+                            <label class="profile-edit-row"><span>Kelurahan</span><input id="cpKelurahan"></label>
+                            <label class="profile-edit-row"><span>Kecamatan</span><input id="cpKecamatan"></label>
+                            <label class="profile-edit-row"><span>Kota</span><input id="cpKota"></label>
+                            <div class="profile-save-row"><button class="calendar-action-button primary" onclick="saveCalendarProfile()">Simpan Profil</button></div>
+                        </div>
+                    </section>
+
+                    <section class="profile-panel">
+                        <div class="profile-panel-head"><strong>Data Kepegawaian</strong></div>
+                        <div class="profile-panel-body">
+                            <div class="profile-row"><span>Tanggal Masuk</span><b id="cpTglMasuk">-</b></div>
+                            <div class="profile-row"><span>TMT Pangkat</span><b id="cpTmtPangkat">-</b></div>
+                            <div class="profile-row"><span>TMT Jabatan</span><b id="cpTmtJabatan">-</b></div>
+                            <div class="profile-row"><span>TMT Class</span><b id="cpTmtClass">-</b></div>
+                            <div class="profile-row"><span>TMT CPNS</span><b id="cpTmtCpns">-</b></div>
+                            <div class="profile-row"><span>TMT PNS</span><b id="cpTmtPns">-</b></div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <div class="profile-modal" id="calendarPhotoModal">
+                <div class="profile-modal-box">
+                    <div class="profile-modal-head"><strong>Ganti Foto Profil</strong><button onclick="closeCalendarModal('calendarPhotoModal')">×</button></div>
+                    <div class="profile-modal-body">
+                        <img id="calendarPhotoPreview" class="profile-avatar-preview" alt="Preview">
+                        <div class="profile-modal-buttons">
+                            <button class="calendar-action-button secondary" onclick="document.getElementById('calendarGalleryInput').click()">Gallery / File</button>
+                            <button class="calendar-action-button primary" onclick="document.getElementById('calendarCameraInput').click()">Kamera Selfie</button>
+                        </div>
+                        <input id="calendarGalleryInput" type="file" accept="image/*" hidden>
+                        <input id="calendarCameraInput" type="file" accept="image/*" capture="user" hidden>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-modal" id="calendarPasswordModal">
+                <div class="profile-modal-box">
+                    <div class="profile-modal-head"><strong>Reset Password</strong><button onclick="closeCalendarModal('calendarPasswordModal')">×</button></div>
+                    <div class="profile-modal-body">
+                        <label class="profile-edit-row"><span>Password Baru</span><input id="calendarNewPassword" type="password" autocomplete="new-password"></label>
+                        <label class="profile-edit-row"><span>Konfirmasi</span><input id="calendarConfirmPassword" type="password" autocomplete="new-password"></label>
+                        <small>Minimal 8 karakter.</small>
+                    </div>
+                    <div class="profile-modal-foot"><button class="calendar-action-button secondary" onclick="closeCalendarModal('calendarPasswordModal')">Batal</button><button class="calendar-action-button primary" onclick="saveCalendarPassword()">Simpan</button></div>
+                </div>
+            </div>
+
+            <div class="profile-modal" id="calendarSignatureModal">
+                <div class="profile-modal-box">
+                    <div class="profile-modal-head"><strong>Ganti Tanda Tangan</strong><button onclick="closeCalendarModal('calendarSignatureModal')">×</button></div>
+                    <div class="profile-modal-body">
+                        <small>Tanda tangan dengan jari/stylus. Background transparan.</small>
+                        <canvas id="calendarSignatureCanvas" width="1000" height="500"></canvas>
+                    </div>
+                    <div class="profile-modal-foot"><button class="calendar-action-button secondary" onclick="clearCalendarSignature()">Hapus</button><button class="calendar-action-button primary" onclick="saveCalendarSignature()">Simpan</button></div>
+                </div>
+            </div>
+
+            {% elif active_menu == "cuti" %}
 
             <div class="breadcrumb-card">
                 <strong>Pengajuanku / Cuti</strong>
@@ -2197,5 +2321,76 @@ if (accountMenuToggle && accountMenuDropdown) {
 }
 </script>
 
+
+{% if active_menu == "profilku" %}
+<script>
+(function () {
+    const $ = id => document.getElementById(id);
+    const alertBox = $("calendarProfileAlert");
+    let sigCtx = null, drawing = false;
+
+    function alertMsg(msg, ok=true) {
+        alertBox.textContent = msg;
+        alertBox.className = "calendar-profile-alert show " + (ok ? "success" : "error");
+        setTimeout(() => alertBox.className = "calendar-profile-alert", 4000);
+    }
+    function text(id,v){ $(id).textContent = v || "-"; }
+    function modal(id,open){ $(id).classList.toggle("open",open); }
+    window.closeCalendarModal = id => modal(id,false);
+    window.openCalendarPhotoModal = () => modal("calendarPhotoModal",true);
+    window.openCalendarPasswordModal = () => modal("calendarPasswordModal",true);
+    window.openCalendarSignatureModal = () => { modal("calendarSignatureModal",true); initSig(); };
+
+    async function loadProfile() {
+        const r=await fetch("/api/profilku");
+        const p=await r.json();
+        if(!r.ok||!p.success) throw new Error(p.message||"Gagal memuat profil.");
+        const d=p.data;
+        text("cpNama",d.nama); text("cpNip",d.nip); text("cpFinger",d.finger_id); text("cpPangkat",d.pangkat);
+        text("cpGol",d.gol); text("cpJabatan",d.jabatan); text("cpUnit",d.unit_kerja); text("cpEselon",d.eselon);
+        text("cpTglLahir",d.tgl_lahir); text("cpJenisKel",d.jenis_kel); text("cpStatusKawin",d.status_perkawinan);
+        text("cpAgama",d.agama); text("cpKtp",d.no_ktp); text("cpNpwp",d.no_npwp); text("cpTglMasuk",d.tgl_masuk);
+        text("cpTmtPangkat",d.tmt_pangkat); text("cpTmtJabatan",d.tmt_jabatan); text("cpTmtClass",d.tmt_class);
+        text("cpTmtCpns",d.tmt_cpns); text("cpTmtPns",d.tmt_pns);
+        $("cpNoTelp").value=d.no_telp||""; $("cpEmail").value=d.email||""; $("cpAlamat").value=d.alamat||"";
+        $("cpKelurahan").value=d.kelurahan||""; $("cpKecamatan").value=d.kecamatan||""; $("cpKota").value=d.kota||"";
+        if(d.photo_url){ const u="/api/profilku/photo?v="+Date.now(); $("calendarProfileAvatar").src=u; $("calendarProfileAvatar").style.display="block"; $("calendarProfileFallback").style.display="none"; $("calendarPhotoPreview").src=u; }
+    }
+    window.saveCalendarProfile=async function(){
+        const r=await fetch("/api/profilku",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+            no_telp:$("cpNoTelp").value,email:$("cpEmail").value,alamat:$("cpAlamat").value,kelurahan:$("cpKelurahan").value,kecamatan:$("cpKecamatan").value,kota:$("cpKota").value
+        })});
+        const p=await r.json(); if(!r.ok||!p.success)return alertMsg(p.message||"Gagal menyimpan.",false); alertMsg("Profil berhasil disimpan.");
+    };
+    async function upload(file){
+        if(!file)return; const fd=new FormData(); fd.append("photo",file);
+        const r=await fetch("/api/profilku/photo",{method:"POST",body:fd}); const p=await r.json();
+        if(!r.ok||!p.success)return alertMsg(p.message||"Gagal menyimpan foto.",false);
+        modal("calendarPhotoModal",false); alertMsg("Foto profil berhasil disimpan."); loadProfile();
+    }
+    $("calendarGalleryInput").addEventListener("change",e=>upload(e.target.files[0]));
+    $("calendarCameraInput").addEventListener("change",e=>upload(e.target.files[0]));
+    window.saveCalendarPassword=async function(){
+        const r=await fetch("/api/profilku/password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({new_password:$("calendarNewPassword").value,confirm_password:$("calendarConfirmPassword").value})});
+        const p=await r.json(); if(!r.ok||!p.success)return alertMsg(p.message||"Gagal mengubah password.",false);
+        $("calendarNewPassword").value=""; $("calendarConfirmPassword").value=""; modal("calendarPasswordModal",false); alertMsg("Password berhasil diubah.");
+    };
+    function initSig(){
+        if(sigCtx)return; const c=$("calendarSignatureCanvas"); sigCtx=c.getContext("2d"); sigCtx.lineWidth=3; sigCtx.lineCap="round"; sigCtx.lineJoin="round";
+        const pt=e=>{const r=c.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return{x:(s.clientX-r.left)*(c.width/r.width),y:(s.clientY-r.top)*(c.height/r.height)};};
+        const down=e=>{e.preventDefault();drawing=true;const p=pt(e);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);};
+        const move=e=>{if(!drawing)return;e.preventDefault();const p=pt(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();};
+        c.addEventListener("pointerdown",down);c.addEventListener("pointermove",move);window.addEventListener("pointerup",()=>drawing=false);
+    }
+    window.clearCalendarSignature=()=>{const c=$("calendarSignatureCanvas");c.getContext("2d").clearRect(0,0,c.width,c.height);};
+    window.saveCalendarSignature=async function(){
+        const c=$("calendarSignatureCanvas"),r=await fetch("/api/profilku/signature",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({signature:c.toDataURL("image/png")})});
+        const p=await r.json(); if(!r.ok||!p.success)return alertMsg(p.message||"Gagal menyimpan tanda tangan.",false);
+        modal("calendarSignatureModal",false); alertMsg("Tanda tangan berhasil disimpan.");
+    };
+    loadProfile().catch(e=>alertMsg(e.message,false));
+})();
+</script>
+{% endif %}
 </body>
 </html>
