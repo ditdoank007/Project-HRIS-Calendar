@@ -182,6 +182,112 @@ def api_login():
         }), 500
 
 
+@app.route("/rekam-medis-qrcode")
+def rekam_medis_qrcode():
+    token = str(request.args.get("token") or "").strip()
+    if not token or len(token) > 150:
+        return render_template(
+            "rekam_medis_qrcode.html",
+            token="",
+            error="QR Rekam Medis tidak valid."
+        ), 400
+
+    return render_template(
+        "rekam_medis_qrcode.html",
+        token=token,
+        logged_in=bool(session.get("logged_in")),
+        nama=session.get("nama"),
+        nip=session.get("nip"),
+    )
+
+
+@app.route("/api/rekam-medis-qrcode/info")
+def api_rekam_medis_qrcode_info():
+    token = str(request.args.get("token") or "").strip()
+    if not token or len(token) > 150:
+        return jsonify({"status": "error", "message": "Token QR tidak valid."}), 400
+
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/agenda/rekam-medis/attendance-info",
+            params={"token": token},
+            headers=hris_internal_headers(),
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({"status": "error", "message": "Layanan Rekam Medis HRIS tidak tersedia."}), 502
+
+    try:
+        payload = response.json()
+    except Exception:
+        payload = {"status": "error", "message": "Respons HRIS Rekam Medis tidak valid."}
+    return jsonify(payload), response.status_code
+
+
+@app.route("/api/rekam-medis-qrcode/employee", methods=["POST"])
+@login_required
+def api_rekam_medis_qrcode_employee():
+    payload = request.get_json(silent=True) or {}
+    token = str(payload.get("token") or "").strip()
+    if not token:
+        return jsonify({"status": "error", "message": "Token QR wajib diisi."}), 400
+
+    try:
+        response = requests.post(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/agenda/rekam-medis/attendance/employee",
+            json={"token": token},
+            headers=hris_internal_headers(),
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({"status": "error", "message": "Layanan Rekam Medis HRIS tidak tersedia."}), 502
+
+    try:
+        payload = response.json()
+    except Exception:
+        payload = {"status": "error", "message": "Respons HRIS Rekam Medis tidak valid."}
+    return jsonify(payload), response.status_code
+
+
+@app.route("/api/rekam-medis-qrcode/guest", methods=["POST"])
+def api_rekam_medis_qrcode_guest():
+    payload = request.get_json(silent=True) or {}
+    token = str(payload.get("token") or "").strip()
+
+    if not token:
+        return jsonify({"status": "error", "message": "Token QR wajib diisi."}), 400
+
+    try:
+        response = requests.post(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/agenda/rekam-medis/attendance/guest",
+            json={
+                "token": token,
+                "nik": str(payload.get("nik") or "").strip(),
+                "nama": str(payload.get("nama") or "").strip(),
+                "jenis_kelamin": str(payload.get("jenis_kelamin") or "").strip().upper(),
+                "instansi": str(payload.get("instansi") or "").strip(),
+                "email": str(payload.get("email") or "").strip(),
+                "no_handphone": str(payload.get("no_handphone") or "").strip(),
+                "tanda_tangan": payload.get("tanda_tangan"),
+            },
+            headers={
+                "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+            },
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({"status": "error", "message": "Layanan Rekam Medis HRIS tidak tersedia."}), 502
+
+    try:
+        payload = response.json()
+    except Exception:
+        payload = {"status": "error", "message": "Respons HRIS Rekam Medis tidak valid."}
+    return jsonify(payload), response.status_code
+
+
 @app.route("/absen-qrcode")
 def absen_qrcode():
     token = str(request.args.get("token") or "").strip()
