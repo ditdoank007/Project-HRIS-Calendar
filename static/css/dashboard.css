@@ -2916,6 +2916,27 @@ body.medical-modal-open {
 .calendar-profile-alert.success { background:#ecfdf5; color:#047857; }
 .calendar-profile-alert.error { background:#fef2f2; color:#b91c1c; }
 
+.profile-signature-panel { grid-column: 1 / -1; }
+.profile-signature-body { min-height:150px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:10px; }
+.profile-signature-preview {
+    display:block;
+    max-width:min(520px, 100%);
+    max-height:180px;
+    width:auto;
+    height:auto;
+    object-fit:contain;
+    background:transparent;
+}
+.profile-signature-empty {
+    padding:22px 24px;
+    border:1px dashed #d1d5db;
+    border-radius:12px;
+    color:#6b7280;
+    background:#f9fafb;
+    font-size:12px;
+}
+.profile-signature-body small { color:#6b7280; font-size:11px; }
+
 .profile-modal {
     position:fixed;
     inset:0;
