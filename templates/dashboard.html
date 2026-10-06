@@ -214,12 +214,14 @@
                     <section class="profile-panel">
                         <div class="profile-panel-head"><strong>Data Pribadi</strong></div>
                         <div class="profile-panel-body">
+                            <div class="profile-row"><span>Tempat Lahir</span><b id="cpTempatLahir">-</b></div>
                             <div class="profile-row"><span>Tanggal Lahir</span><b id="cpTglLahir">-</b></div>
                             <div class="profile-row"><span>Jenis Kelamin</span><b id="cpJenisKel">-</b></div>
                             <div class="profile-row"><span>Status Perkawinan</span><b id="cpStatusKawin">-</b></div>
                             <div class="profile-row"><span>Agama</span><b id="cpAgama">-</b></div>
                             <div class="profile-row"><span>No. KTP</span><b id="cpKtp">-</b></div>
                             <div class="profile-row"><span>No. NPWP</span><b id="cpNpwp">-</b></div>
+                            <div class="profile-row"><span>Hobi</span><b id="cpHobi">-</b></div>
                         </div>
                     </section>
 
@@ -245,6 +247,12 @@
                             <div class="profile-row"><span>TMT Class</span><b id="cpTmtClass">-</b></div>
                             <div class="profile-row"><span>TMT CPNS</span><b id="cpTmtCpns">-</b></div>
                             <div class="profile-row"><span>TMT PNS</span><b id="cpTmtPns">-</b></div>
+                            <div class="profile-row"><span>Gol. Rekrut</span><b id="cpGolRecruit">-</b></div>
+                            <div class="profile-row"><span>Status Pegawai</span><b id="cpStatusPeg">-</b></div>
+                            <div class="profile-row"><span>Status Keluar</span><b id="cpIsKeluar">-</b></div>
+                            <div class="profile-row"><span>Tanggal Keluar</span><b id="cpTglKeluar">-</b></div>
+                            <div class="profile-row"><span>Alasan Keluar</span><b id="cpAlasanKeluar">-</b></div>
+                            <div class="profile-row"><span>VIP</span><b id="cpIsVip">-</b></div>
                         </div>
                     </section>
                 </div>
@@ -2348,9 +2356,9 @@ if (accountMenuToggle && accountMenuDropdown) {
         const d=p.data;
         text("cpNama",d.nama); text("cpNip",d.nip); text("cpFinger",d.finger_id); text("cpPangkat",d.pangkat);
         text("cpGol",d.gol); text("cpJabatan",d.jabatan); text("cpUnit",d.unit_kerja); text("cpEselon",d.eselon);
-        text("cpTglLahir",d.tgl_lahir); text("cpJenisKel",d.jenis_kel); text("cpStatusKawin",d.status_perkawinan);
-        text("cpAgama",d.agama); text("cpKtp",d.no_ktp); text("cpNpwp",d.no_npwp); text("cpTglMasuk",d.tgl_masuk);
-        text("cpTmtPangkat",d.tmt_pangkat); text("cpTmtJabatan",d.tmt_jabatan); text("cpTmtClass",d.tmt_class);
+        text("cpTempatLahir",d.tempat_lahir); text("cpTglLahir",d.tgl_lahir); text("cpJenisKel",d.jenis_kel); text("cpStatusKawin",d.status_perkawinan);
+        text("cpAgama",d.agama); text("cpKtp",d.no_ktp); text("cpNpwp",d.no_npwp); text("cpHobi",d.hobi); text("cpTglMasuk",d.tgl_masuk);
+        text("cpTmtPangkat",d.tmt_pangkat); text("cpTmtJabatan",d.tmt_jabatan); text("cpTmtClass",d.tmt_class); text("cpGolRecruit",d.gol_recruit); text("cpStatusPeg",d.status_peg); text("cpIsKeluar",d.is_keluar); text("cpTglKeluar",d.tgl_keluar); text("cpAlasanKeluar",d.alasan_keluar); text("cpIsVip",d.is_vip);
         text("cpTmtCpns",d.tmt_cpns); text("cpTmtPns",d.tmt_pns);
         $("cpNoTelp").value=d.no_telp||""; $("cpEmail").value=d.email||""; $("cpAlamat").value=d.alamat||"";
         $("cpKelurahan").value=d.kelurahan||""; $("cpKecamatan").value=d.kecamatan||""; $("cpKota").value=d.kota||"";
