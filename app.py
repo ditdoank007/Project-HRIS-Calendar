@@ -420,7 +420,6 @@ def agenda():
     )
 
 
-
 @app.route("/plans")
 @login_required
 def plans():
@@ -764,6 +763,14 @@ def api_personal_calendar():
         }), 502
 
 
+def hris_internal_headers():
+    nip = str(session.get("nip") or "").strip()
+    return {
+        "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+        "X-Calendar-NIP": nip,
+    }
+
+
 @app.route("/api/agenda/dinas-luar/pdf")
 @login_required
 def api_agenda_dinas_luar_pdf():
@@ -814,7 +821,6 @@ def api_agenda_dinas_luar_pdf():
     )
 
 
-
 @app.route("/api/calendar/<token>.ics")
 def api_calendar_feed_proxy(token):
 
@@ -860,45 +866,4 @@ def health():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80)def hris_internal_headers():
-    nip = str(session.get("nip") or "").strip()
-    return {
-        "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
-        "X-Calendar-NIP": nip,
-    }
-
-
-def _proxy_personal_benefit(path, params):
-    nip = str(session.get("nip") or "").strip()
-    if not nip:
-        return jsonify({
-            "status": "error",
-            "message": "NIP tidak ditemukan."
-        }), 401
-
-    try:
-        response = requests.get(
-            f"{Config.HRIS_INTERNAL_API_URL}{path}",
-            params=params,
-            headers=hris_internal_headers(),
-            timeout=20,
-            verify="/etc/ssl/certs/ca-certificates.crt",
-        )
-    except requests.RequestException:
-        return jsonify({
-            "status": "error",
-            "message": "Layanan Benefit HRIS tidak tersedia."
-        }), 502
-
-    try:
-        payload = response.json()
-    except Exception:
-        return jsonify({
-            "status": "error",
-            "message": "Respons Benefit HRIS tidak valid."
-        }), 502
-
-    return jsonify(payload), response.status_code
-
-
-
+    app.run(host="0.0.0.0", port=80)
