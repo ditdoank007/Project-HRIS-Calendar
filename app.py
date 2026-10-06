@@ -239,6 +239,137 @@ def api_rekam_medisku():
         }), 502
 
 
+@app.route("/profilku")
+@login_required
+def profilku():
+    return render_template(
+        "dashboard.html",
+        nama=session.get("nama"),
+        nip=session.get("nip"),
+        active_menu="profilku"
+    )
+
+
+def _hris_profile_headers():
+    return {
+        "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+        "X-Calendar-NIP": str(session.get("nip") or ""),
+    }
+
+
+@app.route("/api/profilku")
+@login_required
+def api_profilku():
+    if not session.get("nip"):
+        return jsonify({"success": False, "message": "NIP tidak ditemukan."}), 401
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/profile",
+            headers=_hris_profile_headers(),
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.RequestException:
+        app.logger.exception("HRIS Profilku unavailable")
+        return jsonify({"success": False, "message": "Layanan profil HRIS tidak tersedia."}), 502
+
+
+@app.route("/api/profilku", methods=["PUT"])
+@login_required
+def api_profilku_update():
+    try:
+        response = requests.put(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/profile",
+            headers={**_hris_profile_headers(), "Content-Type": "application/json"},
+            json=request.get_json(silent=True) or {},
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.RequestException:
+        app.logger.exception("HRIS Profilku update unavailable")
+        return jsonify({"success": False, "message": "Gagal menyimpan profil."}), 502
+
+
+@app.route("/api/profilku/photo")
+@login_required
+def api_profilku_photo():
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/profile-photo",
+            headers=_hris_profile_headers(),
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+        if response.status_code != 200:
+            return ("", response.status_code)
+        return Response(
+            response.content,
+            status=200,
+            content_type=response.headers.get("Content-Type", "image/jpeg"),
+            headers={"Cache-Control": "no-store"},
+        )
+    except requests.RequestException:
+        return ("", 502)
+
+
+@app.route("/api/profilku/photo", methods=["POST"])
+@login_required
+def api_profilku_photo_upload():
+    file = request.files.get("photo")
+    if not file:
+        return jsonify({"success": False, "message": "Foto wajib dipilih."}), 400
+    try:
+        response = requests.post(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/profile-photo",
+            headers=_hris_profile_headers(),
+            files={"photo": (file.filename, file.stream, file.mimetype)},
+            timeout=30,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.RequestException:
+        app.logger.exception("HRIS Profilku photo upload unavailable")
+        return jsonify({"success": False, "message": "Gagal menyimpan foto profil."}), 502
+
+
+@app.route("/api/profilku/password", methods=["POST"])
+@login_required
+def api_profilku_password():
+    payload = request.get_json(silent=True) or {}
+    payload["username"] = session.get("sso_username") or session.get("username") or ""
+    try:
+        response = requests.post(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/profile-password",
+            headers={**_hris_profile_headers(), "Content-Type": "application/json"},
+            json=payload,
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.RequestException:
+        app.logger.exception("HRIS Profilku password unavailable")
+        return jsonify({"success": False, "message": "Gagal mengubah password."}), 502
+
+
+@app.route("/api/profilku/signature", methods=["POST"])
+@login_required
+def api_profilku_signature():
+    try:
+        response = requests.post(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/profile-signature",
+            headers={**_hris_profile_headers(), "Content-Type": "application/json"},
+            json=request.get_json(silent=True) or {},
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.RequestException:
+        app.logger.exception("HRIS Profilku signature unavailable")
+        return jsonify({"success": False, "message": "Gagal menyimpan tanda tangan."}), 502
+
+
 @app.route("/phone-calendar")
 @login_required
 def phone_calendar():
