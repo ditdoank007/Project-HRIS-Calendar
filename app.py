@@ -189,6 +189,56 @@ def calendar_page():
     )
 
 
+@app.route("/rekam-medisku")
+@login_required
+def rekam_medisku():
+    return render_template(
+        "dashboard.html",
+        nama=session.get("nama"),
+        nip=session.get("nip"),
+        active_menu="rekam_medisku"
+    )
+
+
+@app.route("/api/rekam-medisku")
+@login_required
+def api_rekam_medisku():
+    nip = session.get("nip")
+
+    if not nip:
+        return jsonify({
+            "status": "error",
+            "message": "NIP tidak ditemukan."
+        }), 401
+
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/rekam-medis/history",
+            headers={
+                "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+                "X-Calendar-NIP": nip,
+            },
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+
+        return jsonify(response.json()), response.status_code
+
+    except requests.RequestException:
+        app.logger.exception("Rekam Medis HRIS API unavailable")
+        return jsonify({
+            "status": "error",
+            "message": "Layanan Rekam Medis HRIS tidak tersedia."
+        }), 502
+
+    except Exception:
+        app.logger.exception("Rekam Medis history API error")
+        return jsonify({
+            "status": "error",
+            "message": "Gagal mengambil riwayat Rekam Medis."
+        }), 502
+
+
 @app.route("/phone-calendar")
 @login_required
 def phone_calendar():
