@@ -3022,3 +3022,542 @@ body.medical-modal-open {
     .profile-hero { padding:20px 15px; }
     .profile-grid { padding:15px; }
 }
+
+
+/* Restored AgendaKu portal */
+.agenda-portal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.agenda-month-controls {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    padding: 4px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f9fafb;
+}
+
+.agenda-month-controls strong {
+    min-width: 118px;
+    text-align: center;
+    color: #374151;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.agenda-month-button {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    color: #374151;
+    cursor: pointer;
+    font-size: 19px;
+    line-height: 1;
+}
+
+.agenda-month-button:hover {
+    border-color: #dc2626;
+    color: #dc2626;
+    background: #fff7f7;
+}
+
+@media (max-width: 700px) {
+    .agenda-portal-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .agenda-month-controls {
+        align-self: flex-start;
+    }
+}
+
+/* ============================================================
+   AGENDAKU PORTAL
+   ============================================================ */
+
+.agenda-portal {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.agenda-portal-header,
+.agenda-group-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(15,23,42,.04);
+}
+
+.agenda-portal-header {
+    padding: 24px 26px;
+}
+
+.agenda-portal-kicker {
+    color: #dc2626;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+.agenda-portal-header h2 {
+    margin: 5px 0 4px;
+    font-size: 22px;
+    font-weight: 800;
+    color: #111827;
+}
+
+.agenda-portal-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.agenda-group-card {
+    overflow: hidden;
+}
+
+.agenda-group-header {
+    min-height: 76px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.agenda-group-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.agenda-group-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 18px;
+}
+
+.agenda-group-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 800;
+    color: #111827;
+}
+
+.agenda-group-header p {
+    margin: 3px 0 0;
+    color: #6b7280;
+    font-size: 11px;
+}
+
+.agenda-group-count {
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.agenda-portal-loading {
+    padding: 24px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.agenda-portal-error {
+    margin: 15px 20px;
+    padding: 12px 14px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 12px;
+}
+
+.agenda-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.agenda-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 920px;
+}
+
+.agenda-table th {
+    padding: 11px 14px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    color: #6b7280;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.agenda-table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid #edf0f3;
+    color: #374151;
+    font-size: 11px;
+    vertical-align: middle;
+}
+
+.agenda-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.agenda-table td strong {
+    display: block;
+    color: #111827;
+    font-size: 11px;
+}
+
+.agenda-table td > span {
+    display: block;
+    margin-top: 3px;
+    color: #6b7280;
+    font-size: 10px;
+}
+
+.agenda-count-cell {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.agenda-action-cell {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.agenda-view-button {
+    min-width: 54px;
+    height: 30px;
+    padding: 0 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    color: #374151;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.agenda-view-button:hover {
+    border-color: #dc2626;
+    color: #dc2626;
+    background: #fff7f7;
+}
+
+.agenda-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 72px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+
+.agenda-status-terjadwal {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.agenda-status-selesai {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.agenda-status-batal {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.agenda-empty-row {
+    padding: 35px !important;
+    text-align: center;
+    color: #9ca3af !important;
+}
+
+.agenda-empty-card {
+    padding: 28px 20px;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.agenda-disposisi-list {
+    padding: 14px 20px 20px;
+}
+
+.agenda-disposisi-item {
+    min-height: 62px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.agenda-disposisi-item > div {
+    min-width: 0;
+}
+
+.agenda-disposisi-item strong,
+.agenda-disposisi-item span,
+.agenda-disposisi-item small {
+    display: block;
+}
+
+.agenda-disposisi-item strong {
+    color: #111827;
+    font-size: 12px;
+}
+
+.agenda-disposisi-item span {
+    margin-top: 3px;
+    color: #6b7280;
+    font-size: 10px;
+}
+
+.agenda-disposisi-item small {
+    margin-top: 3px;
+    color: #9ca3af;
+    font-size: 10px;
+}
+
+.agenda-portal-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.agenda-portal-modal[hidden] {
+    display: none;
+}
+
+.agenda-portal-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15,23,42,.55);
+}
+
+.agenda-portal-modal-card {
+    position: relative;
+    z-index: 1;
+    width: min(760px, 100%);
+    max-height: 88vh;
+    overflow: auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 25px 60px rgba(15,23,42,.25);
+}
+
+.agenda-portal-modal-header {
+    min-height: 76px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.agenda-portal-modal-header h3 {
+    margin: 4px 0 0;
+    color: #111827;
+    font-size: 17px;
+}
+
+.agenda-modal-close {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 7px;
+    background: #f3f4f6;
+    color: #374151;
+    cursor: pointer;
+    font-size: 22px;
+}
+
+.agenda-portal-modal-body {
+    padding: 22px;
+}
+
+.agenda-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.agenda-detail-field {
+    padding: 13px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.agenda-detail-field > span {
+    display: block;
+    margin-bottom: 5px;
+    color: #9ca3af;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+}
+
+.agenda-detail-field > strong {
+    color: #111827;
+    font-size: 12px;
+}
+
+.agenda-detail-section {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.agenda-detail-section-title {
+    margin-bottom: 10px;
+    color: #111827;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.agenda-detail-attendance {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.agenda-attendance-row {
+    min-height: 42px;
+    padding: 8px 12px;
+    display: grid;
+    grid-template-columns: 28px 1fr 160px;
+    gap: 8px;
+    align-items: center;
+    border-bottom: 1px solid #edf0f3;
+    font-size: 11px;
+}
+
+.agenda-attendance-row:last-child {
+    border-bottom: 0;
+}
+
+.agenda-attendance-row small {
+    color: #6b7280;
+}
+
+.agenda-detail-empty {
+    padding: 13px;
+    border-radius: 7px;
+    background: #f9fafb;
+    color: #9ca3af;
+    font-size: 11px;
+}
+
+.agenda-notulen-button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 0 15px;
+    border-radius: 7px;
+    background: #dc2626;
+    color: #fff;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.agenda-notulen-button:hover {
+    background: #b91c1c;
+    color: #fff;
+}
+
+body.agenda-modal-open {
+    overflow: hidden;
+}
+
+@media (max-width: 700px) {
+    .agenda-portal-header {
+        padding: 20px;
+    }
+
+    .agenda-group-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .agenda-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .agenda-attendance-row {
+        grid-template-columns: 24px 1fr;
+    }
+
+    .agenda-attendance-row small {
+        grid-column: 2;
+    }
+
+    .agenda-portal-modal {
+        padding: 10px;
+    }
+
+    .agenda-portal-modal-card {
+        max-height: 92vh;
+    }
+}
+
+
+
+/* ============================================================
+   AGENDAKU OVERVIEW
+   ============================================================ */
+.agenda-overview{display:flex;flex-direction:column;gap:18px}
+.agenda-overview-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px 26px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 2px 8px rgba(15,23,42,.04)}
+.agenda-overview-header h2{margin:5px 0 4px;color:#111827;font-size:22px;font-weight:800}
+.agenda-overview-header p{margin:0;color:#6b7280;font-size:12px}
+.agenda-overview-period{padding:9px 13px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;color:#374151;font-size:11px;font-weight:800;white-space:nowrap}
+.agenda-overview-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.agenda-overview-card{min-height:190px;padding:22px;display:flex;flex-direction:column;text-decoration:none;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 2px 8px rgba(15,23,42,.04);transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.agenda-overview-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(15,23,42,.08);border-color:#d1d5db}
+.agenda-overview-card-top{display:flex;align-items:center;gap:10px;color:#111827;font-size:12px;font-weight:800;letter-spacing:.5px}
+.agenda-overview-icon{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#fee2e2;font-size:18px}
+.agenda-overview-card>strong{margin-top:22px;color:#111827;font-size:34px;line-height:1}
+.agenda-overview-card>small{margin-top:7px;color:#6b7280;font-size:11px}
+.agenda-overview-card>em{margin-top:auto;padding-top:18px;color:#dc2626;font-size:10px;font-style:normal;font-weight:800}
+.agenda-overview-rapat .agenda-overview-icon{background:#dbeafe}
+.agenda-overview-disposisi .agenda-overview-icon{background:#fef3c7}
+.agenda-overview-kesamaptaan .agenda-overview-icon{background:#dcfce7}
+@media(max-width:900px){.agenda-overview-cards{grid-template-columns:1fr}.agenda-overview-header{align-items:flex-start;flex-direction:column}}
+
+.agenda-overview-message{display:block;margin-top:8px;color:#dc2626;font-size:11px;font-weight:800;line-height:1.35;min-height:30px}
