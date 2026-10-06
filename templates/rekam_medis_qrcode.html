@@ -164,7 +164,7 @@ document.getElementById("guestAttend").addEventListener("click",async()=>{
  try{
   const response=await fetch("/api/rekam-medis-qrcode/guest",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token,nik,nama:name,jenis_kelamin:gender,instansi,email,no_handphone:phone,tanda_tangan:canvas.toDataURL("image/png")})});
   const result=await response.json();if(!response.ok||result.status!=="success")throw new Error(result.message||"Pendaftaran gagal.");
-  showSuccess(result.message);
+  showSuccess("Silahkan menunggu antrian untuk pemeriksaan rekam medis.");
  }catch(e){button.disabled=false;button.textContent="SIMPAN PENDAFTARAN";alert(e.message)}
 });
 
