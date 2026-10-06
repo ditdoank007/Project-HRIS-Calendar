@@ -60,7 +60,13 @@
             </a>
 
             <div class="sidebar-menu-group {{ 'open' if active_menu in ['plans', 'cuti', 'sakit', 'ijin'] else '' }}">
-                <a href="/plans"
+                <a href="/rekam-medisku"
+               class="{{ 'active' if active_menu == 'rekam_medisku' else '' }}">
+                <span class="menu-icon">♡</span>
+                <span>REKAM MEDISKU</span>
+            </a>
+
+            <a href="/plans"
                    class="sidebar-menu-parent {{ 'active' if active_menu in ['plans', 'cuti', 'sakit', 'ijin'] else '' }}">
                     <span class="menu-icon">◇</span>
                     <span>PENGAJUANKU</span>
@@ -986,6 +992,100 @@
 
         </section>
 
+        {% elif active_menu == "rekam_medisku" %}
+
+        <div class="breadcrumb-card">
+            <strong>Rekam Medisku</strong>
+        </div>
+
+        <section class="medical-history-card">
+            <div class="medical-history-header">
+                <div>
+                    <div class="medical-history-kicker">REKAM MEDIS PRIBADI PEGAWAI</div>
+                    <h2>Riwayat Rekam Medis</h2>
+                    <p>Riwayat pemeriksaan kesehatan yang pernah kamu ikuti di HRIS Reborn.</p>
+                </div>
+                <div class="medical-history-total" id="medicalHistoryTotal">0 pemeriksaan</div>
+            </div>
+
+            <div id="medicalHistoryLoading" class="medical-history-loading">
+                Memuat riwayat Rekam Medis...
+            </div>
+
+            <div id="medicalHistoryError" class="medical-history-error" hidden></div>
+
+            <div id="medicalHistoryEmpty" class="medical-history-empty" hidden>
+                <div class="medical-empty-icon">+</div>
+                <strong>Belum ada riwayat Rekam Medis</strong>
+                <span>Hasil pemeriksaan yang sudah selesai akan tampil di halaman ini.</span>
+            </div>
+
+            <div id="medicalHistoryTableWrap" class="medical-history-table-wrap" hidden>
+                <table class="medical-history-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal Pemeriksaan</th>
+                            <th>Jam</th>
+                            <th>Kegiatan</th>
+                            <th>Lokasi</th>
+                            <th>Hasil</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medicalHistoryBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <div id="medicalDetailModal" class="medical-detail-modal" hidden>
+            <div class="medical-detail-backdrop" data-medical-close></div>
+
+            <section class="medical-detail-dialog"
+                     role="dialog"
+                     aria-modal="true"
+                     aria-labelledby="medicalDetailTitle">
+
+                <div class="medical-detail-header">
+                    <div>
+                        <div class="medical-history-kicker">DETAIL PEMERIKSAAN</div>
+                        <h2 id="medicalDetailTitle">Rekam Medis</h2>
+                    </div>
+                    <button type="button"
+                            class="medical-detail-close"
+                            data-medical-close
+                            aria-label="Tutup detail">×</button>
+                </div>
+
+                <div class="medical-detail-body">
+
+                    <div class="medical-detail-summary">
+                        <div><span>Kegiatan</span><strong id="medicalDetailActivity">-</strong></div>
+                        <div><span>Lokasi</span><strong id="medicalDetailLocation">-</strong></div>
+                        <div><span>Jadwal</span><strong id="medicalDetailSchedule">-</strong></div>
+                        <div><span>Pemeriksaan Dilakukan</span><strong id="medicalDetailExamAt">-</strong></div>
+                    </div>
+
+                    <div class="medical-detail-section-title">Hasil Pemeriksaan</div>
+
+                    <div class="medical-detail-grid">
+                        <div class="medical-detail-field"><span>Tekanan Darah</span><strong id="medicalDetailBloodPressure">-</strong></div>
+                        <div class="medical-detail-field"><span>Nadi</span><strong id="medicalDetailPulse">-</strong></div>
+                        <div class="medical-detail-field"><span>Frekuensi Nafas</span><strong id="medicalDetailRespiration">-</strong></div>
+                        <div class="medical-detail-field"><span>Suhu</span><strong id="medicalDetailTemperature">-</strong></div>
+                        <div class="medical-detail-field"><span>SpO2</span><strong id="medicalDetailSpo2">-</strong></div>
+                        <div class="medical-detail-field"><span>Hasil Kebugaran</span><strong id="medicalDetailFitness">-</strong></div>
+                    </div>
+
+                    <div class="medical-detail-notes-grid">
+                        <div><span>Keluhan</span><p id="medicalDetailComplaint">-</p></div>
+                        <div><span>Tindakan / Catatan</span><p id="medicalDetailAction">-</p></div>
+                        <div><span>Pemeriksa</span><p id="medicalDetailExaminer">-</p></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
         {% else %}
 
         <div class="breadcrumb-card">
@@ -1761,6 +1861,181 @@ function renderYear() {
 }
 
 loadCalendar();
+
+{% elif active_menu == "rekam_medisku" %}
+const medicalHistoryLoading = document.getElementById("medicalHistoryLoading");
+const medicalHistoryError = document.getElementById("medicalHistoryError");
+const medicalHistoryEmpty = document.getElementById("medicalHistoryEmpty");
+const medicalHistoryTableWrap = document.getElementById("medicalHistoryTableWrap");
+const medicalHistoryBody = document.getElementById("medicalHistoryBody");
+const medicalHistoryTotal = document.getElementById("medicalHistoryTotal");
+const medicalDetailModal = document.getElementById("medicalDetailModal");
+
+let medicalHistory = [];
+
+function medicalEscape(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function medicalWibDateTime(value) {
+    if (!value) return "-";
+
+    const raw = String(value);
+    const iso = /[zZ]|[+-]\\d{2}:?\\d{2}$/.test(raw)
+        ? raw
+        : raw + "+07:00";
+
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return "-";
+
+    return new Intl.DateTimeFormat("id-ID", {
+        timeZone: "Asia/Jakarta",
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    }).format(date) + " WIB";
+}
+
+function medicalDate(value) {
+    if (!value) return "-";
+
+    const parts = String(value).split("-");
+    if (parts.length !== 3) return value;
+
+    const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    return new Intl.DateTimeFormat("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+    }).format(date);
+}
+
+function medicalResultBadge(value) {
+    const result = String(value || "").toUpperCase();
+
+    if (result === "FIT") {
+        return '<span class="medical-result-badge medical-result-fit">FIT</span>';
+    }
+
+    if (result === "UNFIT") {
+        return '<span class="medical-result-badge medical-result-unfit">UNFIT</span>';
+    }
+
+    return '<span class="medical-result-badge medical-result-empty">-</span>';
+}
+
+function medicalSetText(id, value) {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value || "-";
+}
+
+function openMedicalDetail(index) {
+    const item = medicalHistory[index];
+    if (!item) return;
+
+    medicalSetText("medicalDetailTitle", item.judul || "Rekam Medis");
+    medicalSetText("medicalDetailActivity", item.judul);
+    medicalSetText("medicalDetailLocation", item.lokasi || "Kantor SAR Surabaya");
+    medicalSetText(
+        "medicalDetailSchedule",
+        medicalDate(item.tanggal) + " • " + (item.jam || "-") + " WIB"
+    );
+    medicalSetText("medicalDetailExamAt", medicalWibDateTime(item.pemeriksaan_at));
+    medicalSetText("medicalDetailBloodPressure", item.tekanan_darah);
+    medicalSetText("medicalDetailPulse", item.nadi ? item.nadi + " / menit" : "-");
+    medicalSetText("medicalDetailRespiration", item.frekuensi_nafas ? item.frekuensi_nafas + " / menit" : "-");
+    medicalSetText("medicalDetailTemperature", item.suhu !== null && item.suhu !== undefined ? item.suhu + " °C" : "-");
+    medicalSetText("medicalDetailSpo2", item.spo2 !== null && item.spo2 !== undefined ? item.spo2 + " %" : "-");
+    medicalSetText("medicalDetailFitness", item.hasil_kebugaran || "-");
+    medicalSetText("medicalDetailComplaint", item.keluhan || "-");
+    medicalSetText("medicalDetailAction", item.tindakan || "-");
+    medicalSetText("medicalDetailExaminer", item.pemeriksa || "-");
+
+    medicalDetailModal.hidden = false;
+    document.body.classList.add("medical-modal-open");
+}
+
+function closeMedicalDetail() {
+    medicalDetailModal.hidden = true;
+    document.body.classList.remove("medical-modal-open");
+}
+
+document.querySelectorAll("[data-medical-close]").forEach((element) => {
+    element.addEventListener("click", closeMedicalDetail);
+});
+
+async function loadMedicalHistory() {
+    medicalHistoryLoading.hidden = false;
+    medicalHistoryError.hidden = true;
+    medicalHistoryEmpty.hidden = true;
+    medicalHistoryTableWrap.hidden = true;
+
+    try {
+        const response = await fetch(
+            "/api/rekam-medisku",
+            { credentials: "same-origin" }
+        );
+
+        const payload = await response.json();
+
+        if (!response.ok || payload.status !== "success") {
+            throw new Error(
+                payload.message || "Gagal mengambil riwayat Rekam Medis."
+            );
+        }
+
+        medicalHistory = Array.isArray(payload.data)
+            ? payload.data
+            : [];
+
+        medicalHistoryTotal.textContent =
+            medicalHistory.length + " pemeriksaan";
+
+        if (!medicalHistory.length) {
+            medicalHistoryEmpty.hidden = false;
+            return;
+        }
+
+        medicalHistoryBody.innerHTML = medicalHistory.map((item, index) => {
+            return '<tr>' +
+                '<td>' + (index + 1) + '</td>' +
+                '<td><strong>' + medicalEscape(medicalDate(item.tanggal)) + '</strong></td>' +
+                '<td>' + medicalEscape(item.jam || "-") + ' WIB</td>' +
+                '<td><strong class="medical-history-title">' + medicalEscape(item.judul || "-") + '</strong><small>' + medicalEscape(item.status_pemeriksaan || "SELESAI") + '</small></td>' +
+                '<td>' + medicalEscape(item.lokasi || "-") + '</td>' +
+                '<td>' + medicalResultBadge(item.hasil_kebugaran) + '</td>' +
+                '<td><button type="button" class="medical-detail-button" data-medical-detail="' + index + '">Detail</button></td>' +
+                '</tr>';
+        }).join("");
+
+        medicalHistoryBody
+            .querySelectorAll("[data-medical-detail]")
+            .forEach((button) => {
+                button.addEventListener("click", () => {
+                    openMedicalDetail(Number(button.dataset.medicalDetail));
+                });
+            });
+
+        medicalHistoryTableWrap.hidden = false;
+
+    } catch (errorObject) {
+        medicalHistoryError.textContent =
+            errorObject.message || "Gagal mengambil riwayat Rekam Medis.";
+        medicalHistoryError.hidden = false;
+
+    } finally {
+        medicalHistoryLoading.hidden = true;
+    }
+}
+
+loadMedicalHistory();
 
 {% endif %}
 {% endif %}
