@@ -311,14 +311,12 @@ document.getElementById("guestForm").addEventListener("submit", async function(e
                 <p class="lead">Pendaftaran Anda berhasil.</p>
                 <div class="info">
                     <div class="label">Kegiatan Rekam Medis</div>
-                    <div class="value">${"" || ""}</div>
+                    <div class="value">{{ info.title|e }}</div>
                 </div>
                 <div class="waiting">
                     Silahkan menunggu antrian untuk pemeriksaan Rekam Medis.
                 </div>
             `;
-            const activity = document.querySelector(".card .value");
-            if(activity) activity.textContent = data.data?.kegiatan_judul || "{{ info.title|e }}";
             window.scrollTo({top:0, behavior:"smooth"});
             return;
         }
