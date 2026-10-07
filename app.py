@@ -228,6 +228,24 @@ def api_buku_tamu_pegawai():
     return jsonify(payload), response.status_code
 
 
+@app.route("/api/buku-tamu/keperluan")
+def api_buku_tamu_keperluan():
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/buku-tamu/keperluan",
+            headers={"X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY},
+            timeout=10,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({"status": "error", "message": "Layanan Jenis Keperluan HRIS tidak tersedia."}), 502
+    try:
+        payload = response.json()
+    except Exception:
+        payload = {"status": "error", "message": "Respons HRIS tidak valid."}
+    return jsonify(payload), response.status_code
+
+
 @app.route("/api/buku-tamu/submit", methods=["POST"])
 def api_buku_tamu_submit():
     payload = request.get_json(silent=True) or {}
@@ -243,6 +261,7 @@ def api_buku_tamu_submit():
         "instansi": str(payload.get("instansi") or "").strip(),
         "no_hp": str(payload.get("no_hp") or "").strip(),
         "keperluan": str(payload.get("keperluan") or "").strip(),
+        "keperluan_detail": str(payload.get("keperluan_detail") or "").strip(),
         "keterangan": str(payload.get("keterangan") or "").strip(),
         "pegawai_nip": str(payload.get("pegawai_nip") or "").strip(),
         "pegawai_nama": str(payload.get("pegawai_nama") or "").strip(),
