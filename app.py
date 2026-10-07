@@ -375,8 +375,17 @@ def absen_qrcode():
         ), response.status_code
 
     info = payload.get("data") or {}
+    mode = str(request.args.get("mode") or "").strip().lower()
 
-    if session.get("logged_in"):
+    if mode == "pegawai":
+        if not session.get("logged_in"):
+            return redirect(
+                url_for(
+                    "login",
+                    next=f"/absen-qrcode?token={token}&mode=pegawai",
+                )
+            )
+
         try:
             response = _hris_rekam_medis_request(
                 "/api/internal/calendar/agenda/rapat/attendance/employee",
@@ -393,6 +402,7 @@ def absen_qrcode():
                 message="Gagal mencatat kehadiran pegawai.",
                 info=info,
                 token=token,
+                mode=mode,
             ), 502
 
         return render_template(
@@ -402,16 +412,25 @@ def absen_qrcode():
             message=result.get("message", "Scan QR berhasil."),
             info=info,
             token=token,
-            participant_mode="PEGAWAI",
+            mode=mode,
             attendee=result.get("data"),
         ), response.status_code
+
+    if mode == "non-pegawai":
+        return render_template(
+            "absen_qrcode.html",
+            success=False,
+            info=info,
+            token=token,
+            mode=mode,
+        )
 
     return render_template(
         "absen_qrcode.html",
         success=False,
         info=info,
         token=token,
-        participant_mode="GUEST",
+        mode="",
     )
 
 
@@ -446,7 +465,7 @@ def absen_qrcode_pegawai():
     if not token or len(token) > 150:
         return redirect(url_for("login"))
     if not session.get("logged_in"):
-        return redirect(url_for("login", next=f"/absen-qrcode?token={token}"))
+        return redirect(url_for("login", next=f"/absen-qrcode?token={token}&mode=pegawai"))
     return redirect(url_for("absen_qrcode", token=token))
 
 
