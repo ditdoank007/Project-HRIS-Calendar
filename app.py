@@ -47,7 +47,11 @@ def login():
     if session.get("logged_in"):
         return redirect(url_for("dashboard"))
 
-    return render_template("login.html")
+    next_url = str(request.args.get("next") or "").strip()
+    if not next_url.startswith("/") or next_url.startswith("//"):
+        next_url = "/dashboard"
+
+    return render_template("login.html", next_url=next_url)
 
 
 @app.route("/api/login", methods=["POST"])
@@ -57,6 +61,9 @@ def api_login():
     username = str(data.get("username") or "").strip()
     password = str(data.get("password") or "").strip()
     remember = bool(data.get("remember"))
+    next_url = str(data.get("next") or "").strip()
+    if not next_url.startswith("/") or next_url.startswith("//"):
+        next_url = "/dashboard"
 
     if not username:
         return jsonify({
@@ -150,7 +157,8 @@ def api_login():
                 "username": sso_username,
                 "nip": sso_nip,
                 "nama": sso_name
-            }
+            },
+            "redirect_to": next_url
         })
 
     except requests.RequestException:
@@ -187,6 +195,140 @@ def calendar_page():
         nip=session.get("nip"),
         active_menu="calendar"
     )
+
+
+def _hris_rekam_medis_request(path, method="GET", **kwargs):
+    """Proxy public QR scan requests to HRIS through the private internal API."""
+    headers = kwargs.pop("headers", {}) or {}
+    headers.update({
+        "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+    })
+    return requests.request(
+        method,
+        f"{Config.HRIS_INTERNAL_API_URL.rstrip('/')}{path}",
+        headers=headers,
+        timeout=20,
+        verify="/etc/ssl/certs/ca-certificates.crt",
+        **kwargs,
+    )
+
+
+@app.route("/rekam-medis/scan/<token>")
+def rekam_medis_scan(token):
+    token = str(token or "").strip()
+    if not token or len(token) > 150:
+        return render_template(
+            "rekam_medis_scan.html",
+            success=False,
+            message="QR Code Rekam Medis tidak valid.",
+        ), 400
+
+    nip = str(session.get("nip") or "").strip()
+    headers = {}
+    if nip:
+        headers["X-Calendar-NIP"] = nip
+
+    try:
+        response = _hris_rekam_medis_request(
+            "/api/internal/calendar/rekam-medis/attendance-info",
+            params={"token": token},
+            headers=headers,
+        )
+        payload = response.json()
+    except (requests.RequestException, ValueError):
+        app.logger.exception("Rekam Medis QR info request failed")
+        return render_template(
+            "rekam_medis_scan.html",
+            success=False,
+            message="Layanan Rekam Medis HRIS tidak dapat dihubungi.",
+        ), 502
+
+    if response.status_code != 200 or payload.get("status") != "success":
+        return render_template(
+            "rekam_medis_scan.html",
+            success=False,
+            message=payload.get("message", "QR Rekam Medis tidak dapat diproses."),
+        ), response.status_code
+
+    info = payload.get("data") or {}
+    participant_mode = str(info.get("participant_mode") or "").upper()
+
+    if participant_mode == "PEGAWAI" and not session.get("logged_in"):
+        return redirect(url_for("login", next=request.path))
+
+    if participant_mode == "PEGAWAI" and session.get("logged_in"):
+        try:
+            response = _hris_rekam_medis_request(
+                "/api/internal/calendar/rekam-medis/attendance/employee",
+                method="POST",
+                headers={"X-Calendar-NIP": str(session.get("nip") or "")},
+                json={"token": token},
+            )
+            payload = response.json()
+        except (requests.RequestException, ValueError):
+            app.logger.exception("Rekam Medis employee scan request failed")
+            return render_template(
+                "rekam_medis_scan.html",
+                success=False,
+                message="Gagal mendaftarkan kehadiran pegawai.",
+                info=info,
+                token=token,
+            ), 502
+
+        return render_template(
+            "rekam_medis_scan.html",
+            success=response.status_code == 200 and payload.get("status") == "success",
+            already=not bool(payload.get("created")),
+            message=payload.get("message", "Scan QR berhasil."),
+            info=info,
+            token=token,
+            participant_mode=participant_mode,
+            peserta=payload.get("data"),
+        ), response.status_code
+
+    if participant_mode != "NON_PEGAWAI":
+        return render_template(
+            "rekam_medis_scan.html",
+            success=False,
+            message="Jenis peserta pada QR Rekam Medis tidak dikenali.",
+            info=info,
+            token=token,
+        ), 400
+
+    return render_template(
+        "rekam_medis_scan.html",
+        success=False,
+        info=info,
+        token=token,
+        participant_mode=participant_mode,
+    )
+
+
+@app.route("/api/rekam-medis/scan/non-pegawai", methods=["POST"])
+def api_rekam_medis_scan_non_pegawai():
+    payload = request.get_json(silent=True) or {}
+    token = str(payload.get("token") or "").strip()
+
+    try:
+        response = _hris_rekam_medis_request(
+            "/api/internal/calendar/rekam-medis/attendance/guest",
+            method="POST",
+            json=payload,
+        )
+        try:
+            result = response.json()
+        except ValueError:
+            result = {
+                "status": "error",
+                "message": "Respons layanan Rekam Medis HRIS tidak valid.",
+            }
+        return jsonify(result), response.status_code
+    except requests.RequestException:
+        app.logger.exception("Rekam Medis non-employee scan request failed")
+        return jsonify({
+            "status": "error",
+            "message": "Layanan Rekam Medis HRIS tidak dapat dihubungi.",
+        }), 502
 
 
 @app.route("/rekam-medisku")
