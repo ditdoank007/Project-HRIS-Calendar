@@ -29,13 +29,13 @@ form{margin-top:22px}.field{margin-bottom:15px}.field label{display:block;font-w
 
 {% if success %}
 <div class="icon">✓</div>
-<h1>{% if mode == "pegawai" %}Absen Kehadiran Tersimpan{% else %}Absen Berhasil{% endif %}</h1>
-<p class="lead">{% if mode == "pegawai" %}Absen kehadiran pegawai telah tersimpan.{% else %}Kehadiran non pegawai berhasil dicatat.{% endif %}</p>
+<h1>Pendaftaran Berhasil</h1>
+<p class="lead">Pendaftaran Anda berhasil.</p>
 <div class="info">
 <div class="label">Agenda</div><div class="value">{{ info.title }}</div>
-<div class="label">Waktu</div><div class="value">{{ info.start|replace("T"," ") }}</div>
-<div class="label">Lokasi</div><div class="value">{{ info.location or "-" }}</div>
-<div class="label">Peserta</div><div class="value">{{ attendee.nama if attendee and attendee.nama else attendee.name if attendee and attendee.name else session.get("nama","Pegawai") }}</div>
+</div>
+<div class="note" style="font-size:16px;font-weight:700;color:#166b3a;">
+Silahkan menunggu antrian / proses kehadiran agenda.
 </div>
 
 {% elif mode == "pegawai" %}
@@ -117,7 +117,22 @@ document.getElementById("guestForm").onsubmit=async e=>{
    const d=await r.json();
    m.className="msg "+(r.ok&&d.status==="success"?"success":"");
    m.textContent=d.message||"Gagal mencatat kehadiran.";
-   if(r.ok&&d.status==="success"){m.className="msg success";m.textContent="Absen berhasil.";document.getElementById("guestForm").querySelectorAll("input,button").forEach(x=>x.disabled=true)}
+   if(r.ok&&d.status==="success"){
+     document.querySelector(".card").innerHTML = `
+       <div class="brand"><img src="{{ url_for('static', filename='img/logo-basarnas.png') }}" alt="Basarnas"><div><b>CALENDAR</b><small>Kantor SAR Surabaya</small></div></div>
+       <div class="icon">✓</div>
+       <h1>Pendaftaran Berhasil</h1>
+       <p class="lead">Pendaftaran Anda berhasil.</p>
+       <div class="info">
+         <div class="label">Agenda</div><div class="value">{{ info.title|e }}</div>
+       </div>
+       <div class="note" style="font-size:16px;font-weight:700;color:#166b3a;">
+         Silahkan menunggu antrian / proses kehadiran agenda.
+       </div>
+     `;
+     window.scrollTo({top:0,behavior:"smooth"});
+     return;
+   }
  }catch(x){m.className="msg";m.textContent="Server Calendar tidak dapat dihubungi."}
  finally{if(!(m.className.includes("success"))){b.disabled=false;b.textContent="Simpan Kehadiran"}}
 };
