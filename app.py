@@ -251,12 +251,18 @@ def rekam_medis_scan(token):
         ), response.status_code
 
     info = payload.get("data") or {}
-    participant_mode = str(info.get("participant_mode") or "").upper()
+    mode = str(request.args.get("mode") or "").strip().lower()
 
-    if participant_mode == "PEGAWAI" and not session.get("logged_in"):
-        return redirect(url_for("login", next=request.path))
+    # QR Rekam Medis selalu menampilkan pilihan peserta terlebih dahulu.
+    if mode == "pegawai":
+        if not session.get("logged_in"):
+            return redirect(
+                url_for(
+                    "login",
+                    next=f"/rekam-medis/scan/{token}?mode=pegawai",
+                )
+            )
 
-    if participant_mode == "PEGAWAI" and session.get("logged_in"):
         try:
             response = _hris_rekam_medis_request(
                 "/api/internal/calendar/agenda/rekam-medis/attendance/employee",
@@ -273,6 +279,7 @@ def rekam_medis_scan(token):
                 message="Gagal mendaftarkan kehadiran pegawai.",
                 info=info,
                 token=token,
+                mode=mode,
             ), 502
 
         return render_template(
@@ -282,25 +289,25 @@ def rekam_medis_scan(token):
             message=payload.get("message", "Scan QR berhasil."),
             info=info,
             token=token,
-            participant_mode=participant_mode,
+            mode=mode,
             peserta=payload.get("data"),
         ), response.status_code
 
-    if participant_mode != "NON_PEGAWAI":
+    if mode == "non-pegawai":
         return render_template(
             "rekam_medis_scan.html",
             success=False,
-            message="Jenis peserta pada QR Rekam Medis tidak dikenali.",
             info=info,
             token=token,
-        ), 400
+            mode=mode,
+        )
 
     return render_template(
         "rekam_medis_scan.html",
         success=False,
         info=info,
         token=token,
-        participant_mode=participant_mode,
+        mode="",
     )
 
 
