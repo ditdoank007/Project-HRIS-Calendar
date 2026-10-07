@@ -224,9 +224,7 @@ def rekam_medis_scan(token):
         ), 400
 
     nip = str(session.get("nip") or "").strip()
-    headers = {}
-    if nip:
-        headers["X-Calendar-NIP"] = nip
+    headers = {"X-Calendar-NIP": nip} if nip else {}
 
     try:
         response = _hris_rekam_medis_request(
@@ -247,19 +245,26 @@ def rekam_medis_scan(token):
         return render_template(
             "rekam_medis_scan.html",
             success=False,
-            message=payload.get("message", "QR Rekam Medis tidak dapat diproses."),
+            message=payload.get(
+                "message",
+                "QR Rekam Medis tidak dapat diproses.",
+            ),
         ), response.status_code
 
     info = payload.get("data") or {}
-    mode = str(request.args.get("mode") or "").strip().lower()
+    participant_mode = str(
+        info.get("participant_mode") or ""
+    ).strip().upper()
 
-    # QR Rekam Medis selalu menampilkan pilihan peserta terlebih dahulu.
-    if mode == "pegawai":
+    # QR Rekam Medis PEGAWAI:
+    # scan -> login BDIP jika belum login -> kembali ke URL yang sama
+    # -> otomatis masuk daftar/antrian pemeriksaan.
+    if participant_mode == "PEGAWAI":
         if not session.get("logged_in"):
             return redirect(
                 url_for(
                     "login",
-                    next=f"/rekam-medis/scan/{token}?mode=pegawai",
+                    next=f"/rekam-medis/scan/{token}",
                 )
             )
 
@@ -267,48 +272,59 @@ def rekam_medis_scan(token):
             response = _hris_rekam_medis_request(
                 "/api/internal/calendar/agenda/rekam-medis/attendance/employee",
                 method="POST",
-                headers={"X-Calendar-NIP": str(session.get("nip") or "")},
+                headers={
+                    "X-Calendar-NIP": str(session.get("nip") or ""),
+                },
                 json={"token": token},
             )
-            payload = response.json()
+            result = response.json()
         except (requests.RequestException, ValueError):
-            app.logger.exception("Rekam Medis employee scan request failed")
+            app.logger.exception(
+                "Rekam Medis employee scan request failed"
+            )
             return render_template(
                 "rekam_medis_scan.html",
                 success=False,
                 message="Gagal mendaftarkan kehadiran pegawai.",
                 info=info,
                 token=token,
-                mode=mode,
+                participant_mode="PEGAWAI",
             ), 502
 
         return render_template(
             "rekam_medis_scan.html",
-            success=response.status_code == 200 and payload.get("status") == "success",
-            already=not bool(payload.get("created")),
-            message=payload.get("message", "Scan QR berhasil."),
+            success=(
+                response.status_code == 200
+                and result.get("status") == "success"
+            ),
+            already=not bool(result.get("created")),
+            message=result.get("message", "Scan QR berhasil."),
             info=info,
             token=token,
-            mode=mode,
-            peserta=payload.get("data"),
+            participant_mode="PEGAWAI",
+            peserta=result.get("data"),
         ), response.status_code
 
-    if mode == "non-pegawai":
+    # QR Rekam Medis NON PEGAWAI:
+    # tidak boleh masuk halaman/login pegawai. Langsung tampilkan
+    # formulir peserta non-pegawai.
+    if participant_mode == "NON_PEGAWAI":
         return render_template(
             "rekam_medis_scan.html",
             success=False,
             info=info,
             token=token,
-            mode=mode,
+            participant_mode="NON_PEGAWAI",
         )
 
     return render_template(
         "rekam_medis_scan.html",
         success=False,
+        message="Jenis peserta pada QR Rekam Medis tidak dikenali.",
         info=info,
         token=token,
-        mode="",
-    )
+        participant_mode="",
+    ), 400
 
 
 @app.route("/api/rekam-medis/scan/non-pegawai", methods=["POST"])
