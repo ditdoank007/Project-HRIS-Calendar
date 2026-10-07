@@ -54,25 +54,16 @@ h1{font-size:25px}
 
     {% if success %}
         <div class="icon">✓</div>
-        <h1>Anda Berhasil Terdaftar</h1>
-        <p class="lead">{{ message }}</p>
-
+        <h1>Pendaftaran Berhasil</h1>
+        <p class="lead">
+            Pendaftaran Anda berhasil.
+        </p>
         <div class="info">
             <div class="label">Kegiatan Rekam Medis</div>
             <div class="value">{{ info.title }}</div>
-
-            <div class="label">Tanggal / Jam</div>
-            <div class="value">{{ info.start|replace("T"," ") }} WIB</div>
-
-            <div class="label">Lokasi</div>
-            <div class="value">{{ info.location }}</div>
-
-            <div class="label">Pegawai</div>
-            <div class="value">{{ peserta.nama if peserta else session.get("nama","Pegawai") }}</div>
         </div>
-
         <div class="waiting">
-            Silahkan menunggu antrian untuk pemeriksaan rekam medis.
+            Silahkan menunggu antrian untuk pemeriksaan Rekam Medis.
         </div>
     {% else %}
         <h1>Login Pegawai</h1>
@@ -310,22 +301,26 @@ document.getElementById("guestForm").addEventListener("submit", async function(e
         msg.textContent = data.message || "Gagal mendaftarkan peserta.";
 
         if(response.ok && data.status === "success"){
-            const formControls =
-                document.getElementById("guestForm")
-                .querySelectorAll("input,select,button");
-
-            formControls.forEach(function(control){
-                control.disabled = true;
-            });
-
-            if(data.created){
-                msg.className = "msg success";
-                msg.innerHTML =
-                    "Pendaftaran peserta berhasil.<br>" +
-                    "<strong>Silahkan menunggu antrian untuk pemeriksaan rekam medis.</strong>";
-            }
-
+            document.querySelector(".card").innerHTML = `
+                <div class="brand">
+                    <img src="{{ url_for('static', filename='img/logo-basarnas.png') }}" alt="Basarnas">
+                    <div><b>CALENDAR</b><small>Kantor SAR Surabaya</small></div>
+                </div>
+                <div class="icon">✓</div>
+                <h1>Pendaftaran Berhasil</h1>
+                <p class="lead">Pendaftaran Anda berhasil.</p>
+                <div class="info">
+                    <div class="label">Kegiatan Rekam Medis</div>
+                    <div class="value">${"" || ""}</div>
+                </div>
+                <div class="waiting">
+                    Silahkan menunggu antrian untuk pemeriksaan Rekam Medis.
+                </div>
+            `;
+            const activity = document.querySelector(".card .value");
+            if(activity) activity.textContent = data.data?.kegiatan_judul || "{{ info.title|e }}";
             window.scrollTo({top:0, behavior:"smooth"});
+            return;
         }
     }catch(err){
         msg.className = "msg";
