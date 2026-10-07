@@ -263,7 +263,8 @@ if (loginForm) {
                 body: JSON.stringify({
                     username,
                     password,
-                    remember
+                    remember,
+                    next: {{ next_url|tojson }}
                 })
             });
 
@@ -277,7 +278,7 @@ if (loginForm) {
                 return;
             }
 
-            window.location.href = "/dashboard";
+            window.location.href = result.redirect_to || "/dashboard";
 
         } catch (error) {
             alert(
