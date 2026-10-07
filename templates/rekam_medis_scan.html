@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scan Rekam Medis — Calendar</title>
+<style>
+:root{--orange:#f15a24;--navy:#24364b;--muted:#6b7b93;--green:#159447;--bg:#f5f7fa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--navy)}
+.wrap{min-height:100vh;display:flex;justify-content:center;padding:28px 16px}
+.card{width:100%;max-width:620px;background:#fff;border-radius:24px;box-shadow:0 12px 35px rgba(30,50,70,.12);padding:30px}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.brand img{width:48px;height:48px;object-fit:contain}.brand b{font-size:20px}.brand small{display:block;color:var(--muted);margin-top:3px}
+.icon{width:86px;height:86px;border-radius:50%;background:#e8f8ef;display:grid;place-items:center;margin:4px auto 20px;color:var(--green);font-size:48px}
+h1{font-size:30px;text-align:center;margin:0 0 10px}.lead{text-align:center;color:var(--muted);font-size:17px;line-height:1.5}
+.info{background:#f7f9fc;border-radius:16px;padding:18px;margin:22px 0}.label{font-size:13px;color:var(--muted);margin-top:12px}.label:first-child{margin-top:0}.value{font-size:18px;font-weight:700;margin-top:4px;line-height:1.35}
+button{border:0;border-radius:12px;background:var(--orange);color:#fff;padding:14px 18px;font-size:16px;font-weight:700;cursor:pointer;width:100%}
+button:disabled{opacity:.6;cursor:wait}.note{font-size:13px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5}
+form{margin-top:22px}.field{margin-bottom:15px}.field label{display:block;font-weight:700;margin-bottom:7px}.field input,.field select{width:100%;padding:13px;border:1px solid #d7dee8;border-radius:10px;font-size:16px;background:#fff}
+.sig{border:1px solid #d7dee8;border-radius:12px;background:#fff;touch-action:none;width:100%;height:190px}.sig-actions{display:flex;gap:8px;margin-top:8px}.sig-actions button{background:#68768a;padding:10px;font-size:14px}.msg{padding:14px;border-radius:12px;margin-top:16px;background:#fff4f0;color:#a33d18}.success{background:#eaf8ef;color:#166b3a}
+@media(max-width:480px){.card{padding:22px;border-radius:18px}h1{font-size:25px}.value{font-size:16px}}
+</style>
+</head>
+<body>
+<div class="wrap"><main class="card">
+<div class="brand">
+<img src="{{ url_for('static', filename='img/logo-basarnas.png') }}" alt="Basarnas">
+<div><b>CALENDAR</b><small>Kantor SAR Surabaya</small></div>
+</div>
+
+{% if participant_mode == "PEGAWAI" and success %}
+<div class="icon">✓</div>
+<h1>Scan QR Berhasil</h1>
+<p class="lead">{{ message }}</p>
+<div class="info">
+<div class="label">Kegiatan Rekam Medis</div><div class="value">{{ info.title }}</div>
+<div class="label">Tanggal / Jam</div><div class="value">{{ info.start|replace("T"," ") }} WIB</div>
+<div class="label">Lokasi</div><div class="value">{{ info.location }}</div>
+<div class="label">Pegawai</div><div class="value">{{ peserta.nama if peserta else session.get("nama","Pegawai") }}</div>
+</div>
+{% elif participant_mode == "NON_PEGAWAI" %}
+<h1>Peserta Rekam Medis</h1>
+<p class="lead">Silakan isi data peserta di bawah. Tidak perlu login sebagai pegawai.</p>
+<div class="info">
+<div class="label">Kegiatan Rekam Medis</div><div class="value">{{ info.title }}</div>
+<div class="label">Tanggal / Jam</div><div class="value">{{ info.start|replace("T"," ") }} WIB</div>
+<div class="label">Lokasi</div><div class="value">{{ info.location }}</div>
+</div>
+<form id="guestForm">
+<input type="hidden" id="token" value="{{ token }}">
+<div class="field"><label for="nik">NIK</label><input id="nik" inputmode="numeric" maxlength="16" required></div>
+<div class="field"><label for="nama">Nama Lengkap</label><input id="nama" required></div>
+<div class="field"><label for="jenis_kelamin">Jenis Kelamin</label><select id="jenis_kelamin" required><option value="">Pilih</option><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
+<div class="field"><label for="instansi">Instansi / Organisasi</label><input id="instansi" required></div>
+<div class="field"><label for="email">Email Aktif</label><input id="email" type="email" required></div>
+<div class="field"><label for="no_handphone">No. Handphone</label><input id="no_handphone" inputmode="tel" required></div>
+<div class="field"><label>Tanda Tangan</label><canvas id="signature" class="sig"></canvas><div class="sig-actions"><button type="button" id="clearSig">Bersihkan Tanda Tangan</button></div></div>
+<button type="submit" id="submitGuest">Daftar Pemeriksaan</button>
+<div id="guestMessage"></div>
+</form>
+{% elif success %}
+<div class="icon">✓</div><h1>Scan QR Berhasil</h1><p class="lead">{{ message }}</p>
+{% else %}
+<h1>QR Rekam Medis</h1><p class="lead">{{ message }}</p>
+{% if participant_mode == "PEGAWAI" %}<div class="info"><div class="label">Kegiatan</div><div class="value">{{ info.title }}</div></div>{% endif %}
+{% endif %}
+</main></div>
+
+<script>
+{% if participant_mode == "NON_PEGAWAI" %}
+const canvas=document.getElementById("signature"),ctx=canvas.getContext("2d");
+let drawing=false,hasSignature=false;
+function resizeCanvas(){
+ const ratio=window.devicePixelRatio||1,rect=canvas.getBoundingClientRect();
+ canvas.width=rect.width*ratio;canvas.height=rect.height*ratio;ctx.setTransform(ratio,0,0,ratio,0,0);
+ ctx.lineWidth=2.5;ctx.lineCap="round";ctx.strokeStyle="#24364b";
+}
+function point(e){const r=canvas.getBoundingClientRect();const p=e.touches?e.touches[0]:e;return{x:p.clientX-r.left,y:p.clientY-r.top}}
+function start(e){e.preventDefault();drawing=true;const p=point(e);ctx.beginPath();ctx.moveTo(p.x,p.y)}
+function move(e){if(!drawing)return;e.preventDefault();const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke();hasSignature=true}
+function end(){drawing=false}
+resizeCanvas();window.addEventListener("resize",resizeCanvas);
+canvas.addEventListener("mousedown",start);canvas.addEventListener("mousemove",move);window.addEventListener("mouseup",end);
+canvas.addEventListener("touchstart",start,{passive:false});canvas.addEventListener("touchmove",move,{passive:false});canvas.addEventListener("touchend",end);
+document.getElementById("clearSig").onclick=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);hasSignature=false};
+document.getElementById("guestForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ if(!hasSignature){alert("Tanda tangan wajib diisi.");return}
+ const btn=document.getElementById("submitGuest"),msg=document.getElementById("guestMessage");btn.disabled=true;btn.textContent="Menyimpan...";
+ const body={token:document.getElementById("token").value,nik:document.getElementById("nik").value.trim(),nama:document.getElementById("nama").value.trim(),jenis_kelamin:document.getElementById("jenis_kelamin").value,instansi:document.getElementById("instansi").value.trim(),email:document.getElementById("email").value.trim(),no_handphone:document.getElementById("no_handphone").value.trim(),tanda_tangan:canvas.toDataURL("image/png")};
+ try{
+  const r=await fetch("/api/rekam-medis/scan/non-pegawai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const data=await r.json();msg.className="msg "+(r.ok&&data.status==="success"?"success":"");msg.textContent=data.message||"Gagal mendaftarkan peserta.";
+  if(r.ok&&data.status==="success"){document.getElementById("guestForm").querySelectorAll("input,select,button").forEach(x=>x.disabled=true);window.scrollTo({top:0,behavior:"smooth"});}
+ }catch(err){msg.className="msg";msg.textContent="Server Calendar tidak dapat dihubungi."}
+ finally{btn.disabled=false;btn.textContent="Daftar Pemeriksaan"}
+});
+{% endif %}
+</script>
+</body>
+</html>
