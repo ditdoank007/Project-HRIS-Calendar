@@ -424,6 +424,95 @@ def api_absen_qrcode_guest():
     return jsonify(payload), response.status_code
 
 
+@app.route("/buku-tamu")
+def buku_tamu():
+    token = str(request.args.get("token") or "").strip()
+    if not token or len(token) > 150:
+        return render_template("buku_tamu.html", token="", error="QR Buku Tamu tidak valid."), 400
+    return render_template("buku_tamu.html", token=token)
+
+
+@app.route("/api/buku-tamu/info")
+def api_buku_tamu_info():
+    token = str(request.args.get("token") or "").strip()
+    if not token or len(token) > 150:
+        return jsonify({"status": "error", "message": "Token QR tidak valid."}), 400
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/buku-tamu/info",
+            params={"token": token},
+            headers={"X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY},
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({"status": "error", "message": "Layanan Buku Tamu HRIS tidak tersedia."}), 502
+    try:
+        payload = response.json()
+    except Exception:
+        payload = {"status": "error", "message": "Respons HRIS tidak valid."}
+    return jsonify(payload), response.status_code
+
+
+@app.route("/api/buku-tamu/pegawai")
+def api_buku_tamu_pegawai():
+    q = str(request.args.get("q") or "").strip()
+    if len(q) < 2:
+        return jsonify({"status": "success", "data": []})
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/buku-tamu/pegawai",
+            params={"q": q},
+            headers={"X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY},
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({"status": "error", "message": "Layanan data pegawai HRIS tidak tersedia."}), 502
+    try:
+        payload = response.json()
+    except Exception:
+        payload = {"status": "error", "message": "Respons HRIS tidak valid."}
+    return jsonify(payload), response.status_code
+
+
+@app.route("/api/buku-tamu/submit", methods=["POST"])
+def api_buku_tamu_submit():
+    payload = request.get_json(silent=True) or {}
+    token = str(payload.get("token") or "").strip()
+    signature_data = payload.get("signature_data")
+    if not token or len(token) > 150:
+        return jsonify({"status": "error", "message": "Token QR tidak valid."}), 400
+    if not signature_data or len(str(signature_data)) > 750000:
+        return jsonify({"status": "error", "message": "Tanda tangan tidak valid atau terlalu besar."}), 400
+    safe_payload = {
+        "token": token,
+        "nama": str(payload.get("nama") or "").strip(),
+        "instansi": str(payload.get("instansi") or "").strip(),
+        "no_hp": str(payload.get("no_hp") or "").strip(),
+        "keperluan": str(payload.get("keperluan") or "").strip(),
+        "keterangan": str(payload.get("keterangan") or "").strip(),
+        "pegawai_nip": str(payload.get("pegawai_nip") or "").strip(),
+        "pegawai_nama": str(payload.get("pegawai_nama") or "").strip(),
+        "signature_data": signature_data,
+    }
+    try:
+        response = requests.post(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/buku-tamu/submit",
+            json=safe_payload,
+            headers={"X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY},
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        return jsonify({"status": "error", "message": "Layanan Buku Tamu HRIS tidak tersedia."}), 502
+    try:
+        result = response.json()
+    except Exception:
+        result = {"status": "error", "message": "Respons HRIS tidak valid."}
+    return jsonify(result), response.status_code
+
+
 @app.route("/dashboard")
 @login_required
 def dashboard():
