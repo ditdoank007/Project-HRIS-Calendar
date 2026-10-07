@@ -230,7 +230,7 @@ def rekam_medis_scan(token):
 
     try:
         response = _hris_rekam_medis_request(
-            "/api/internal/calendar/rekam-medis/attendance-info",
+            "/api/internal/calendar/agenda/rekam-medis/attendance-info",
             params={"token": token},
             headers=headers,
         )
@@ -259,7 +259,7 @@ def rekam_medis_scan(token):
     if participant_mode == "PEGAWAI" and session.get("logged_in"):
         try:
             response = _hris_rekam_medis_request(
-                "/api/internal/calendar/rekam-medis/attendance/employee",
+                "/api/internal/calendar/agenda/rekam-medis/attendance/employee",
                 method="POST",
                 headers={"X-Calendar-NIP": str(session.get("nip") or "")},
                 json={"token": token},
@@ -311,7 +311,7 @@ def api_rekam_medis_scan_non_pegawai():
 
     try:
         response = _hris_rekam_medis_request(
-            "/api/internal/calendar/rekam-medis/attendance/guest",
+            "/api/internal/calendar/agenda/rekam-medis/attendance/guest",
             method="POST",
             json=payload,
         )
