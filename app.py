@@ -331,6 +331,118 @@ def api_rekam_medis_scan_non_pegawai():
         }), 502
 
 
+@app.route("/absen-qrcode")
+def absen_qrcode():
+    """Public QR gateway for Agenda Rapat/Kesamaptaan attendance."""
+    token = str(request.args.get("token") or "").strip()
+    if not token or len(token) > 150:
+        return render_template(
+            "absen_qrcode.html",
+            success=False,
+            message="QR Code absensi tidak valid.",
+        ), 400
+
+    nip = str(session.get("nip") or "").strip()
+    headers = {"X-Calendar-NIP": nip} if nip else {}
+
+    try:
+        response = _hris_rekam_medis_request(
+            "/api/internal/calendar/agenda/rapat/attendance-info",
+            params={"token": token},
+            headers=headers,
+        )
+        payload = response.json()
+    except (requests.RequestException, ValueError):
+        app.logger.exception("Agenda QR info request failed")
+        return render_template(
+            "absen_qrcode.html",
+            success=False,
+            message="Layanan absensi HRIS tidak dapat dihubungi.",
+        ), 502
+
+    if response.status_code != 200 or payload.get("status") != "success":
+        return render_template(
+            "absen_qrcode.html",
+            success=False,
+            message=payload.get("message", "QR absensi tidak dapat diproses."),
+        ), response.status_code
+
+    info = payload.get("data") or {}
+
+    if session.get("logged_in"):
+        try:
+            response = _hris_rekam_medis_request(
+                "/api/internal/calendar/agenda/rapat/attendance/employee",
+                method="POST",
+                headers={"X-Calendar-NIP": str(session.get("nip") or "")},
+                json={"token": token},
+            )
+            result = response.json()
+        except (requests.RequestException, ValueError):
+            app.logger.exception("Agenda employee QR request failed")
+            return render_template(
+                "absen_qrcode.html",
+                success=False,
+                message="Gagal mencatat kehadiran pegawai.",
+                info=info,
+                token=token,
+            ), 502
+
+        return render_template(
+            "absen_qrcode.html",
+            success=response.status_code == 200 and result.get("status") == "success",
+            already=not bool(result.get("created")),
+            message=result.get("message", "Scan QR berhasil."),
+            info=info,
+            token=token,
+            participant_mode="PEGAWAI",
+            attendee=result.get("data"),
+        ), response.status_code
+
+    return render_template(
+        "absen_qrcode.html",
+        success=False,
+        info=info,
+        token=token,
+        participant_mode="GUEST",
+    )
+
+
+@app.route("/api/absen-qrcode/guest", methods=["POST"])
+def api_absen_qrcode_guest():
+    payload = request.get_json(silent=True) or {}
+    try:
+        response = _hris_rekam_medis_request(
+            "/api/internal/calendar/agenda/rapat/attendance/guest",
+            method="POST",
+            json=payload,
+        )
+        try:
+            result = response.json()
+        except ValueError:
+            result = {
+                "status": "error",
+                "message": "Respons layanan absensi HRIS tidak valid.",
+            }
+        return jsonify(result), response.status_code
+    except requests.RequestException:
+        app.logger.exception("Agenda guest QR request failed")
+        return jsonify({
+            "status": "error",
+            "message": "Layanan absensi HRIS tidak dapat dihubungi.",
+        }), 502
+
+
+@app.route("/absen-qrcode/pegawai")
+def absen_qrcode_pegawai():
+    token = str(request.args.get("token") or "").strip()
+    if not token or len(token) > 150:
+        return redirect(url_for("login"))
+    if not session.get("logged_in"):
+        return redirect(url_for("login", next=f"/absen-qrcode?token={token}"))
+    return redirect(url_for("absen_qrcode", token=token))
+
+
 @app.route("/rekam-medisku")
 @login_required
 def rekam_medisku():
