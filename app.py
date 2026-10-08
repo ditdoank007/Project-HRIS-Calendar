@@ -402,35 +402,13 @@ def absen_qrcode():
                 )
             )
 
-        try:
-            response = _hris_rekam_medis_request(
-                "/api/internal/calendar/agenda/rapat/attendance/employee",
-                method="POST",
-                headers={"X-Calendar-NIP": str(session.get("nip") or "")},
-                json={"token": token},
-            )
-            result = response.json()
-        except (requests.RequestException, ValueError):
-            app.logger.exception("Agenda employee QR request failed")
-            return render_template(
-                "absen_qrcode.html",
-                success=False,
-                message="Gagal mencatat kehadiran pegawai.",
-                info=info,
-                token=token,
-                mode=mode,
-            ), 502
-
         return render_template(
             "absen_qrcode.html",
-            success=response.status_code == 200 and result.get("status") == "success",
-            already=not bool(result.get("created")),
-            message=result.get("message", "Scan QR berhasil."),
+            success=False,
             info=info,
             token=token,
-            mode=mode,
-            attendee=result.get("data"),
-        ), response.status_code
+            mode="pegawai-confirm",
+        )
 
     if mode == "non-pegawai":
         return render_template(
@@ -525,7 +503,7 @@ def absen_qrcode_pegawai():
         success=False,
         info=payload.get("data") or {},
         token=token,
-        mode="pegawai-link",
+        mode="pegawai-confirm",
     )
 
 
