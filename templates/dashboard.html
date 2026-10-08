@@ -1977,10 +1977,42 @@ function renderAgenda(date) {
     dayEvents.forEach(event => {
 
         const item = document.createElement("div");
-
         item.className = "agenda-item";
 
         const type = eventType(event);
+        const isRapat = String(event.type || "").toUpperCase() === "RAPAT";
+
+        let bodyHtml = `
+            <strong>${escapeHtml(eventTitle(event))}</strong>
+            <span>${escapeHtml(
+                event.description ||
+                event.keterangan ||
+                ""
+            )}</span>
+            <small>${escapeHtml(eventDate(event))}${event.start && String(event.start).includes("T") ? " • " + escapeHtml(String(event.start).substring(11, 16)) + " WIB" : ""}</small>
+        `;
+
+        if (isRapat) {
+            const datePart = event.start
+                ? String(event.start).substring(0, 10)
+                : eventDate(event);
+            const timePart = event.start && String(event.start).includes("T")
+                ? String(event.start).substring(11, 16)
+                : "-";
+
+            bodyHtml = `
+                <strong>Agenda RAPAT : ${escapeHtml(event.title || "-")}</strong>
+                <small>${escapeHtml(datePart)} • ${escapeHtml(timePart)} WIB</small>
+                ${event.attendance_url ? `
+                    <a class="agenda-attendance-link"
+                       href="${escapeHtml(event.attendance_url)}"
+                       target="_blank"
+                       rel="noopener">
+                        🔗 Buka Tautan Absensi Rapat
+                    </a>
+                ` : ""}
+            `;
+        }
 
         item.innerHTML = `
             <div class="agenda-accent event-${type
@@ -1988,13 +2020,7 @@ function renderAgenda(date) {
                 .replace(/[^a-z0-9]+/g, "-")}"></div>
 
             <div class="agenda-body">
-                <strong>${escapeHtml(eventTitle(event))}</strong>
-                <span>${escapeHtml(
-                    event.description ||
-                    event.keterangan ||
-                    ""
-                )}</span>
-                <small>${escapeHtml(eventDate(event))}${event.start && String(event.start).includes("T") ? " • " + escapeHtml(String(event.start).substring(11, 16)) + " WIB" : ""}</small>
+                ${bodyHtml}
             </div>
         `;
 
@@ -2108,7 +2134,8 @@ function renderAgendaKesamaptaanRows(r){const b=document.getElementById("agendaK
 function renderAgendaDisposisi(r){const l=document.getElementById("agendaDisposisiList"),c=document.getElementById("agendaDisposisiCount"),f=(r||[]).filter(i=>String(i.event_type||"").toUpperCase()==="DISPOSISI");c.textContent=f.length+" disposisi";l.innerHTML=f.length?f.map(i=>'<div class="agenda-disposisi-item"><div><strong>'+escapeHtml(i.title||"-")+'</strong><span>'+agendaFormatDate(i.start_date)+'</span><small>'+escapeHtml(i.location||i.description||"")+'</small></div>'+agendaStatusBadge(i.status)+'</div>').join(""):'<div class="agenda-empty-card">Belum ada disposisi pada bulan ini.</div>';}
 function refreshAgendaCurrentMonth(){updateAgendaMonthTitle();{% if agenda_tab == "rapat" %}renderAgendaRapatRows(agendaRowsForCurrentMonth(agendaRapatRows));{% elif agenda_tab == "disposisi" %}renderAgendaDisposisi(agendaRowsForCurrentMonth(agendaDisposisiRows));{% else %}renderAgendaKesamaptaanRows(agendaRowsForCurrentMonth(agendaKesamaptaanRows));{% endif %}}
 function changeAgendaMonth(n){agendaCurrentDate=new Date(agendaCurrentDate.getFullYear(),agendaCurrentDate.getMonth()+n,1);refreshAgendaCurrentMonth();}
-function openAgendaRapatModal(id){const i=agendaRapatRows.find(x=>Number(x.event_id)===Number(id));if(!i)return;document.getElementById("agendaRapatModalTitle").textContent=i.title||"-";const a=Array.isArray(i.attendance)?i.attendance:[];const ah=a.length?'<div class="agenda-detail-attendance">'+a.map((p,n)=>'<div class="agenda-attendance-row"><span>'+(n+1)+'.</span><strong>'+escapeHtml(p.nama||p.nip||"-")+'<small>'+escapeHtml(String(p.attendee_type||"").toUpperCase()==="NON_PEGAWAI"?"Non Pegawai":"Pegawai")+'</small></strong><small>'+escapeHtml(p.nip||"-")+'</small></div>').join("")+'</div>':'<div class="agenda-detail-empty">Belum ada peserta yang tercatat hadir.</div>';const nh=i.notulen_available?'<a class="agenda-notulen-button" href="/api/agenda/rapat/'+Number(i.event_id)+'/notulen" target="_blank">Buka / Download Notulen PDF</a>':'<div class="agenda-detail-empty">Notulen belum tersedia.</div>';document.getElementById("agendaRapatModalBody").innerHTML='<div class="agenda-detail-grid"><div class="agenda-detail-field"><span>Tanggal / Waktu</span><strong>'+agendaFormatDate(i.start)+' · '+agendaFormatTime(i.start)+' - '+agendaFormatTime(i.end)+' WIB</strong></div><div class="agenda-detail-field"><span>Tempat</span><strong>'+escapeHtml(i.location||"-")+'</strong></div><div class="agenda-detail-field"><span>Pimpinan Rapat</span><strong>'+escapeHtml(i.organizer_name||"-")+'</strong></div><div class="agenda-detail-field"><span>Status</span>'+agendaStatusBadge(i.status)+'</div></div><div class="agenda-detail-section"><div class="agenda-detail-section-title">Kehadiran · '+Number(i.attendance_count||0)+' orang</div>'+ah+'</div><div class="agenda-detail-section"><div class="agenda-detail-section-title">Notulen Rapat</div>'+nh+'</div>';document.getElementById("agendaRapatModal").hidden=false;document.body.classList.add("agenda-modal-open");}
+function openAgendaRapatModal(id){const i=agendaRapatRows.find(x=>Number(x.event_id)===Number(id));if(!i)return;document.getElementById("agendaRapatModalTitle").textContent=i.title||"-";const a=Array.isArray(i.attendance)?i.attendance:[];const ah=a.length?'<div class="agenda-detail-attendance">'+a.map((p,n)=>'<div class="agenda-attendance-row"><span>'+(n+1)+'.</span><strong>'+escapeHtml(p.nama||p.nip||"-")+'<small>'+escapeHtml(String(p.attendee_type||"").toUpperCase()==="NON_PEGAWAI"?"Non Pegawai":"Pegawai")+'</small></strong><small>'+escapeHtml(p.nip||"-")+'</small></div>').join("")+'</div>':'<div class="agenda-detail-empty">Belum ada peserta yang tercatat hadir.</div>';const nh=i.notulen_available?'<a class="agenda-notulen-button" href="/api/agenda/rapat/'+Number(i.event_id)+'/notulen" target="_blank">Buka / Download Notulen PDF</a>':'<div class="agenda-detail-empty">Notulen belum tersedia.</div>';const attendanceLinkHtml=i.attendance_url?'<div class="agenda-detail-section"><div class="agenda-detail-section-title">Tautan Absensi Rapat</div><a class="agenda-notulen-button agenda-attendance-button" href="'+escapeHtml(i.attendance_url)+'" target="_blank" rel="noopener">🔗 Buka Halaman Absensi Rapat</a></div>':'';
+document.getElementById("agendaRapatModalBody").innerHTML=attendanceLinkHtml+'<div class="agenda-detail-grid"><div class="agenda-detail-field"><span>Tanggal / Waktu</span><strong>'+agendaFormatDate(i.start)+' · '+agendaFormatTime(i.start)+' - '+agendaFormatTime(i.end)+' WIB</strong></div><div class="agenda-detail-field"><span>Tempat</span><strong>'+escapeHtml(i.location||"-")+'</strong></div><div class="agenda-detail-field"><span>Pimpinan Rapat</span><strong>'+escapeHtml(i.organizer_name||"-")+'</strong></div><div class="agenda-detail-field"><span>Status</span>'+agendaStatusBadge(i.status)+'</div></div><div class="agenda-detail-section"><div class="agenda-detail-section-title">Kehadiran · '+Number(i.attendance_count||0)+' orang</div>'+ah+'</div><div class="agenda-detail-section"><div class="agenda-detail-section-title">Notulen Rapat</div>'+nh+'</div>';document.getElementById("agendaRapatModal").hidden=false;document.body.classList.add("agenda-modal-open");}
 function closeAgendaRapatModal(){document.getElementById("agendaRapatModal").hidden=true;document.body.classList.remove("agenda-modal-open");}
 function openAgendaKesamaptaanModal(id){const i=agendaKesamaptaanRows.find(x=>Number(x.event_id)===Number(id));if(!i)return;document.getElementById("agendaKesamaptaanModalTitle").textContent=i.title||"Kesamaptaan";document.getElementById("agendaKesamaptaanModalBody").innerHTML='<div class="agenda-detail-grid"><div class="agenda-detail-field"><span>Tanggal / Waktu</span><strong>'+agendaFormatDate(i.start)+' · '+agendaFormatTime(i.start)+' WIB</strong></div><div class="agenda-detail-field"><span>Tempat</span><strong>'+escapeHtml(i.location||"-")+'</strong></div><div class="agenda-detail-field"><span>Status</span>'+agendaStatusBadge(i.status)+'</div></div><div class="agenda-detail-section"><div class="agenda-detail-section-title">Dokumen Kesamaptaan</div><a class="agenda-notulen-button" href="/api/agenda/kesamaptaan/'+Number(i.event_id)+'/pdf" target="_blank">View / Download PDF Absensi Kehadiran</a></div>';document.getElementById("agendaKesamaptaanModal").hidden=false;document.body.classList.add("agenda-modal-open");}
 function closeAgendaKesamaptaanModal(){document.getElementById("agendaKesamaptaanModal").hidden=true;document.body.classList.remove("agenda-modal-open");}
