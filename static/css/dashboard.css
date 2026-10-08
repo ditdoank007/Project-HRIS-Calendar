@@ -3751,8 +3751,8 @@ body.agenda-modal-open {
     z-index: 1200;
     border: 1px solid rgba(255,255,255,.12);
     border-radius: 16px;
-    background: #111827;
-    box-shadow: 0 20px 50px rgba(0,0,0,.35);
+    background: #080c14;
+    box-shadow: 0 20px 50px rgba(0,0,0,.48);
 }
 
 .notification-head,
@@ -3765,11 +3765,13 @@ body.agenda-modal-open {
 }
 
 .notification-head {
-    border-bottom: 1px solid rgba(255,255,255,.08);
+    background: #0b111b;
+    border-bottom: 1px solid rgba(255,255,255,.09);
 }
 
 .notification-foot {
-    border-top: 1px solid rgba(255,255,255,.08);
+    background: #0b111b;
+    border-top: 1px solid rgba(255,255,255,.09);
     font-size: 11px;
     color: rgba(255,255,255,.58);
 }
@@ -3807,7 +3809,7 @@ body.agenda-modal-open {
 }
 
 .notification-item.unread {
-    background: rgba(245,158,11,.07);
+    background: #101722;
 }
 
 .notification-item-icon {
@@ -3829,12 +3831,13 @@ body.agenda-modal-open {
 }
 
 .notification-item-body strong {
+    color: #f59e0b;
     font-size: 12px;
     line-height: 1.35;
 }
 
 .notification-item-body span {
-    color: rgba(255,255,255,.72);
+    color: rgba(255,255,255,.78);
     font-size: 11px;
     line-height: 1.4;
     overflow: hidden;
