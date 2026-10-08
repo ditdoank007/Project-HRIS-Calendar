@@ -153,16 +153,11 @@ document.getElementById("guestForm").onsubmit=async e=>{
    m.textContent=d.message||"Gagal mencatat kehadiran.";
    if(r.ok&&d.status==="success"){
      document.querySelector(".card").innerHTML = `
-       <div class="brand"><img src="{{ url_for('static', filename='img/logo-basarnas.png') }}" alt="Basarnas"><div><b>CALENDAR</b><small>Kantor SAR Surabaya</small></div></div>
        <div class="icon">✓</div>
-       <h1>Pendaftaran Berhasil</h1>
-       <p class="lead">Pendaftaran Anda berhasil.</p>
-       <div class="info">
-         <div class="label">Agenda</div><div class="value">{{ info.title|e }}</div>
-       </div>
-       <div class="note" style="font-size:16px;font-weight:700;color:#166b3a;">
-         Silahkan menunggu antrian / proses kehadiran agenda.
-       </div>
+       <h1>Absen Berhasil</h1>
+       <button class="choice" type="button" style="margin-top:22px;" onclick="window.close(); setTimeout(() => { window.location.href='/dashboard'; }, 150);">
+         TUTUP
+       </button>
      `;
      window.scrollTo({top:0,behavior:"smooth"});
      return;
