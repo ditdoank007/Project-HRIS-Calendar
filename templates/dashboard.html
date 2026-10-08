@@ -2596,7 +2596,11 @@ function renderNotifications() {
                 console.error("Gagal menandai notifikasi:", error);
             }
 
-            if (notification) notification.read = true;
+            if (notification) {
+                calendarNotifications = calendarNotifications.filter(function (x) {
+                    return Number(x.id) !== id;
+                });
+            }
             renderNotifications();
 
             if (notification && notification.url) {
@@ -2670,9 +2674,7 @@ if (notificationToggle && notificationDropdown) {
                 });
                 if (!response.ok) throw new Error("Gagal menandai semua notifikasi.");
 
-                calendarNotifications.forEach(function (item) {
-                    item.read = true;
-                });
+                calendarNotifications = [];
                 renderNotifications();
             } catch (error) {
                 console.error("Gagal menandai semua notifikasi:", error);
