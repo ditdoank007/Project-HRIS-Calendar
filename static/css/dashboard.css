@@ -1800,6 +1800,90 @@ body.sidebar-minimized .user-card {
    PERSONAL DASHBOARD
    ============================================================ */
 
+.signature-reminder-card {
+    margin: 18px 0;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid #f5c2c7;
+    border-left: 4px solid #dc2626;
+    border-radius: 10px;
+    background: #fff7f7;
+}
+
+.signature-reminder-icon {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.signature-reminder-body {
+    min-width: 0;
+    flex: 1;
+}
+
+.signature-reminder-kicker {
+    margin-bottom: 3px;
+    color: #b91c1c;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.signature-reminder-body strong {
+    display: block;
+    color: #374151;
+    font-size: 13px;
+}
+
+.signature-reminder-body p {
+    margin: 4px 0 0;
+    color: #6b7280;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.signature-reminder-button {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 0 13px;
+    border-radius: 7px;
+    background: #dc2626;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: background .15s ease, transform .15s ease;
+}
+
+.signature-reminder-button:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 700px) {
+    .signature-reminder-card {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .signature-reminder-button {
+        width: 100%;
+    }
+}
+
 .personal-dashboard-card {
     background: #fff;
     border: 1px solid #e5e7eb;
