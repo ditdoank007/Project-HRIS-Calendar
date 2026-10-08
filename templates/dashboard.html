@@ -131,6 +131,24 @@
             </div>
 
             <div class="topbar-actions">
+                <div class="notification-center">
+                    <button type="button" id="notificationToggle" class="notification-toggle" aria-expanded="false" aria-label="Buka notifikasi">
+                        <span class="notification-bell" aria-hidden="true">🔔</span>
+                        <span id="notificationBadge" class="notification-badge" hidden>0</span>
+                    </button>
+                    <div id="notificationDropdown" class="notification-dropdown" hidden>
+                        <div class="notification-head">
+                            <strong>Notifikasi</strong>
+                            <button type="button" id="notificationReadAll" class="notification-read-all">Tandai semua dibaca</button>
+                        </div>
+                        <div id="notificationList" class="notification-list">
+                            <div class="notification-empty">Memuat notifikasi...</div>
+                        </div>
+                        <div class="notification-foot">
+                            <span id="notificationSummary">0 notifikasi baru</span>
+                        </div>
+                    </div>
+                </div>
                 <div class="account-menu">
                     <button type="button"
                             id="accountMenuToggle"
@@ -2465,6 +2483,207 @@ async function logout() {
     } finally {
         window.location.href = "/";
     }
+}
+
+const notificationToggle =
+    document.getElementById("notificationToggle");
+const notificationDropdown =
+    document.getElementById("notificationDropdown");
+const notificationBadge =
+    document.getElementById("notificationBadge");
+const notificationList =
+    document.getElementById("notificationList");
+const notificationReadAll =
+    document.getElementById("notificationReadAll");
+const notificationSummary =
+    document.getElementById("notificationSummary");
+
+let calendarNotifications = [];
+
+function notificationEscape(value) {
+    return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function notificationTime(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+
+    const diff = Math.max(0, Date.now() - date.getTime());
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return "baru saja";
+    if (minutes < 60) return minutes + " menit lalu";
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return hours + " jam lalu";
+
+    const days = Math.floor(hours / 24);
+    if (days < 7) return days + " hari lalu";
+
+    return date.toLocaleDateString("id-ID", {
+        day: "2-digit", month: "2-digit", year: "numeric"
+    });
+}
+
+function notificationIcon(type) {
+    const map = {
+        AGENDA_RAPAT: "📅",
+        DISPOSISI: "📄",
+        DINAS_LUAR: "✈️",
+        KESAMAPTAAN: "🏃"
+    };
+    return map[String(type || "").toUpperCase()] || "🔔";
+}
+
+function renderNotifications() {
+    if (!notificationList) return;
+
+    const unread = calendarNotifications.filter(function (item) {
+        return !item.read;
+    }).length;
+
+    if (!calendarNotifications.length) {
+        notificationList.innerHTML =
+            '<div class="notification-empty">Tidak ada notifikasi baru.</div>';
+    } else {
+        notificationList.innerHTML = calendarNotifications.map(function (item) {
+            return '<button type="button" class="notification-item ' +
+                (item.read ? "" : "unread") +
+                '" data-notification-id="' + Number(item.id) + '">' +
+                '<span class="notification-item-icon">' +
+                    notificationIcon(item.source_type) +
+                '</span>' +
+                '<span class="notification-item-body">' +
+                    '<strong>' + notificationEscape(item.title) + '</strong>' +
+                    '<span>' + notificationEscape(item.message) + '</span>' +
+                    '<small>' + notificationTime(item.created_at) + '</small>' +
+                '</span>' +
+                (item.read ? "" : '<span class="notification-unread-dot"></span>') +
+                '</button>';
+        }).join("");
+    }
+
+    if (notificationBadge) {
+        notificationBadge.textContent = unread > 99 ? "99+" : String(unread);
+        notificationBadge.hidden = unread === 0;
+    }
+
+    if (notificationSummary) {
+        notificationSummary.textContent =
+            unread === 0
+                ? "Tidak ada notifikasi baru"
+                : unread + " notifikasi belum dibaca";
+    }
+
+    notificationList.querySelectorAll(".notification-item").forEach(function (item) {
+        item.addEventListener("click", async function () {
+            const id = Number(item.dataset.notificationId);
+            const notification = calendarNotifications.find(function (x) {
+                return Number(x.id) === id;
+            });
+
+            try {
+                await fetch("/api/notifications/" + id + "/read", {
+                    method: "POST",
+                    credentials: "same-origin"
+                });
+            } catch (error) {
+                console.error("Gagal menandai notifikasi:", error);
+            }
+
+            if (notification) notification.read = true;
+            renderNotifications();
+
+            if (notification && notification.url) {
+                window.location.href = notification.url;
+            }
+        });
+    });
+}
+
+async function loadNotifications(openDropdown) {
+    try {
+        const response = await fetch("/api/notifications?limit=30", {
+            credentials: "same-origin",
+            cache: "no-store"
+        });
+        if (!response.ok) throw new Error("Gagal mengambil notifikasi.");
+
+        const payload = await response.json();
+        if (payload.status !== "success") {
+            throw new Error(payload.message || "Gagal mengambil notifikasi.");
+        }
+
+        calendarNotifications = Array.isArray(payload.data)
+            ? payload.data
+            : [];
+
+        renderNotifications();
+
+        if (openDropdown && notificationDropdown) {
+            notificationDropdown.hidden = false;
+            notificationToggle.setAttribute("aria-expanded", "true");
+        }
+    } catch (error) {
+        console.error("Notification Center:", error);
+        if (notificationList) {
+            notificationList.innerHTML =
+                '<div class="notification-empty">Notifikasi belum dapat dimuat.</div>';
+        }
+    }
+}
+
+if (notificationToggle && notificationDropdown) {
+    notificationToggle.addEventListener("click", function (event) {
+        event.stopPropagation();
+
+        const willOpen = notificationDropdown.hidden;
+        notificationDropdown.hidden = !willOpen;
+        notificationToggle.setAttribute(
+            "aria-expanded",
+            willOpen ? "true" : "false"
+        );
+
+        if (willOpen) loadNotifications(true);
+    });
+
+    notificationDropdown.addEventListener("click", function (event) {
+        event.stopPropagation();
+    });
+
+    document.addEventListener("click", function () {
+        notificationDropdown.hidden = true;
+        notificationToggle.setAttribute("aria-expanded", "false");
+    });
+
+    if (notificationReadAll) {
+        notificationReadAll.addEventListener("click", async function () {
+            try {
+                const response = await fetch("/api/notifications/read-all", {
+                    method: "POST",
+                    credentials: "same-origin"
+                });
+                if (!response.ok) throw new Error("Gagal menandai semua notifikasi.");
+
+                calendarNotifications.forEach(function (item) {
+                    item.read = true;
+                });
+                renderNotifications();
+            } catch (error) {
+                console.error("Gagal menandai semua notifikasi:", error);
+            }
+        });
+    }
+
+    loadNotifications(false);
+    window.setInterval(function () {
+        loadNotifications(false);
+    }, 45000);
 }
 
 const accountMenuToggle =
