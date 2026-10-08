@@ -477,12 +477,83 @@ def api_absen_qrcode_guest():
 
 @app.route("/absen-qrcode/pegawai")
 def absen_qrcode_pegawai():
+    """Direct attendance page used by shared meeting links."""
     token = str(request.args.get("token") or "").strip()
     if not token or len(token) > 150:
-        return redirect(url_for("login"))
+        return render_template(
+            "absen_qrcode.html",
+            success=False,
+            message="Tautan absensi rapat tidak valid.",
+        ), 400
+
     if not session.get("logged_in"):
-        return redirect(url_for("login", next=f"/absen-qrcode?token={token}&mode=pegawai"))
-    return redirect(url_for("absen_qrcode", token=token))
+        return redirect(
+            url_for(
+                "login",
+                next=f"/absen-qrcode/pegawai?token={token}",
+            )
+        )
+
+    nip = str(session.get("nip") or "").strip()
+    try:
+        response = _hris_rekam_medis_request(
+            "/api/internal/calendar/agenda/rapat/attendance-info",
+            params={"token": token},
+            headers={"X-Calendar-NIP": nip} if nip else {},
+        )
+        payload = response.json()
+    except (requests.RequestException, ValueError):
+        app.logger.exception("Direct meeting attendance info request failed")
+        return render_template(
+            "absen_qrcode.html",
+            success=False,
+            message="Layanan absensi HRIS tidak dapat dihubungi.",
+        ), 502
+
+    if response.status_code != 200 or payload.get("status") != "success":
+        return render_template(
+            "absen_qrcode.html",
+            success=False,
+            message=payload.get(
+                "message",
+                "Agenda rapat tidak dapat ditemukan.",
+            ),
+        ), response.status_code
+
+    return render_template(
+        "absen_qrcode.html",
+        success=False,
+        info=payload.get("data") or {},
+        token=token,
+        mode="pegawai-link",
+    )
+
+
+@app.route("/api/absen-qrcode/pegawai", methods=["POST"])
+@login_required
+def api_absen_qrcode_pegawai():
+    payload = request.get_json(silent=True) or {}
+    token = str(payload.get("token") or "").strip()
+    if not token or len(token) > 150:
+        return jsonify({
+            "status": "error",
+            "message": "Token absensi rapat tidak valid.",
+        }), 400
+
+    try:
+        response = _hris_rekam_medis_request(
+            "/api/internal/calendar/agenda/rapat/attendance/employee",
+            method="POST",
+            headers={"X-Calendar-NIP": str(session.get("nip") or "")},
+            json={"token": token},
+        )
+        return jsonify(response.json()), response.status_code
+    except (requests.RequestException, ValueError):
+        app.logger.exception("Direct meeting employee attendance request failed")
+        return jsonify({
+            "status": "error",
+            "message": "Layanan absensi HRIS tidak dapat dihubungi.",
+        }), 502
 
 
 @app.route("/rekam-medisku")
