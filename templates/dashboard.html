@@ -2515,6 +2515,26 @@ if (accountMenuToggle && accountMenuDropdown) {
         setTimeout(() => alertBox.className = "calendar-profile-alert", 4000);
     }
     function text(id,v){ $(id).textContent = v || "-"; }
+
+    function profileDate(value) {
+        if (!value) return "-";
+
+        const raw = String(value).trim();
+        if (!raw || raw.startsWith("0000-00-00")) return "-";
+
+        const parts = raw.substring(0, 10).split("-");
+        if (parts.length !== 3) return raw;
+
+        const [year, month, day] = parts;
+        if (!year || !month || !day) return raw;
+
+        return day + "-" + month + "-" + year;
+    }
+
+    function dateText(id, value) {
+        $(id).textContent = profileDate(value);
+    }
+
     function modal(id,open){ $(id).classList.toggle("open",open); }
     window.closeCalendarModal = id => modal(id,false);
     window.openCalendarPhotoModal = () => modal("calendarPhotoModal",true);
@@ -2528,10 +2548,10 @@ if (accountMenuToggle && accountMenuDropdown) {
         const d=p.data;
         text("cpNama",d.nama); text("cpNip",d.nip); text("cpFinger",d.finger_id); text("cpPangkat",d.pangkat);
         text("cpGol",d.gol); text("cpJabatan",d.jabatan); text("cpUnit",d.unit_kerja); text("cpEselon",d.eselon);
-        text("cpTempatLahir",d.tempat_lahir); text("cpTglLahir",d.tgl_lahir); text("cpJenisKel",d.jenis_kel); text("cpStatusKawin",d.status_perkawinan);
-        text("cpAgama",d.agama); text("cpKtp",d.no_ktp); text("cpNpwp",d.no_npwp); text("cpHobi",d.hobi); text("cpTglMasuk",d.tgl_masuk);
-        text("cpTmtPangkat",d.tmt_pangkat); text("cpTmtJabatan",d.tmt_jabatan); text("cpTmtClass",d.tmt_class); text("cpGolRecruit",d.gol_recruit); text("cpStatusPeg",d.status_peg); text("cpIsKeluar",d.is_keluar); text("cpTglKeluar",d.tgl_keluar); text("cpAlasanKeluar",d.alasan_keluar); text("cpIsVip",d.is_vip);
-        text("cpTmtCpns",d.tmt_cpns); text("cpTmtPns",d.tmt_pns);
+        text("cpTempatLahir",d.tempat_lahir); dateText("cpTglLahir",d.tgl_lahir); text("cpJenisKel",d.jenis_kel); text("cpStatusKawin",d.status_perkawinan);
+        text("cpAgama",d.agama); text("cpKtp",d.no_ktp); text("cpNpwp",d.no_npwp); text("cpHobi",d.hobi); dateText("cpTglMasuk",d.tgl_masuk);
+        dateText("cpTmtPangkat",d.tmt_pangkat); dateText("cpTmtJabatan",d.tmt_jabatan); dateText("cpTmtClass",d.tmt_class); text("cpGolRecruit",d.gol_recruit); text("cpStatusPeg",d.status_peg); text("cpIsKeluar",d.is_keluar); dateText("cpTglKeluar",d.tgl_keluar); text("cpAlasanKeluar",d.alasan_keluar); text("cpIsVip",d.is_vip);
+        dateText("cpTmtCpns",d.tmt_cpns); dateText("cpTmtPns",d.tmt_pns);
         $("cpNoTelp").value=d.no_telp||""; $("cpEmail").value=d.email||""; $("cpAlamat").value=d.alamat||"";
         $("cpKelurahan").value=d.kelurahan||""; $("cpKecamatan").value=d.kecamatan||""; $("cpKota").value=d.kota||"";
         if(d.photo_url){ const u="/api/profilku/photo?v="+Date.now(); $("calendarProfileAvatar").src=u; $("calendarProfileAvatar").style.display="block"; $("calendarProfileFallback").style.display="none"; $("calendarPhotoPreview").src=u; }
