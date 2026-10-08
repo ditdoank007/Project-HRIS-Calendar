@@ -2001,7 +2001,8 @@ function renderAgenda(date) {
                 : "-";
 
             bodyHtml = `
-                <strong>Agenda RAPAT : ${escapeHtml(event.title || "-")}</strong>
+                <strong>Agenda RAPAT :</strong>
+                <strong>${escapeHtml(event.title || "-")}</strong>
                 <small>${escapeHtml(datePart)} • ${escapeHtml(timePart)} WIB</small>
                 ${event.attendance_url ? `
                     <a class="agenda-attendance-link"
