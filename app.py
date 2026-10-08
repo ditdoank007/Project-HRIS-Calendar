@@ -553,6 +553,80 @@ def _hris_profile_headers():
     }
 
 
+@app.route("/api/notifications")
+@login_required
+def api_notifications():
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/notifications",
+            headers={
+                "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+                "X-Calendar-NIP": str(session.get("nip") or ""),
+            },
+            params=request.args,
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.RequestException:
+        app.logger.exception("HRIS notifications unavailable")
+        return jsonify({"status": "error", "message": "Layanan notifikasi HRIS tidak tersedia."}), 502
+
+
+@app.route("/api/notifications/unread-count")
+@login_required
+def api_notifications_unread_count():
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/notifications/unread-count",
+            headers={
+                "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+                "X-Calendar-NIP": str(session.get("nip") or ""),
+            },
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.RequestException:
+        return jsonify({"status": "error", "message": "Layanan notifikasi HRIS tidak tersedia."}), 502
+
+
+@app.route("/api/notifications/<int:notification_id>/read", methods=["POST"])
+@login_required
+def api_notification_read(notification_id):
+    try:
+        response = requests.post(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/notifications/{notification_id}/read",
+            headers={
+                "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+                "X-Calendar-NIP": str(session.get("nip") or ""),
+            },
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.RequestException:
+        return jsonify({"status": "error", "message": "Layanan notifikasi HRIS tidak tersedia."}), 502
+
+
+@app.route("/api/notifications/read-all", methods=["POST"])
+@login_required
+def api_notifications_read_all():
+    try:
+        response = requests.post(
+            f"{Config.HRIS_INTERNAL_API_URL}/api/internal/calendar/notifications/read-all",
+            headers={
+                "X-Calendar-Internal-Key": Config.HRIS_INTERNAL_API_KEY,
+                "X-Calendar-NIP": str(session.get("nip") or ""),
+            },
+            timeout=15,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.RequestException:
+        return jsonify({"status": "error", "message": "Layanan notifikasi HRIS tidak tersedia."}), 502
+
+
 @app.route("/api/profilku")
 @login_required
 def api_profilku():
