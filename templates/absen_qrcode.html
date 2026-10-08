@@ -38,6 +38,23 @@ form{margin-top:22px}.field{margin-bottom:15px}.field label{display:block;font-w
 Silahkan menunggu antrian / proses kehadiran agenda.
 </div>
 
+{% elif mode == "pegawai-link" %}
+<div class="icon" style="background:#fff3e8;color:var(--orange);">✓</div>
+<h1>Absensi Rapat</h1>
+<p class="lead">Silakan konfirmasi kehadiran Anda untuk rapat ini.</p>
+<div class="info">
+<div class="label">Agenda</div><div class="value">{{ info.title }}</div>
+<div class="label">Waktu</div><div class="value">{{ info.start|replace("T"," ") }}</div>
+<div class="label">Lokasi</div><div class="value">{{ info.location or "-" }}</div>
+</div>
+<div class="actions">
+<button class="choice" type="button" id="submitEmployeeAttendance">
+    Absen Kehadiran Rapat
+</button>
+</div>
+<div id="employeeMessage"></div>
+<p class="note">Anda login sebagai {{ session.get("nama") or "Pegawai" }}. Setelah tombol ditekan, kehadiran langsung tercatat.</p>
+
 {% elif mode == "pegawai" %}
 <h1>Absensi Pegawai</h1>
 <p class="lead">Untuk Pegawai Kantor SAR Surabaya, silakan login menggunakan akun BDIP.</p>
@@ -89,6 +106,53 @@ Silahkan menunggu antrian / proses kehadiran agenda.
 </main></div>
 
 <script>
+{% if mode == "pegawai-link" %}
+const employeeButton = document.getElementById("submitEmployeeAttendance");
+const employeeMessage = document.getElementById("employeeMessage");
+
+employeeButton?.addEventListener("click", async function () {
+    employeeButton.disabled = true;
+    employeeButton.textContent = "Mencatat kehadiran...";
+    try {
+        const response = await fetch("/api/absen-qrcode/pegawai", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            credentials: "same-origin",
+            body: JSON.stringify({
+                token: {{ token|tojson }}
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || result.status !== "success") {
+            throw new Error(result.message || "Gagal mencatat kehadiran.");
+        }
+
+        document.querySelector(".card").innerHTML = `
+            <div class="brand"><img src="{{ url_for('static', filename='img/logo-basarnas.png') }}" alt="Basarnas"><div><b>PEGAWAI</b><small>Kantor SAR Surabaya</small></div></div>
+            <div class="icon">✓</div>
+            <h1>Kehadiran Berhasil</h1>
+            <p class="lead">Kehadiran Anda untuk rapat ini sudah tercatat.</p>
+            <div class="info">
+                <div class="label">Agenda</div>
+                <div class="value">{{ info.title|e }}</div>
+                <div class="label">Waktu</div>
+                <div class="value">{{ info.start|replace("T"," ") }}</div>
+            </div>
+            <div class="note success" style="font-size:16px;font-weight:700;">
+                Kehadiran berhasil dicatat pada sistem HRIS.
+            </div>
+        `;
+    } catch (error) {
+        employeeMessage.className = "msg";
+        employeeMessage.textContent = error.message || "Gagal mencatat kehadiran.";
+        employeeButton.disabled = false;
+        employeeButton.textContent = "Absen Kehadiran Rapat";
+    }
+});
+
+{% endif %}
 {% if mode == "non-pegawai" %}
 const canvas=document.getElementById("signature"),ctx=canvas.getContext("2d");
 let drawing=false,hasSignature=false;
