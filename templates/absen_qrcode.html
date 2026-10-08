@@ -42,9 +42,18 @@ TUTUP
 <div class="label">Judul Rapat</div><div class="value">{{ info.title }}</div>
 </div>
 <div class="actions">
+{% if info.employee_attended %}
+<div class="note success" style="font-size:18px;font-weight:700;">
+    Anda Sudah Absen Hadir
+</div>
+<button class="choice secondary" type="button" style="margin-top:4px;" onclick="window.close(); setTimeout(() => { window.location.href='/dashboard'; }, 150);">
+    TUTUP
+</button>
+{% else %}
 <button class="choice" type="button" id="submitEmployeeAttendance">
     HADIR
 </button>
+{% endif %}
 </div>
 <div id="employeeMessage"></div>
 
@@ -105,6 +114,17 @@ employeeButton?.addEventListener("click", async function () {
 
         if (!response.ok || result.status !== "success") {
             throw new Error(result.message || "Gagal mencatat kehadiran.");
+        }
+
+        if (result.created === false) {
+            document.querySelector(".card").innerHTML = `
+                <div class="icon">✓</div>
+                <h1>Anda Sudah Absen Hadir</h1>
+                <button class="choice secondary" type="button" style="margin-top:22px;" onclick="window.close(); setTimeout(() => { window.location.href='/dashboard'; }, 150);">
+                    TUTUP
+                </button>
+            `;
+            return;
         }
 
         document.querySelector(".card").innerHTML = `
