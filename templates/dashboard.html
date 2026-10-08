@@ -1280,6 +1280,18 @@
             <strong>Dashboard Pribadi</strong>
         </div>
 
+        <section id="dashboardSignatureReminder"
+                 class="signature-reminder-card"
+                 hidden>
+            <div class="signature-reminder-icon">✎</div>
+            <div class="signature-reminder-body">
+                <div class="signature-reminder-kicker">TINDAKAN DIPERLUKAN</div>
+                <strong>Tanda tangan digital Anda belum tersedia.</strong>
+                <p>Silakan lengkapi tanda tangan agar dapat digunakan pada Daftar Hadir Rapat, Kesamaptaan, dan dokumen HRIS lainnya.</p>
+            </div>
+            <a href="/profilku" class="signature-reminder-button">Profilku → Ganti Tanda Tangan</a>
+        </section>
+
         <section class="personal-dashboard-card">
 
                 <div class="personal-dashboard-header">
@@ -1617,6 +1629,24 @@ async function loadDashboardSummary() {
         }
 
         const data = payload.data || {};
+
+        // Peringatan tanda tangan: hanya tampil jika file NIP.png belum tersedia.
+        // Status diambil dari Profilku agar tidak perlu endpoint/database baru.
+        try {
+            const profileResponse = await fetch("/api/profilku", {
+                credentials: "same-origin",
+                cache: "no-store"
+            });
+            const profilePayload = await profileResponse.json();
+            const signatureReminder = document.getElementById("dashboardSignatureReminder");
+            if (signatureReminder) {
+                const signatureExists = Boolean(profilePayload?.data?.signature_exists);
+                signatureReminder.hidden = signatureExists || !profileResponse.ok;
+            }
+        } catch (signatureError) {
+            // Jangan mengganggu dashboard utama jika status tanda tangan gagal diperiksa.
+            console.warn("Status tanda tangan tidak dapat diperiksa:", signatureError);
+        }
 
         document.getElementById("dashboardDaysPassed").textContent =
             Number(payload.days_passed || 0);
