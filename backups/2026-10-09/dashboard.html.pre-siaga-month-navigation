@@ -1,0 +1,2931 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar — Dashboard Pribadi</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <img src="{{ url_for('static', filename='img/logo-basarnas.png') }}"
+                 alt="Basarnas">
+
+            <div class="brand-text">
+                <div class="brand-name">PEGAWAI</div>
+                <div class="brand-office">Kantor SAR Surabaya</div>
+            </div>
+
+            <button type="button"
+                    id="sidebarToggle"
+                    class="sidebar-toggle"
+                    title="Minimize sidebar"
+                    aria-label="Minimize sidebar">
+                ‹
+            </button>
+        </div>
+
+        <nav class="sidebar-menu">
+
+            <a href="/dashboard"
+               class="{{ 'active' if active_menu == 'dashboard' or not active_menu else '' }}">
+                <span class="menu-icon">⌂</span>
+                <span>DASHBOARD</span>
+            </a>
+
+            <a href="/calendar"
+               class="{{ 'active' if active_menu == 'calendar' else '' }}">
+                <span class="menu-icon">▦</span>
+                <span>KALENDER SAYA</span>
+            </a>
+
+            <a href="/phone-calendar"
+               class="{{ 'active' if active_menu == 'phone' else '' }}">
+                <span class="menu-icon">▣</span>
+                <span>KALENDER HANDPHONE</span>
+            </a>
+
+<div class="sidebar-menu-group {{ 'open' if active_menu == 'agenda' else '' }}">
+                <a href="/agenda" class="sidebar-menu-parent {{ 'active' if active_menu == 'agenda' else '' }}"><span class="menu-icon">◆</span><span>AGENDAKU</span><span class="menu-chevron">›</span></a>
+                <div class="sidebar-submenu">
+                    <a href="/agenda?tab=rapat" class="{{ 'active' if active_menu == 'agenda' and agenda_tab == 'rapat' else '' }}"><span class="submenu-dot"></span><span>RAPAT</span></a>
+                    <a href="/agenda?tab=disposisi" class="{{ 'active' if active_menu == 'agenda' and agenda_tab == 'disposisi' else '' }}"><span class="submenu-dot"></span><span>DISPOSISI</span></a>
+                    <a href="/agenda?tab=kesamaptaan" class="{{ 'active' if active_menu == 'agenda' and agenda_tab == 'kesamaptaan' else '' }}"><span class="submenu-dot"></span><span>KESAMAPTAAN</span></a>
+                </div>
+            </div>
+
+            
+            <a href="/rekam-medisku"
+               class="{{ 'active' if active_menu == 'rekam_medisku' else '' }}">
+                <span class="menu-icon">♡</span>
+                <span>REKAM MEDISKU</span>
+            </a>
+
+            <div class="sidebar-menu-group {{ 'open' if active_menu in ['benefit_tunkin', 'benefit_uang_makan', 'benefit_uang_siaga'] else '' }}">
+                <a href="/benefitku/tunjangan-kinerja" class="sidebar-menu-parent {{ 'active' if active_menu in ['benefit_tunkin', 'benefit_uang_makan', 'benefit_uang_siaga'] else '' }}">
+                    <span class="menu-icon">▤</span><span>BENEFITKU</span><span class="menu-chevron">›</span>
+                </a>
+                <div class="sidebar-submenu">
+                    <a href="/benefitku/tunjangan-kinerja" class="{{ 'active' if active_menu == 'benefit_tunkin' else '' }}"><span class="submenu-dot"></span><span>Tunjangan Kinerja</span></a>
+                    <a href="/benefitku/uang-makan" class="{{ 'active' if active_menu == 'benefit_uang_makan' else '' }}"><span class="submenu-dot"></span><span>Rekap Uang Makan</span></a>
+                    <a href="/benefitku/uang-siaga" class="{{ 'active' if active_menu == 'benefit_uang_siaga' else '' }}"><span class="submenu-dot"></span><span>Uang Siaga</span></a>
+                </div>
+            </div>
+
+            <div class="sidebar-menu-group {{ 'open' if active_menu in ['plans', 'cuti', 'sakit', 'ijin'] else '' }}">
+            <a href="/plans"
+                   class="sidebar-menu-parent {{ 'active' if active_menu in ['plans', 'cuti', 'sakit', 'ijin'] else '' }}">
+                    <span class="menu-icon">◇</span>
+                    <span>PENGAJUANKU</span>
+                    <span class="menu-chevron">›</span>
+                </a>
+
+                <div class="sidebar-submenu">
+                    <a href="/plans/cuti"
+                       class="{{ 'active' if active_menu == 'cuti' else '' }}">
+                        <span class="submenu-dot"></span>
+                        <span>Cuti</span>
+                    </a>
+
+                    <a href="/plans/sakit"
+                       class="{{ 'active' if active_menu == 'sakit' else '' }}">
+                        <span class="submenu-dot"></span>
+                        <span>Sakit</span>
+                    </a>
+
+                    <a href="/plans/ijin"
+                       class="{{ 'active' if active_menu == 'ijin' else '' }}">
+                        <span class="submenu-dot"></span>
+                        <span>Ijin</span>
+                    </a>
+                </div>
+            </div>
+
+            <a href="/profilku"
+               class="{{ 'active' if active_menu == 'profilku' else '' }}">
+                <span class="menu-icon">♙</span>
+                <span>PROFILKU</span>
+            </a>
+
+        </nav>
+
+    </aside>
+
+    <div id="mobileMenuOverlay"
+         class="mobile-menu-overlay"></div>
+
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <button type="button"
+                    id="mobileMenuToggle"
+                    class="mobile-menu-toggle"
+                    aria-label="Buka menu">
+                ☰
+            </button>
+
+            <div class="topbar-actions">
+                <div class="notification-center">
+                    <button type="button" id="notificationToggle" class="notification-toggle" aria-expanded="false" aria-label="Buka notifikasi">
+                        <span class="notification-bell" aria-hidden="true">🔔</span>
+                        <span id="notificationBadge" class="notification-badge" hidden>0</span>
+                    </button>
+                    <div id="notificationDropdown" class="notification-dropdown" hidden>
+                        <div class="notification-head">
+                            <strong>Notifikasi</strong>
+                            <button type="button" id="notificationReadAll" class="notification-read-all">Tandai semua dibaca</button>
+                        </div>
+                        <div id="notificationList" class="notification-list">
+                            <div class="notification-empty">Memuat notifikasi...</div>
+                        </div>
+                        <div class="notification-foot">
+                            <span id="notificationSummary">0 notifikasi baru</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="account-menu">
+                    <button type="button"
+                            id="accountMenuToggle"
+                            class="account-menu-toggle"
+                            aria-expanded="false"
+                            aria-label="Buka menu akun">
+                        <span class="account-avatar" style="overflow:hidden;padding:0;">
+                            <img src="/api/profilku/photo?v={{ session.get('nip') }}"
+                                 alt="Foto profil"
+                                 style="width:100%;height:100%;object-fit:cover;"
+                                 onerror="this.style.display='none'; this.parentElement.textContent='{{ (nama or "Pegawai")[:1]|upper }}';">
+                        </span>
+
+                        <span class="account-name">
+                            {{ nama or "Pegawai" }}
+                        </span>
+
+                        <span class="account-chevron">▾</span>
+                    </button>
+
+                    <div id="accountMenuDropdown"
+                         class="account-menu-dropdown">
+                        <div class="account-menu-info">
+                            <div class="account-menu-name">
+                                {{ nama or "Pegawai" }}
+                            </div>
+                            <div class="account-menu-nip">
+                                {{ session.get("nip") or "" }}
+                            </div>
+                        </div>
+
+                        <button type="button"
+                                class="account-menu-logout"
+                                onclick="logout()">
+                            <span>↪</span>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </header>
+
+
+        <section class="dashboard-content">
+
+            {% if active_menu in ["benefit_tunkin", "benefit_uang_makan", "benefit_uang_siaga"] %}
+            {% set benefit_title = "Tunjangan Kinerja" if active_menu == "benefit_tunkin" else ("Rekap Uang Makan" if active_menu == "benefit_uang_makan" else "Uang Siaga") %}
+            <div class="breadcrumb-card"><strong>Benefitku / {{ benefit_title }}</strong></div>
+            <section class="profile-card" style="padding:24px;">
+                <div class="submission-kicker">BENEFIT PEGAWAI</div>
+                <h2 style="margin:8px 0 6px;">{{ benefit_title }}</h2>
+                <p style="color:#64748b;margin:0 0 22px;">Data perhitungan untuk {{ nama or "Pegawai" }}. Pilih periode lalu tekan Tampilkan.</p>
+                <form id="benefitFilter" style="display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-bottom:22px;">
+                    {% if active_menu == "benefit_tunkin" %}
+                    <label style="display:grid;gap:6px;font-size:13px;font-weight:600;">Tanggal Mulai<input id="benefitStart" type="date" required style="padding:10px;border:1px solid #cbd5e1;border-radius:8px;"></label>
+                    <label style="display:grid;gap:6px;font-size:13px;font-weight:600;">Tanggal Selesai<input id="benefitEnd" type="date" required style="padding:10px;border:1px solid #cbd5e1;border-radius:8px;"></label>
+                    {% else %}
+                    <div id="benefitMonthPicker" style="display:grid;gap:6px;font-size:13px;font-weight:600;">
+                        <span>Periode</span>
+                        <div style="display:flex;align-items:center;gap:10px;padding:4px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;min-height:38px;">
+                            <button type="button" id="benefitMonthPrev" aria-label="Bulan sebelumnya" title="Bulan sebelumnya" style="width:32px;height:30px;border:0;border-radius:6px;background:#f1f5f9;color:#334155;font-size:21px;line-height:1;cursor:pointer;">&#8249;</button>
+                            <span id="benefitMonthLabel" aria-live="polite" style="min-width:132px;text-align:center;color:#0f172a;font-size:14px;font-weight:700;">-</span>
+                            <button type="button" id="benefitMonthNext" aria-label="Bulan berikutnya" title="Bulan berikutnya" style="width:32px;height:30px;border:0;border-radius:6px;background:#f1f5f9;color:#334155;font-size:21px;line-height:1;cursor:pointer;">&#8250;</button>
+                        </div>
+                        <input id="benefitMonth" type="month" required tabindex="-1" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
+                    </div>
+                    {% endif %}
+                    <button type="submit" class="calendar-action-button primary">Tampilkan</button>
+                </form>
+                <div id="benefitStatus" role="status" style="padding:12px 14px;border-radius:8px;background:#f8fafc;color:#475569;margin-bottom:16px;">Memuat data benefit…</div>
+                <div id="benefitSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px;"></div>
+                <div id="benefitDetail" style="overflow:auto;"></div>
+            </section>
+            <script src="{{ url_for('static', filename='js/benefitku.js') }}" defer></script>
+            {% elif active_menu == "profilku" %}
+            <div class="breadcrumb-card"><strong>Profilku</strong></div>
+
+            <section class="profile-card">
+                <div class="profile-hero">
+                    <div class="profile-identity">
+                        <span class="profile-avatar-large" id="calendarProfileFallback">{{ (nama or "Pegawai")[:1]|upper }}</span>
+                        <img id="calendarProfileAvatar" class="profile-avatar-large" alt="Foto profil" style="display:none;">
+                        <div>
+                            <div class="submission-kicker">PROFIL PEGAWAI</div>
+                            <h2 id="calendarProfileName">{{ nama or "Pegawai" }}</h2>
+                            <p id="calendarProfileMeta">{{ nip or "" }}</p>
+                        </div>
+                    </div>
+                    <div class="profile-tools">
+                        <button class="calendar-action-button secondary" onclick="openCalendarPhotoModal()">Ganti Foto Profil</button>
+                        <button class="calendar-action-button secondary" onclick="openCalendarPasswordModal()">Reset Password</button>
+                        <button class="calendar-action-button secondary" onclick="openCalendarSignatureModal()">Ganti Tanda Tangan</button>
+                    </div>
+                </div>
+
+                <div id="calendarProfileAlert" class="calendar-profile-alert"></div>
+
+                <div class="profile-grid">
+                    <section class="profile-panel">
+                        <div class="profile-panel-head"><strong>Identitas Pegawai</strong></div>
+                        <div class="profile-panel-body">
+                            <div class="profile-row"><span>Nama Lengkap</span><b id="cpNama">-</b></div>
+                            <div class="profile-row"><span>NIP</span><b id="cpNip">-</b></div>
+                            <div class="profile-row"><span>Finger ID</span><b id="cpFinger">-</b></div>
+                            <div class="profile-row"><span>Pangkat</span><b id="cpPangkat">-</b></div>
+                            <div class="profile-row"><span>Golongan</span><b id="cpGol">-</b></div>
+                            <div class="profile-row"><span>Jabatan</span><b id="cpJabatan">-</b></div>
+                            <div class="profile-row"><span>Unit Kerja</span><b id="cpUnit">-</b></div>
+                            <div class="profile-row"><span>Eselon</span><b id="cpEselon">-</b></div>
+                        </div>
+                    </section>
+
+                    <section class="profile-panel">
+                        <div class="profile-panel-head"><strong>Data Pribadi</strong></div>
+                        <div class="profile-panel-body">
+                            <div class="profile-row"><span>Tempat Lahir</span><b id="cpTempatLahir">-</b></div>
+                            <div class="profile-row"><span>Tanggal Lahir</span><b id="cpTglLahir">-</b></div>
+                            <div class="profile-row"><span>Jenis Kelamin</span><b id="cpJenisKel">-</b></div>
+                            <div class="profile-row"><span>Status Perkawinan</span><b id="cpStatusKawin">-</b></div>
+                            <div class="profile-row"><span>Agama</span><b id="cpAgama">-</b></div>
+                            <div class="profile-row"><span>No. KTP</span><b id="cpKtp">-</b></div>
+                            <div class="profile-row"><span>No. NPWP</span><b id="cpNpwp">-</b></div>
+                            <div class="profile-row"><span>Hobi</span><b id="cpHobi">-</b></div>
+                        </div>
+                    </section>
+
+                    <section class="profile-panel">
+                        <div class="profile-panel-head"><strong>Kontak & Alamat</strong><span class="status-badge status-ok">DAPAT DIUBAH</span></div>
+                        <div class="profile-panel-body">
+                            <label class="profile-edit-row"><span>No. Telp</span><input id="cpNoTelp" type="tel"></label>
+                            <label class="profile-edit-row"><span>e-Mail</span><input id="cpEmail" type="email"></label>
+                            <label class="profile-edit-row"><span>Alamat</span><input id="cpAlamat"></label>
+                            <label class="profile-edit-row"><span>Kelurahan</span><input id="cpKelurahan"></label>
+                            <label class="profile-edit-row"><span>Kecamatan</span><input id="cpKecamatan"></label>
+                            <label class="profile-edit-row"><span>Kota</span><input id="cpKota"></label>
+                            <div class="profile-save-row"><button class="calendar-action-button primary" onclick="saveCalendarProfile()">Simpan Profil</button></div>
+                        </div>
+                    </section>
+
+                    <section class="profile-panel">
+                        <div class="profile-panel-head"><strong>Data Kepegawaian</strong></div>
+                        <div class="profile-panel-body">
+                            <div class="profile-row"><span>Tanggal Masuk</span><b id="cpTglMasuk">-</b></div>
+                            <div class="profile-row"><span>TMT Pangkat</span><b id="cpTmtPangkat">-</b></div>
+                            <div class="profile-row"><span>TMT Jabatan</span><b id="cpTmtJabatan">-</b></div>
+                            <div class="profile-row"><span>TMT Class</span><b id="cpTmtClass">-</b></div>
+                            <div class="profile-row"><span>TMT CPNS</span><b id="cpTmtCpns">-</b></div>
+                            <div class="profile-row"><span>TMT PNS</span><b id="cpTmtPns">-</b></div>
+                            <div class="profile-row"><span>Gol. Rekrut</span><b id="cpGolRecruit">-</b></div>
+                            <div class="profile-row"><span>Status Pegawai</span><b id="cpStatusPeg">-</b></div>
+                            <div class="profile-row"><span>Status Keluar</span><b id="cpIsKeluar">-</b></div>
+                            <div class="profile-row"><span>Tanggal Keluar</span><b id="cpTglKeluar">-</b></div>
+                            <div class="profile-row"><span>Alasan Keluar</span><b id="cpAlasanKeluar">-</b></div>
+                            <div class="profile-row"><span>VIP</span><b id="cpIsVip">-</b></div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <section class="profile-panel profile-signature-panel">
+                <div class="profile-panel-head">
+                    <strong>Tanda Tanganmu :</strong>
+                    <span class="status-badge status-ok">NIP.png</span>
+                </div>
+                <div class="profile-panel-body profile-signature-body">
+                    <div id="calendarSignatureEmpty" class="profile-signature-empty">Belum ada tanda tangan tersimpan.</div>
+                    <img id="calendarSignaturePreview" class="profile-signature-preview" alt="Tanda tangan pegawai" style="display:none;">
+                    <small>Tanda tangan terbaru akan menggantikan file sebelumnya dengan nama NIP.png.</small>
+                </div>
+            </section>
+
+            <div class="profile-modal" id="calendarPhotoModal">
+                <div class="profile-modal-box">
+                    <div class="profile-modal-head"><strong>Ganti Foto Profil</strong><button onclick="closeCalendarModal('calendarPhotoModal')">×</button></div>
+                    <div class="profile-modal-body">
+                        <img id="calendarPhotoPreview" class="profile-avatar-preview" alt="Preview">
+                        <div class="profile-modal-buttons">
+                            <button class="calendar-action-button secondary" onclick="document.getElementById('calendarGalleryInput').click()">Gallery / File</button>
+                            <button class="calendar-action-button primary" onclick="document.getElementById('calendarCameraInput').click()">Kamera Selfie</button>
+                        </div>
+                        <input id="calendarGalleryInput" type="file" accept="image/*" hidden>
+                        <input id="calendarCameraInput" type="file" accept="image/*" capture="user" hidden>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-modal" id="calendarPasswordModal">
+                <div class="profile-modal-box">
+                    <div class="profile-modal-head"><strong>Reset Password</strong><button onclick="closeCalendarModal('calendarPasswordModal')">×</button></div>
+                    <div class="profile-modal-body">
+                        <label class="profile-edit-row"><span>Password Baru</span><input id="calendarNewPassword" type="password" autocomplete="new-password"></label>
+                        <label class="profile-edit-row"><span>Konfirmasi</span><input id="calendarConfirmPassword" type="password" autocomplete="new-password"></label>
+                        <small>Minimal 8 karakter.</small>
+                    </div>
+                    <div class="profile-modal-foot"><button class="calendar-action-button secondary" onclick="closeCalendarModal('calendarPasswordModal')">Batal</button><button class="calendar-action-button primary" onclick="saveCalendarPassword()">Simpan</button></div>
+                </div>
+            </div>
+
+            <div class="profile-modal" id="calendarSignatureModal">
+                <div class="profile-modal-box">
+                    <div class="profile-modal-head"><strong>Ganti Tanda Tangan</strong><button onclick="closeCalendarModal('calendarSignatureModal')">×</button></div>
+                    <div class="profile-modal-body">
+                        <small>Tanda tangan dengan jari/stylus. Background transparan.</small>
+                        <canvas id="calendarSignatureCanvas" width="1000" height="500"></canvas>
+                    </div>
+                    <div class="profile-modal-foot"><button class="calendar-action-button secondary" onclick="clearCalendarSignature()">Hapus</button><button class="calendar-action-button primary" onclick="saveCalendarSignature()">Simpan</button></div>
+                </div>
+            </div>
+
+            {% elif active_menu == "cuti" %}
+
+            <div class="breadcrumb-card">
+                <strong>Pengajuanku / Cuti</strong>
+            </div>
+
+            <section class="leave-balance-grid">
+
+                <div class="leave-balance-card">
+                    <div class="leave-balance-icon">L</div>
+                    <div class="leave-balance-body">
+                        <span>Sisa Cuti Tahun Lalu</span>
+                        <strong id="leaveBalancePrevious">- hari</strong>
+                    </div>
+                </div>
+
+                <div class="leave-balance-card">
+                    <div class="leave-balance-icon">T</div>
+                    <div class="leave-balance-body">
+                        <span>Sisa Cuti Tahun Berjalan</span>
+                        <strong id="leaveBalanceCurrent">- hari</strong>
+                    </div>
+                </div>
+
+                <div class="leave-balance-card leave-balance-total">
+                    <div class="leave-balance-icon">Σ</div>
+                    <div class="leave-balance-body">
+                        <span>Total Sisa Cuti</span>
+                        <strong id="leaveBalanceTotal">- hari</strong>
+                    </div>
+                </div>
+
+            </section>
+
+            <section class="submission-card leave-form-card">
+
+                <div class="submission-header">
+                    <div>
+                        <div class="submission-kicker">PENGAJUANKU</div>
+                        <h2>Pengajuan Cuti</h2>
+                        <p>
+                            Silahkan isi data pengajuan cuti sesuai ketentuan
+                            yang berlaku.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="leave-form-body">
+
+                    <div class="leave-form-grid">
+
+                        <div class="form-field">
+                            <label for="leaveStartDate">
+                                Tanggal Mulai <span>*</span>
+                            </label>
+                            <input type="date"
+                                   id="leaveStartDate"
+                                   name="start_date">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="leaveEndDate">
+                                Tanggal Selesai <span>*</span>
+                            </label>
+                            <input type="date"
+                                   id="leaveEndDate"
+                                   name="end_date">
+                        </div>
+
+                        <div class="form-field form-field-wide">
+                            <label for="leaveType">
+                                Jenis Cuti <span>*</span>
+                            </label>
+                            <select id="leaveType" name="leave_type">
+                                <option value="">Pilih jenis cuti</option>
+                                <option value="cuti-tahunan">Cuti Tahunan</option>
+                                <option value="cuti-besar">Cuti Besar</option>
+                                <option value="cuti-sakit">Cuti Sakit</option>
+                                <option value="cuti-melahirkan">Cuti Melahirkan</option>
+                                <option value="cuti-alasan-penting">Cuti Alasan Penting</option>
+                            </select>
+                            <small>
+                                Jenis cuti akan diambil dari Master Potongan HRIS.
+                            </small>
+                        </div>
+
+                        <div class="form-field form-field-wide">
+                            <label for="leaveLocation">
+                                Lokasi Selama Cuti <span>*</span>
+                            </label>
+                            <input type="text"
+                                   id="leaveLocation"
+                                   name="location"
+                                   placeholder="Contoh: Surabaya, Jawa Timur">
+                        </div>
+
+                    </div>
+
+                    <div class="leave-form-footer">
+
+                        <div class="form-required-note">
+                            <span>*</span> Wajib diisi
+                        </div>
+
+                        <button type="button"
+                                id="leaveSubmitButton"
+                                class="primary-action-button">
+                            Simpan Pengajuan
+                        </button>
+
+                    </div>
+
+                    <div id="leaveFormMessage"
+                         class="form-message"
+                         hidden>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="submission-card leave-history-card">
+
+                <div class="history-header">
+                    <div>
+                        <div class="submission-kicker">RIWAYAT</div>
+                        <h2>History Pengajuan Cuti</h2>
+                        <p>
+                            Pengajuan yang pernah Anda buat akan tampil di sini.
+                        </p>
+                    </div>
+
+                    <div class="history-filter">
+                        <select id="leaveHistoryYear">
+                            <option>2026</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="history-table-wrap">
+
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Jenis Cuti</th>
+                                <th>Durasi</th>
+                                <th>Lokasi</th>
+                                <th>Status</th>
+                                <th class="history-action-col">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="leaveHistoryBody">
+
+                            <tr>
+                                <td>—</td>
+                                <td>Belum ada data</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>
+                                    <span class="status-badge status-empty">
+                                        Belum ada pengajuan
+                                    </span>
+                                </td>
+                                <td class="history-actions">
+                                    —
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="history-mobile-note">
+                    History pengajuan akan menampilkan tanggal, jenis,
+                    durasi, lokasi, status persetujuan, serta aksi Edit/Hapus.
+                </div>
+
+            </section>
+
+            {% elif active_menu == "sakit" %}
+
+            <div class="breadcrumb-card">
+                <strong>Pengajuanku / Sakit</strong>
+            </div>
+
+            <section class="submission-card sickness-form-card">
+
+                <div class="submission-header">
+                    <div>
+                        <div class="submission-kicker">PENGAJUANKU</div>
+                        <h2>Pengajuan Sakit</h2>
+                        <p>
+                            Silahkan isi data pengajuan sakit sesuai ketentuan
+                            yang berlaku.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="sickness-form-body">
+
+                    <div class="leave-form-grid">
+
+                        <div class="form-field">
+                            <label for="sicknessStartDate">
+                                Tanggal Mulai <span>*</span>
+                            </label>
+                            <input type="date"
+                                   id="sicknessStartDate"
+                                   name="start_date">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="sicknessEndDate">
+                                Tanggal Selesai <span>*</span>
+                            </label>
+                            <input type="date"
+                                   id="sicknessEndDate"
+                                   name="end_date">
+                        </div>
+
+                        <div class="form-field form-field-wide">
+                            <label for="sicknessType">
+                                Jenis Sakit <span>*</span>
+                            </label>
+                            <select id="sicknessType" name="sickness_type">
+                                <option value="">Pilih jenis sakit</option>
+                                <option value="S-5">Sakit Tanpa SU Dokter</option>
+                                <option value="S-1">Sakit SU Dok 1-2 hr</option>
+                                <option value="S-3">Sakit SU Dok Non Menkes 3-14 hr</option>
+                                <option value="S-4">Sakit SU Dok Non Menkes &gt;14 hr</option>
+                                <option value="S-2">Sakit SU Dok Menkes &gt; 3 hr</option>
+                            </select>
+                            <small>
+                                Jenis sakit akan diambil dari Master Potongan HRIS.
+                            </small>
+                        </div>
+
+                        <div class="form-field form-field-wide">
+                            <label for="sicknessProof">
+                                Surat Keterangan Sakit
+                            </label>
+
+                            <div class="file-upload-box">
+                                <input type="file"
+                                       id="sicknessProof"
+                                       name="sickness_proof"
+                                       accept=".pdf,.jpg,.jpeg,.png">
+
+                                <div class="file-upload-copy">
+                                    <strong>Pilih file surat keterangan sakit</strong>
+                                    <span>PDF, JPG, JPEG atau PNG. Boleh dikosongkan.</span>
+                                </div>
+                            </div>
+
+                            <small>
+                                Surat keterangan sakit bersifat opsional.
+                            </small>
+                        </div>
+
+                    </div>
+
+                    <div class="sickness-form-footer">
+
+                        <div class="form-required-note">
+                            <span>*</span> Wajib diisi
+                        </div>
+
+                        <button type="button"
+                                id="sicknessSubmitButton"
+                                class="primary-action-button">
+                            Simpan Pengajuan
+                        </button>
+
+                    </div>
+
+                    <div id="sicknessFormMessage"
+                         class="form-message"
+                         hidden>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="submission-card sickness-history-card">
+
+                <div class="history-header">
+                    <div>
+                        <div class="submission-kicker">RIWAYAT</div>
+                        <h2>History Pengajuan Sakit</h2>
+                        <p>
+                            Pengajuan yang pernah Anda buat akan tampil di sini.
+                        </p>
+                    </div>
+
+                    <div class="history-filter">
+                        <select id="sicknessHistoryYear">
+                            <option>2026</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="history-table-wrap">
+
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Jenis Sakit</th>
+                                <th>Durasi</th>
+                                <th>Bukti</th>
+                                <th>Status</th>
+                                <th class="history-action-col">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="sicknessHistoryBody">
+
+                            <tr>
+                                <td>—</td>
+                                <td>Belum ada data</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>
+                                    <span class="status-badge status-empty">
+                                        Belum ada pengajuan
+                                    </span>
+                                </td>
+                                <td class="history-actions">—</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </section>
+
+            {% elif active_menu == "ijin" %}
+
+            <div class="breadcrumb-card">
+                <strong>Pengajuanku / Ijin</strong>
+            </div>
+
+            <section class="submission-card permission-form-card">
+
+                <div class="submission-header">
+                    <div>
+                        <div class="submission-kicker">PENGAJUANKU</div>
+                        <h2>Pengajuan Ijin</h2>
+                        <p>
+                            Silahkan isi data pengajuan ijin sesuai ketentuan
+                            yang berlaku.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="permission-form-body">
+
+                    <div class="leave-form-grid">
+
+                        <div class="form-field">
+                            <label for="permissionStartDate">
+                                Tanggal Mulai <span>*</span>
+                            </label>
+                            <input type="date"
+                                   id="permissionStartDate"
+                                   name="start_date">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="permissionEndDate">
+                                Tanggal Selesai <span>*</span>
+                            </label>
+                            <input type="date"
+                                   id="permissionEndDate"
+                                   name="end_date">
+                        </div>
+
+                        <div class="form-field form-field-wide">
+                            <label for="permissionType">
+                                Jenis Ijin <span>*</span>
+                            </label>
+                            <select id="permissionType" name="permission_type">
+                                <option value="">Pilih jenis ijin</option>
+                                <option value="I">Ijin</option>
+                            </select>
+                            <small>
+                                Jenis ijin akan diambil dari Master Potongan HRIS.
+                            </small>
+                        </div>
+
+                    </div>
+
+                    <div class="permission-form-footer">
+
+                        <div class="form-required-note">
+                            <span>*</span> Wajib diisi
+                        </div>
+
+                        <button type="button"
+                                id="permissionSubmitButton"
+                                class="primary-action-button">
+                            Simpan Pengajuan
+                        </button>
+
+                    </div>
+
+                    <div id="permissionFormMessage"
+                         class="form-message"
+                         hidden>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="submission-card permission-history-card">
+
+                <div class="history-header">
+                    <div>
+                        <div class="submission-kicker">RIWAYAT</div>
+                        <h2>History Pengajuan Ijin</h2>
+                        <p>
+                            Pengajuan yang pernah Anda buat akan tampil di sini.
+                        </p>
+                    </div>
+
+                    <div class="history-filter">
+                        <select id="permissionHistoryYear">
+                            <option>2026</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="history-table-wrap">
+
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Jenis Ijin</th>
+                                <th>Durasi</th>
+                                <th>Status</th>
+                                <th class="history-action-col">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="permissionHistoryBody">
+
+                            <tr>
+                                <td>—</td>
+                                <td>Belum ada data</td>
+                                <td>—</td>
+                                <td>
+                                    <span class="status-badge status-empty">
+                                        Belum ada pengajuan
+                                    </span>
+                                </td>
+                                <td class="history-actions">—</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </section>
+
+            {% elif active_menu == "plans" %}
+
+            <div class="breadcrumb-card">
+                <strong>Pengajuanku</strong>
+            </div>
+
+            <section class="submission-card submission-overview">
+
+                <div class="submission-header">
+                    <div>
+                        <div class="submission-kicker">PENGAJUANKU</div>
+                        <h2>Pengajuan Kepegawaian</h2>
+                        <p>
+                            Silahkan melakukan pengajuan Cuti, Sakit dan Ijin
+                            sesuai ketentuan yang berlaku.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="submission-overview-content">
+
+                    <p class="submission-overview-note">
+                        Pengajuan yang sudah disetujui bisa dilihat di
+                        <strong>Kalender Pribadi</strong>.
+                    </p>
+
+                    <div class="submission-summary-title">
+                        Anda sudah melakukan:
+                    </div>
+
+                    <div id="submissionSummaryLoading"
+                         class="submission-summary-loading">
+                        Memuat ringkasan pengajuan...
+                    </div>
+
+                    <div id="submissionSummaryError"
+                         class="submission-summary-error"
+                         hidden>
+                    </div>
+
+                    <div id="submissionSummary"
+                         class="submission-summary-grid"
+                         hidden>
+
+                        <a href="/plans/cuti"
+                           class="submission-summary-card">
+                            <span class="submission-summary-icon">C</span>
+                            <span class="submission-summary-body">
+                                <strong>Cuti</strong>
+                                <b id="summaryCuti">0 hari</b>
+                            </span>
+                            <span class="submission-summary-arrow">›</span>
+                        </a>
+
+                        <a href="/plans/sakit"
+                           class="submission-summary-card">
+                            <span class="submission-summary-icon">S</span>
+                            <span class="submission-summary-body">
+                                <strong>Sakit</strong>
+                                <b id="summarySakit">0 hari</b>
+                            </span>
+                            <span class="submission-summary-arrow">›</span>
+                        </a>
+
+                        <a href="/plans/ijin"
+                           class="submission-summary-card">
+                            <span class="submission-summary-icon">I</span>
+                            <span class="submission-summary-body">
+                                <strong>Ijin</strong>
+                                <b id="summaryIjin">0 hari</b>
+                            </span>
+                            <span class="submission-summary-arrow">›</span>
+                        </a>
+
+                    </div>
+
+                    <div class="submission-summary-year"
+                         id="submissionSummaryYear">
+                    </div>
+
+                </div>
+
+            </section>
+
+            {% elif active_menu == "phone" %}
+
+            <div class="breadcrumb-card">
+                <strong>Kalender Handphone</strong>
+            </div>
+
+            <section class="phone-calendar-card" id="phoneCalendarView">
+
+                <div class="phone-calendar-header">
+                    <div>
+                        <div class="phone-calendar-kicker">PERSONAL CALENDAR</div>
+                        <h2>Sinkronkan Kalender</h2>
+                        <p>
+                            Tambahkan kalender pribadi Basarnas ke perangkat
+                            handphone Anda.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="phoneCalendarLoading"
+                     class="phone-calendar-loading">
+                    Menyiapkan kalender...
+                </div>
+
+                <div id="phoneCalendarError"
+                     class="phone-calendar-error"
+                     hidden>
+                </div>
+
+                <div id="phoneCalendarContent" hidden>
+
+                    <div class="phone-device-title">
+                        <strong>Pilih perangkat</strong>
+                        <span>Pilih cara yang sesuai dengan perangkat Anda.</span>
+                    </div>
+
+                    <div class="phone-device-grid">
+
+                        <button type="button"
+                                id="iphoneCalendarBtn"
+                                class="phone-device-button"
+                                disabled>
+
+                            <span class="phone-device-icon"></span>
+
+                            <span class="phone-device-text">
+                                <strong>iPhone / iPad</strong>
+                                <small>Tambahkan ke iPhone</small>
+                            </span>
+
+                            <span class="phone-device-arrow">›</span>
+
+                        </button>
+
+
+                        <button type="button"
+                                id="androidCalendarBtn"
+                                class="phone-device-button"
+                                disabled>
+
+                            <span class="phone-device-icon android">🤖</span>
+
+                            <span class="phone-device-text">
+                                <strong>Android</strong>
+                                <small>Tambahkan ke Google Calendar</small>
+                            </span>
+
+                            <span class="phone-device-arrow">›</span>
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="phone-feed-card">
+
+                        <div class="phone-feed-header">
+                            <div>
+                                <strong>URL Kalender</strong>
+                                <span>
+                                    Gunakan URL ini untuk berlangganan kalender.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="phone-feed-row">
+
+                            <input type="text"
+                                   id="phoneFeedUrl"
+                                   readonly
+                                   value="">
+
+                            <button type="button"
+                                    id="copyCalendarUrlBtn"
+                                    class="phone-copy-button">
+                                Salin URL
+                            </button>
+
+                        </div>
+
+                        <div id="copyCalendarMessage"
+                             class="phone-copy-message"
+                             hidden>
+                            URL kalender berhasil disalin.
+                        </div>
+
+                    </div>
+
+                    <div id="iphoneSubscriptionPanel"
+                         class="phone-subscription-card"
+                         hidden>
+
+                        <div class="phone-subscription-header">
+                            <strong>Tambahkan Kalender ke iPhone / iPad</strong>
+
+                            <button type="button"
+                                    id="closeIphoneSubscriptionBtn"
+                                    class="phone-subscription-close">
+                                ×
+                            </button>
+                        </div>
+
+                        <p>
+                            Gunakan metode <strong>Berlangganan Kalender</strong>
+                            agar kalender HRIS REBORN tetap tersinkronisasi.
+                        </p>
+
+                        <div class="phone-subscription-url">
+
+                            <strong>URL Kalender</strong>
+
+                            <div class="phone-feed-row">
+
+                                <input type="text"
+                                       id="iphoneSubscriptionUrl"
+                                       readonly
+                                       value="">
+
+                                <button type="button"
+                                        id="copyIphoneSubscriptionBtn"
+                                        class="phone-copy-button">
+                                    Salin URL
+                                </button>
+
+                            </div>
+
+                            <div id="iphoneSubscriptionMessage"
+                                 class="phone-copy-message"
+                                 hidden>
+                                URL kalender berhasil disalin.
+                            </div>
+
+                        </div>
+
+                        <div class="phone-subscription-steps">
+
+                            <strong>Langkah di iPhone / iPad</strong>
+
+                            <ol>
+                                <li>Buka aplikasi <strong>Kalender</strong>.</li>
+                                <li>Pilih <strong>Kalender</strong>.</li>
+                                <li>Pilih <strong>Tambah Kalender</strong>.</li>
+                                <li>
+                                    Pilih
+                                    <strong>Tambah Kalender Berlangganan</strong>.
+                                </li>
+                                <li>Tempel URL Kalender di atas.</li>
+                                <li>Pilih <strong>Berlangganan</strong>.</li>
+                                <li>
+                                    Gunakan nama kalender
+                                    <strong>HRIS REBORN</strong>.
+                                </li>
+                            </ol>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            {% elif active_menu == "calendar" %}
+
+        <div class="breadcrumb-card">
+            <strong>Kalender Saya</strong>
+        </div>
+
+        <section class="calendar-card">
+
+            <div class="calendar-header">
+
+                <div class="calendar-title">
+                    <span class="calendar-title-icon">▦</span>
+                    <strong>Personal Calendar</strong>
+                </div>
+
+                <div class="calendar-controls">
+
+                    <button id="monthViewBtn"
+                            class="view-button active"
+                            type="button">
+                        BULAN
+                    </button>
+
+                    <button id="yearViewBtn"
+                            class="view-button"
+                            type="button">
+                        TAHUN
+                    </button>
+
+                    <button id="prevBtn"
+                            class="nav-button"
+                            type="button">
+                        ‹
+                    </button>
+
+                    <strong id="periodTitle">-</strong>
+
+                    <button id="nextBtn"
+                            class="nav-button"
+                            type="button">
+                        ›
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div id="calendarLoading" class="calendar-loading">
+                Memuat kalender...
+            </div>
+
+            <div id="calendarError"
+                 class="calendar-error"
+                 hidden>
+            </div>
+
+            <div id="monthView">
+
+                <div class="week-header">
+                    <span>SEN</span>
+                    <span>SEL</span>
+                    <span>RAB</span>
+                    <span>KAM</span>
+                    <span>JUM</span>
+                    <span>SAB</span>
+                    <span>MIN</span>
+                </div>
+
+                <div id="calendarGrid" class="calendar-grid"></div>
+
+            </div>
+
+            <div id="yearView"
+                 class="year-grid"
+                 hidden>
+            </div>
+
+            <div class="agenda-section">
+
+                <div class="agenda-header">
+                    <strong id="agendaTitle">Agenda</strong>
+                    <span id="agendaCount">0 kegiatan</span>
+                </div>
+
+                <div id="agendaList"></div>
+
+            </div>
+
+        </section>
+
+        {% elif active_menu == "agenda" %}
+            <div class="breadcrumb-card"><strong>AgendaKu</strong></div>
+            {% if agenda_tab == "overview" %}
+            <section class="agenda-overview">
+                <div class="agenda-overview-header">
+                    <div><div class="agenda-portal-kicker">AGENDAKU</div><h2>Agenda Kegiatan Saya</h2><p>Ringkasan agenda yang tercatat untuk Anda sejak Januari sampai bulan berjalan.</p></div>
+                    <div class="agenda-overview-period" id="agendaOverviewPeriod">-</div>
+                </div>
+                <div id="agendaOverviewLoading" class="agenda-portal-loading">Memuat ringkasan AgendaKu...</div>
+                <div id="agendaOverviewError" class="agenda-portal-error" hidden></div>
+                <div id="agendaOverviewCards" class="agenda-overview-cards" hidden>
+                    <a class="agenda-overview-card agenda-overview-rapat" href="/agenda?tab=rapat"><div class="agenda-overview-card-top"><span class="agenda-overview-icon">👥</span><span>RAPAT</span></div><strong id="agendaOverviewRapatCount">—</strong><small>Total Rapat</small><span id="agendaOverviewRapatMessage" class="agenda-overview-message">Memuat...</span><em>Lihat agenda rapat →</em></a>
+                    <a class="agenda-overview-card agenda-overview-disposisi" href="/agenda?tab=disposisi"><div class="agenda-overview-card-top"><span class="agenda-overview-icon">📄</span><span>DISPOSISI</span></div><strong id="agendaOverviewDisposisiCount">—</strong><small>Total Disposisi</small><span id="agendaOverviewDisposisiMessage" class="agenda-overview-message">Memuat...</span><em>Lihat disposisi →</em></a>
+                    <a class="agenda-overview-card agenda-overview-kesamaptaan" href="/agenda?tab=kesamaptaan"><div class="agenda-overview-card-top"><span class="agenda-overview-icon">🏃</span><span>KESAMAPTAAN</span></div><strong id="agendaOverviewKesamaptaanCount">—</strong><small>Total Kesamaptaan</small><span id="agendaOverviewKesamaptaanMessage" class="agenda-overview-message">Memuat...</span><em>Lihat kesamaptaan →</em></a>
+                </div>
+            </section>
+            {% elif agenda_tab == "rapat" %}
+            <div class="agenda-portal">
+                <div class="agenda-portal-header"><div><div class="agenda-portal-kicker">AGENDAKU</div><h2>RAPAT</h2><p>Agenda rapat yang terhubung dengan HRIS Reborn.</p></div><div class="agenda-month-controls"><button type="button" id="agendaPrevMonth" class="agenda-month-button">‹</button><strong id="agendaMonthTitle">-</strong><button type="button" id="agendaNextMonth" class="agenda-month-button">›</button></div></div>
+                <section class="agenda-group-card"><div class="agenda-group-header"><div class="agenda-group-title"><div class="agenda-group-icon">👥</div><div><h3>RAPAT</h3><p>Agenda rapat dari HRIS Reborn.</p></div></div><span id="agendaRapatCount" class="agenda-group-count">0 rapat</span></div><div id="agendaRapatLoading" class="agenda-portal-loading">Memuat daftar rapat...</div><div id="agendaRapatError" class="agenda-portal-error" hidden></div><div class="agenda-table-wrap"><table class="agenda-table"><thead><tr><th>Tanggal / Waktu</th><th>Agenda Rapat</th><th>Tempat</th><th>Pimpinan</th><th>Peserta</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="agendaRapatBody"></tbody></table></div></section>
+                <div id="agendaRapatModal" class="agenda-portal-modal" hidden><div class="agenda-portal-modal-backdrop" onclick="closeAgendaRapatModal()"></div><div class="agenda-portal-modal-card" role="dialog"><div class="agenda-portal-modal-header"><div><div class="agenda-portal-kicker">DETAIL RAPAT</div><h3 id="agendaRapatModalTitle">-</h3></div><button type="button" class="agenda-modal-close" onclick="closeAgendaRapatModal()">×</button></div><div id="agendaRapatModalBody" class="agenda-portal-modal-body"></div></div></div>
+            </div>
+            {% elif agenda_tab == "disposisi" %}
+            <div class="agenda-portal">
+                <div class="agenda-portal-header"><div><div class="agenda-portal-kicker">AGENDAKU</div><h2>DISPOSISI</h2><p>Disposisi yang ditujukan kepada Anda.</p></div><div class="agenda-month-controls"><button type="button" id="agendaPrevMonth" class="agenda-month-button">‹</button><strong id="agendaMonthTitle">-</strong><button type="button" id="agendaNextMonth" class="agenda-month-button">›</button></div></div>
+                <section class="agenda-group-card"><div class="agenda-group-header"><div class="agenda-group-title"><div class="agenda-group-icon">📄</div><div><h3>DISPOSISI</h3><p>Disposisi yang ditujukan kepada Anda.</p></div></div><span id="agendaDisposisiCount" class="agenda-group-count">0 disposisi</span></div><div id="agendaDisposisiLoading" class="agenda-portal-loading">Memuat daftar disposisi...</div><div id="agendaDisposisiError" class="agenda-portal-error" hidden></div><div id="agendaDisposisiList" class="agenda-disposisi-list"></div></section>
+            </div>
+            {% else %}
+            <div class="agenda-portal">
+                <div class="agenda-portal-header"><div><div class="agenda-portal-kicker">AGENDAKU</div><h2>KESAMAPTAAN</h2><p>Kesamaptaan yang Anda ikuti melalui scan QR.</p></div><div class="agenda-month-controls"><button type="button" id="agendaPrevMonth" class="agenda-month-button">‹</button><strong id="agendaMonthTitle">-</strong><button type="button" id="agendaNextMonth" class="agenda-month-button">›</button></div></div>
+                <section class="agenda-group-card"><div class="agenda-group-header"><div class="agenda-group-title"><div class="agenda-group-icon">🏃</div><div><h3>KESAMAPTAAN</h3><p>Kesamaptaan yang Anda ikuti melalui scan QR.</p></div></div><span id="agendaKesamaptaanCount" class="agenda-group-count">0 kegiatan</span></div><div id="agendaKesamaptaanLoading" class="agenda-portal-loading">Memuat daftar Kesamaptaan...</div><div id="agendaKesamaptaanError" class="agenda-portal-error" hidden></div><div class="agenda-table-wrap"><table class="agenda-table"><thead><tr><th>Tanggal / Waktu</th><th>Kegiatan</th><th>Tempat</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="agendaKesamaptaanBody"></tbody></table></div></section>
+                <div id="agendaKesamaptaanModal" class="agenda-portal-modal" hidden><div class="agenda-portal-modal-backdrop" onclick="closeAgendaKesamaptaanModal()"></div><div class="agenda-portal-modal-card" role="dialog"><div class="agenda-portal-modal-header"><div><div class="agenda-portal-kicker">DETAIL KESAMAPTAAN</div><h3 id="agendaKesamaptaanModalTitle">-</h3></div><button type="button" class="agenda-modal-close" onclick="closeAgendaKesamaptaanModal()">×</button></div><div id="agendaKesamaptaanModalBody" class="agenda-portal-modal-body"></div></div></div>
+            </div>
+            {% endif %}
+
+        {% elif active_menu == "rekam_medisku" %}
+
+        <div class="breadcrumb-card">
+            <strong>Rekam Medisku</strong>
+        </div>
+
+        <section class="medical-history-card">
+            <div class="medical-history-header">
+                <div>
+                    <div class="medical-history-kicker">REKAM MEDIS PRIBADI PEGAWAI</div>
+                    <h2>Riwayat Rekam Medis</h2>
+                    <p>Riwayat pemeriksaan kesehatan yang pernah kamu ikuti di HRIS Reborn.</p>
+                </div>
+                <div class="medical-history-month-controls">
+                    <button type="button" id="medicalPrevMonth" class="agenda-month-button" aria-label="Bulan sebelumnya">‹</button>
+                    <strong id="medicalMonthTitle">-</strong>
+                    <button type="button" id="medicalNextMonth" class="agenda-month-button" aria-label="Bulan berikutnya">›</button>
+                </div>
+                <div class="medical-history-total" id="medicalHistoryTotal">0 pemeriksaan</div>
+            </div>
+
+            <div id="medicalHistoryLoading" class="medical-history-loading">
+                Memuat riwayat Rekam Medis...
+            </div>
+
+            <div id="medicalHistoryError" class="medical-history-error" hidden></div>
+
+            <div id="medicalHistoryEmpty" class="medical-history-empty" hidden>
+                <div class="medical-empty-icon">+</div>
+                <strong>Belum ada riwayat Rekam Medis</strong>
+                <span id="medicalHistoryEmptyText">Hasil pemeriksaan yang sudah selesai akan tampil pada bulan ini.</span>
+            </div>
+
+            <div id="medicalHistoryTableWrap" class="medical-history-table-wrap" hidden>
+                <table class="medical-history-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal Pemeriksaan</th>
+                            <th>Jam</th>
+                            <th>Kegiatan</th>
+                            <th>Lokasi</th>
+                            <th>Hasil</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medicalHistoryBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <div id="medicalDetailModal" class="medical-detail-modal" hidden>
+            <div class="medical-detail-backdrop" data-medical-close></div>
+
+            <section class="medical-detail-dialog"
+                     role="dialog"
+                     aria-modal="true"
+                     aria-labelledby="medicalDetailTitle">
+
+                <div class="medical-detail-header">
+                    <div>
+                        <div class="medical-history-kicker">DETAIL PEMERIKSAAN</div>
+                        <h2 id="medicalDetailTitle">Rekam Medis</h2>
+                    </div>
+                    <button type="button"
+                            class="medical-detail-close"
+                            data-medical-close
+                            aria-label="Tutup detail">×</button>
+                </div>
+
+                <div class="medical-detail-body">
+
+                    <div class="medical-detail-summary">
+                        <div><span>Kegiatan</span><strong id="medicalDetailActivity">-</strong></div>
+                        <div><span>Lokasi</span><strong id="medicalDetailLocation">-</strong></div>
+                        <div><span>Jadwal</span><strong id="medicalDetailSchedule">-</strong></div>
+                        <div><span>Pemeriksaan Dilakukan</span><strong id="medicalDetailExamAt">-</strong></div>
+                    </div>
+
+                    <div class="medical-detail-section-title">Hasil Pemeriksaan</div>
+
+                    <div class="medical-detail-grid">
+                        <div class="medical-detail-field"><span>Tekanan Darah</span><strong id="medicalDetailBloodPressure">-</strong></div>
+                        <div class="medical-detail-field"><span>Nadi</span><strong id="medicalDetailPulse">-</strong></div>
+                        <div class="medical-detail-field"><span>Frekuensi Nafas</span><strong id="medicalDetailRespiration">-</strong></div>
+                        <div class="medical-detail-field"><span>Suhu</span><strong id="medicalDetailTemperature">-</strong></div>
+                        <div class="medical-detail-field"><span>SpO2</span><strong id="medicalDetailSpo2">-</strong></div>
+                        <div class="medical-detail-field"><span>Hasil Kebugaran</span><strong id="medicalDetailFitness">-</strong></div>
+                    </div>
+
+                    <div class="medical-detail-notes-grid">
+                        <div><span>Keluhan</span><p id="medicalDetailComplaint">-</p></div>
+                        <div><span>Tindakan / Catatan</span><p id="medicalDetailAction">-</p></div>
+                        <div><span>Pemeriksa</span><p id="medicalDetailExaminer">-</p></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        {% else %}
+
+        <div class="breadcrumb-card">
+            <strong>Dashboard Pribadi</strong>
+        </div>
+
+        <section id="dashboardSignatureReminder"
+                 class="signature-reminder-card"
+                 hidden>
+            <div class="signature-reminder-icon">✎</div>
+            <div class="signature-reminder-body">
+                <div class="signature-reminder-kicker">TINDAKAN DIPERLUKAN</div>
+                <strong>Tanda tangan digital Anda belum tersedia.</strong>
+                <p>Silakan lengkapi tanda tangan agar dapat digunakan pada Daftar Hadir Rapat, Kesamaptaan, dan dokumen HRIS lainnya.</p>
+            </div>
+            <a href="/profilku" class="signature-reminder-button">Profilku → Ganti Tanda Tangan</a>
+        </section>
+
+        <section class="personal-dashboard-card">
+
+                <div class="personal-dashboard-header">
+                    <div class="personal-dashboard-kicker">KALENDAR PRIBADI PEGAWAI</div>
+
+                    <h2>
+                        Selamat datang di Kalendar Pribadi Pegawai
+                        Kantor SAR Surabaya
+                    </h2>
+
+                    <p id="dashboardWelcomeText">
+                        Menyiapkan ringkasan aktivitas kamu...
+                    </p>
+                </div>
+
+                <div id="dashboardSummaryLoading"
+                     class="dashboard-summary-loading">
+                    Memuat data real dari HRIS Reborn...
+                </div>
+
+                <div id="dashboardSummaryError"
+                     class="dashboard-summary-error"
+                     hidden>
+                </div>
+
+                <div id="dashboardSummaryContent"
+                     hidden>
+
+                    <div class="dashboard-passed-card">
+                        <div class="dashboard-passed-icon">✓</div>
+
+                        <div>
+                            <span>Sampai dengan hari ini</span>
+
+                            <strong>
+                                Kamu sudah melewati
+                                <b id="dashboardDaysPassed">0</b>
+                                hari di tahun
+                                <b id="dashboardYear">-</b>.
+                                Sisa
+                                <b id="dashboardDaysRemaining">0</b>
+                                hari menuju tahun
+                                <b id="dashboardNextYear">-</b>.
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-activity-title">
+                        Rekap aktivitas kamu tahun berjalan
+                    </div>
+
+                    <div class="dashboard-activity-grid">
+
+                        <div class="dashboard-activity-card dashboard-activity-dinas">
+                            <div class="dashboard-activity-icon">D</div>
+
+                            <div class="dashboard-activity-body">
+                                <span>Dinas Luar</span>
+                                <strong><b id="dashboardDinasLuar">0</b> hari</strong>
+                                <small>
+                                    Termasuk Dinas Luar Umum, Operasi dan Sumber Daya.
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-activity-card dashboard-activity-sakit">
+                            <div class="dashboard-activity-icon">S</div>
+
+                            <div class="dashboard-activity-body">
+                                <span>Sakit</span>
+                                <strong><b id="dashboardSakit">0</b> hari</strong>
+                                <small id="dashboardSakitMessage">
+                                    Sehat-sehat selalu ya kamu.
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-activity-card dashboard-activity-ijin">
+                            <div class="dashboard-activity-icon">I</div>
+
+                            <div class="dashboard-activity-body">
+                                <span>Ijin</span>
+                                <strong><b id="dashboardIjin">0</b> hari</strong>
+                                <small id="dashboardIjinMessage">
+                                    Mantap kamu tidak pernah ijin.
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-activity-card dashboard-activity-cuti">
+                            <div class="dashboard-activity-icon">C</div>
+
+                            <div class="dashboard-activity-body">
+                                <span>Cuti</span>
+                                <strong><b id="dashboardCuti">0</b> hari</strong>
+                                <small>Selamat berlibur.</small>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="dashboard-data-note">
+                        Data dihitung berdasarkan transaksi kalender pegawai
+                        dari HRIS Reborn sampai dengan hari ini.
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+        {% endif %}
+
+
+    </main>
+
+</div>
+
+
+<script>
+{% if active_menu == "plans" %}
+async function loadSubmissionSummary() {
+
+    const loading =
+        document.getElementById("submissionSummaryLoading");
+
+    const error =
+        document.getElementById("submissionSummaryError");
+
+    const summary =
+        document.getElementById("submissionSummary");
+
+    try {
+
+        const response = await fetch(
+            "/api/submission-summary",
+            { credentials: "same-origin" }
+        );
+
+        const payload = await response.json();
+
+        if (!response.ok || payload.status !== "success") {
+            throw new Error(
+                payload.message || "Gagal mengambil ringkasan pengajuan."
+            );
+        }
+
+        const data = payload.data || {};
+
+        document.getElementById("summaryCuti").textContent =
+            `${data.CUTI || 0} hari`;
+
+        document.getElementById("summarySakit").textContent =
+            `${data.SAKIT || 0} hari`;
+
+        document.getElementById("summaryIjin").textContent =
+            `${data.IJIN || 0} hari`;
+
+        document.getElementById("submissionSummaryYear").textContent =
+            `Ringkasan tahun ${payload.year}`;
+
+        summary.hidden = false;
+
+    } catch (errorObject) {
+
+        error.textContent =
+            errorObject.message ||
+            "Gagal mengambil ringkasan pengajuan.";
+
+        error.hidden = false;
+
+    } finally {
+
+        loading.hidden = true;
+    }
+}
+
+loadSubmissionSummary();
+
+{% else %}
+{% if active_menu == "phone" %}
+async function loadPhoneCalendar() {
+
+    const loading = document.getElementById("phoneCalendarLoading");
+    const error = document.getElementById("phoneCalendarError");
+    const content = document.getElementById("phoneCalendarContent");
+
+    try {
+
+        const response = await fetch(
+            "/api/phone-calendar-info",
+            { credentials: "same-origin" }
+        );
+
+        const payload = await response.json();
+
+        if (!response.ok || payload.status !== "success") {
+            throw new Error(
+                payload.message || "Gagal menyiapkan kalender."
+            );
+        }
+
+        const feedUrl = payload.feed_url;
+        const webcalUrl = payload.webcal_url;
+
+        document.getElementById("phoneFeedUrl").value = feedUrl;
+
+        const iphonePanel =
+            document.getElementById("iphoneSubscriptionPanel");
+
+        const iphoneUrl =
+            document.getElementById("iphoneSubscriptionUrl");
+
+        iphoneUrl.value = feedUrl;
+
+        document.getElementById("iphoneCalendarBtn")
+            .addEventListener("click", () => {
+                iphonePanel.hidden = false;
+                iphonePanel.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+            });
+
+        document.getElementById("closeIphoneSubscriptionBtn")
+            .addEventListener("click", () => {
+                iphonePanel.hidden = true;
+            });
+
+        document.getElementById("copyIphoneSubscriptionBtn")
+            .addEventListener("click", async () => {
+
+                try {
+                    await navigator.clipboard.writeText(feedUrl);
+
+                    const message =
+                        document.getElementById(
+                            "iphoneSubscriptionMessage"
+                        );
+
+                    message.hidden = false;
+
+                    setTimeout(() => {
+                        message.hidden = true;
+                    }, 2500);
+
+                } catch {
+                    iphoneUrl.focus();
+                    iphoneUrl.select();
+                    document.execCommand("copy");
+                }
+            });
+
+        document.getElementById("androidCalendarBtn")
+            .addEventListener("click", () => {
+                const googleUrl =
+                    "https://calendar.google.com/calendar/u/0/r/settings/addbyurl";
+                window.open(googleUrl, "_blank", "noopener");
+            });
+
+        document.getElementById("copyCalendarUrlBtn")
+            .addEventListener("click", async () => {
+
+                try {
+                    await navigator.clipboard.writeText(feedUrl);
+
+                    const message =
+                        document.getElementById("copyCalendarMessage");
+
+                    message.hidden = false;
+
+                    setTimeout(() => {
+                        message.hidden = true;
+                    }, 2500);
+
+                } catch {
+                    const input =
+                        document.getElementById("phoneFeedUrl");
+
+                    input.focus();
+                    input.select();
+                    document.execCommand("copy");
+                }
+            });
+
+        document.getElementById("iphoneCalendarBtn").disabled = false;
+        document.getElementById("androidCalendarBtn").disabled = false;
+
+        content.hidden = false;
+
+    } catch (errorObject) {
+
+        error.textContent =
+            errorObject.message ||
+            "Gagal menyiapkan kalender handphone.";
+
+        error.hidden = false;
+
+    } finally {
+
+        loading.hidden = true;
+    }
+}
+
+loadPhoneCalendar();
+
+{% else %}
+{% if not active_menu or active_menu == "dashboard" %}
+async function loadDashboardSummary() {
+
+    const loading =
+        document.getElementById("dashboardSummaryLoading");
+
+    const error =
+        document.getElementById("dashboardSummaryError");
+
+    const content =
+        document.getElementById("dashboardSummaryContent");
+
+    try {
+
+        const response = await fetch(
+            "/api/dashboard-summary",
+            { credentials: "same-origin" }
+        );
+
+        const payload = await response.json();
+
+        if (!response.ok || payload.status !== "success") {
+            throw new Error(
+                payload.message ||
+                "Gagal mengambil ringkasan dashboard."
+            );
+        }
+
+        const data = payload.data || {};
+
+        // Peringatan tanda tangan: hanya tampil jika file NIP.png belum tersedia.
+        // Status diambil dari Profilku agar tidak perlu endpoint/database baru.
+        try {
+            const profileResponse = await fetch("/api/profilku", {
+                credentials: "same-origin",
+                cache: "no-store"
+            });
+            const profilePayload = await profileResponse.json();
+            const signatureReminder = document.getElementById("dashboardSignatureReminder");
+            if (signatureReminder) {
+                const signatureExists = Boolean(profilePayload?.data?.signature_exists);
+                signatureReminder.hidden = signatureExists || !profileResponse.ok;
+            }
+        } catch (signatureError) {
+            // Jangan mengganggu dashboard utama jika status tanda tangan gagal diperiksa.
+            console.warn("Status tanda tangan tidak dapat diperiksa:", signatureError);
+        }
+
+        document.getElementById("dashboardDaysPassed").textContent =
+            Number(payload.days_passed || 0);
+
+        document.getElementById("dashboardYear").textContent =
+            payload.year || "-";
+
+        document.getElementById("dashboardDaysRemaining").textContent =
+            Number(payload.days_remaining || 0);
+
+        document.getElementById("dashboardNextYear").textContent =
+            Number(payload.year || 0) + 1;
+
+        document.getElementById("dashboardDinasLuar").textContent =
+            Number(data.DINAS_LUAR || 0);
+
+        document.getElementById("dashboardSakit").textContent =
+            Number(data.SAKIT || 0);
+
+        document.getElementById("dashboardIjin").textContent =
+            Number(data.IJIN || 0);
+
+        document.getElementById("dashboardCuti").textContent =
+            Number(data.CUTI || 0);
+
+        const nama =
+            "{{ (nama or 'Pegawai')|e }}";
+
+        const todayDisplay = String(payload.today || "")
+            .split("-")
+            .reverse()
+            .join("-");
+
+        document.getElementById("dashboardWelcomeText").textContent =
+            `Halo, ${nama}. Berikut ringkasan aktivitas kepegawaian kamu
+            sampai dengan ${todayDisplay || "hari ini"}.`;
+
+        document.getElementById("dashboardSakitMessage").textContent =
+            Number(data.SAKIT || 0) > 0
+                ? "Sehat-sehat selalu ya kamu."
+                : "Sehat-sehat selalu ya kamu.";
+
+        document.getElementById("dashboardIjinMessage").textContent =
+            Number(data.IJIN || 0) === 0
+                ? "Mantap kamu tidak pernah ijin."
+                : "Semoga urusanmu selalu lancar.";
+
+        content.hidden = false;
+
+    } catch (errorObject) {
+
+        error.textContent =
+            errorObject.message ||
+            "Gagal mengambil data dashboard dari HRIS Reborn.";
+
+        error.hidden = false;
+
+    } finally {
+
+        loading.hidden = true;
+    }
+}
+
+loadDashboardSummary();
+
+{% elif active_menu == "calendar" %}
+const MONTH_NAMES = [
+    "Januari", "Februari", "Maret", "April",
+    "Mei", "Juni", "Juli", "Agustus",
+    "September", "Oktober", "November", "Desember"
+];
+
+const priority = {
+    "DINAS LUAR": 1,
+    "DINAS_LUAR": 1,
+    "PIKET SIAGA": 2,
+    "PIKET_SIAGA": 2,
+    "REKAM_MEDIS": 3,
+    "CUTI": 4,
+    "SAKIT": 5,
+    "IJIN": 6,
+    "WFH": 7,
+    "LIBUR": 8
+};
+
+let currentDate = new Date();
+let selectedDate = new Date();
+let events = [];
+
+function dateKey(date) {
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0")
+    ].join("-");
+}
+
+function eventDate(event) {
+    return String(
+        event.start_date ||
+        event.start ||
+        event.tanggal ||
+        event.date ||
+        ""
+    ).substring(0, 10);
+}
+
+function eventType(event) {
+    return String(
+        event.event_type ||
+        event.type ||
+        event.jenis ||
+        event.category ||
+        event.title ||
+        "EVENT"
+    ).toUpperCase();
+}
+
+function eventTitle(event) {
+    return event.title ||
+           event.name ||
+           event.nama ||
+           event.label ||
+           eventType(event);
+}
+
+function sortedEvents(list) {
+    return [...list].sort((a, b) => {
+        const pa = priority[eventType(a)] || 99;
+        const pb = priority[eventType(b)] || 99;
+
+        if (pa !== pb) return pa - pb;
+
+        return eventTitle(a).localeCompare(eventTitle(b));
+    });
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+async function loadCalendar() {
+
+    const loading = document.getElementById("calendarLoading");
+    const error = document.getElementById("calendarError");
+
+    loading.hidden = false;
+    error.hidden = true;
+
+    try {
+
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
+
+        const response = await fetch(
+            `/api/personal-calendar?year=${year}&month=${month}`,
+            { credentials: "same-origin" }
+        );
+
+        const payload = await response.json();
+
+        if (!response.ok || payload.status !== "success") {
+            throw new Error(
+                payload.message || "Gagal mengambil kalender."
+            );
+        }
+
+        events = Array.isArray(payload.data)
+            ? payload.data
+            : [];
+
+        document.getElementById("periodTitle").textContent =
+            `${MONTH_NAMES[month - 1]} ${year}`;
+
+        renderMonth();
+        renderAgenda(selectedDate);
+
+    } catch (errorObject) {
+
+        error.textContent =
+            errorObject.message || "Gagal mengambil data kalender.";
+
+        error.hidden = false;
+
+    } finally {
+
+        loading.hidden = true;
+    }
+}
+
+function renderMonth() {
+
+    const grid = document.getElementById("calendarGrid");
+
+    grid.innerHTML = "";
+
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    const first = new Date(year, month, 1);
+    const last = new Date(year, month + 1, 0);
+
+    let startDay = first.getDay();
+
+    startDay = startDay === 0
+        ? 6
+        : startDay - 1;
+
+    for (let i = 0; i < startDay; i++) {
+
+        const empty = document.createElement("div");
+
+        empty.className = "calendar-day empty";
+
+        grid.appendChild(empty);
+    }
+
+    for (let day = 1; day <= last.getDate(); day++) {
+
+        const date = new Date(year, month, day);
+        const key = dateKey(date);
+
+        const cell = document.createElement("button");
+
+        cell.type = "button";
+        cell.className = "calendar-day";
+
+        if (dateKey(new Date()) === key) {
+            cell.classList.add("today");
+        }
+
+        if (dateKey(selectedDate) === key) {
+            cell.classList.add("selected");
+        }
+
+        const number = document.createElement("span");
+
+        number.className = "day-number";
+        number.textContent = day;
+
+        cell.appendChild(number);
+
+        const dayEvents = sortedEvents(
+            events.filter(event => eventDate(event) === key)
+        );
+
+        if (dayEvents.length) {
+
+            const dots = document.createElement("div");
+
+            dots.className = "event-dots";
+
+            dayEvents.slice(0, 4).forEach(event => {
+
+                const dot = document.createElement("span");
+
+                dot.className =
+                    "event-dot event-" +
+                    eventType(event)
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, "-");
+
+                dots.appendChild(dot);
+            });
+
+            cell.appendChild(dots);
+        }
+
+        cell.addEventListener("click", () => {
+
+            selectedDate = date;
+
+            document
+                .querySelectorAll(".calendar-day.selected")
+                .forEach(item => item.classList.remove("selected"));
+
+            cell.classList.add("selected");
+
+            renderAgenda(selectedDate);
+        });
+
+        grid.appendChild(cell);
+    }
+}
+
+function renderAgenda(date) {
+
+    const key = dateKey(date);
+
+    const dayEvents = sortedEvents(
+        events.filter(event => eventDate(event) === key)
+    );
+
+    document.getElementById("agendaTitle").textContent =
+        `Agenda ${key}`;
+
+    document.getElementById("agendaCount").textContent =
+        `${dayEvents.length} kegiatan`;
+
+    const list = document.getElementById("agendaList");
+
+    list.innerHTML = "";
+
+    if (!dayEvents.length) {
+
+        list.innerHTML =
+            `<div class="agenda-empty">Tidak ada kegiatan.</div>`;
+
+        return;
+    }
+
+    dayEvents.forEach(event => {
+
+        const item = document.createElement("div");
+        item.className = "agenda-item";
+
+        const type = eventType(event);
+        const isRapat = String(event.type || "").toUpperCase() === "RAPAT";
+
+        let bodyHtml = `
+            <strong>${escapeHtml(eventTitle(event))}</strong>
+            <span>${escapeHtml(
+                event.description ||
+                event.keterangan ||
+                ""
+            )}</span>
+            <small>${escapeHtml(eventDate(event))}${event.start && String(event.start).includes("T") ? " • " + escapeHtml(String(event.start).substring(11, 16)) + " WIB" : ""}</small>
+        `;
+
+        if (isRapat) {
+            const datePart = event.start
+                ? String(event.start).substring(0, 10)
+                : eventDate(event);
+            const timePart = event.start && String(event.start).includes("T")
+                ? String(event.start).substring(11, 16)
+                : "-";
+
+            bodyHtml = `
+                <strong>Agenda RAPAT :</strong>
+                <strong>${escapeHtml(event.title || "-")}</strong>
+                <small>${escapeHtml(datePart)} • ${escapeHtml(timePart)} WIB</small>
+                ${event.attendance_url ? `
+                    <a class="agenda-attendance-link"
+                       href="${escapeHtml(event.attendance_url)}"
+                       target="_blank"
+                       rel="noopener">
+                        🔗 Buka Tautan Absensi Rapat
+                    </a>
+                ` : ""}
+            `;
+        }
+
+        item.innerHTML = `
+            <div class="agenda-accent event-${type
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")}"></div>
+
+            <div class="agenda-body">
+                ${bodyHtml}
+            </div>
+        `;
+
+        list.appendChild(item);
+    });
+}
+
+function changeMonth(delta) {
+
+    currentDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + delta,
+        1
+    );
+
+    selectedDate = new Date(currentDate);
+
+    loadCalendar();
+}
+
+document.getElementById("prevBtn")
+    .addEventListener("click", () => changeMonth(-1));
+
+document.getElementById("nextBtn")
+    .addEventListener("click", () => changeMonth(1));
+
+document.getElementById("monthViewBtn")
+    .addEventListener("click", () => {
+
+        document.getElementById("monthView").hidden = false;
+        document.getElementById("yearView").hidden = true;
+
+        document.getElementById("monthViewBtn")
+            .classList.add("active");
+
+        document.getElementById("yearViewBtn")
+            .classList.remove("active");
+    });
+
+document.getElementById("yearViewBtn")
+    .addEventListener("click", () => {
+
+        document.getElementById("monthView").hidden = true;
+        document.getElementById("yearView").hidden = false;
+
+        document.getElementById("yearViewBtn")
+            .classList.add("active");
+
+        document.getElementById("monthViewBtn")
+            .classList.remove("active");
+
+        renderYear();
+    });
+
+function renderYear() {
+
+    const container = document.getElementById("yearView");
+
+    container.innerHTML = "";
+
+    const year = currentDate.getFullYear();
+
+    for (let month = 0; month < 12; month++) {
+
+        const card = document.createElement("button");
+
+        card.type = "button";
+        card.className = "year-month";
+
+        const prefix =
+            `${year}-${String(month + 1).padStart(2, "0")}`;
+
+        const count = events.filter(event =>
+            eventDate(event).startsWith(prefix)
+        ).length;
+
+        card.innerHTML = `
+            <strong>${MONTH_NAMES[month]}</strong>
+            <span>${count} kegiatan</span>
+        `;
+
+        card.addEventListener("click", () => {
+
+            currentDate = new Date(year, month, 1);
+            selectedDate = new Date(currentDate);
+
+            document.getElementById("monthViewBtn").click();
+
+            loadCalendar();
+        });
+
+        container.appendChild(card);
+    }
+}
+
+loadCalendar();
+
+{% elif active_menu == "agenda" %}
+function escapeHtml(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}
+function agendaFormatDate(v){return v?new Date(v).toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"}):"-";}
+function agendaFormatTime(v){return v?new Date(v).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit",hour12:false}):"-";}
+function agendaStatusBadge(s){const x=String(s||"-"),c=x==="SELESAI"?"agenda-status-selesai":x==="BATAL"?"agenda-status-batal":"agenda-status-terjadwal";return '<span class="agenda-status-badge '+c+'">'+escapeHtml(x)+"</span>";}
+const AGENDA_MONTH_NAMES=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+let agendaCurrentDate=new Date(),agendaRapatRows=[],agendaKesamaptaanRows=[],agendaDisposisiRows=[];
+function agendaMonthKey(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");}
+function agendaRowDate(i){return String(i.start||i.start_date||i.tanggal||i.date||"").substring(0,7);}
+function agendaRowsForCurrentMonth(r){const k=agendaMonthKey(agendaCurrentDate);return(r||[]).filter(i=>agendaRowDate(i)===k);}
+function updateAgendaMonthTitle(){document.getElementById("agendaMonthTitle").textContent=AGENDA_MONTH_NAMES[agendaCurrentDate.getMonth()]+" "+agendaCurrentDate.getFullYear();}
+function renderAgendaRapatRows(r){const b=document.getElementById("agendaRapatBody"),c=document.getElementById("agendaRapatCount");c.textContent=r.length+" rapat";b.innerHTML=r.length?r.map(i=>'<tr><td><strong>'+agendaFormatDate(i.start)+'</strong><span>'+agendaFormatTime(i.start)+' - '+agendaFormatTime(i.end)+' WIB</span></td><td><strong>'+escapeHtml(i.title||"-")+'</strong></td><td>'+escapeHtml(i.location||"-")+'</td><td>'+escapeHtml(i.organizer_name||"-")+'</td><td class="agenda-count-cell">'+Number(i.attendance_count||0)+' orang</td><td>'+agendaStatusBadge(i.status)+'</td><td class="agenda-action-cell"><button type="button" class="agenda-view-button" onclick="openAgendaRapatModal('+Number(i.event_id)+')">View</button></td></tr>').join(""):'<tr><td colspan="7" class="agenda-empty-row">Belum ada agenda rapat pada bulan ini.</td></tr>';}
+function renderAgendaKesamaptaanRows(r){const b=document.getElementById("agendaKesamaptaanBody"),c=document.getElementById("agendaKesamaptaanCount");c.textContent=r.length+" kegiatan";b.innerHTML=r.length?r.map(i=>'<tr><td><strong>'+agendaFormatDate(i.start)+'</strong><span>'+agendaFormatTime(i.start)+' WIB</span></td><td><strong>'+escapeHtml(i.title||"-")+'</strong></td><td>'+escapeHtml(i.location||"-")+'</td><td>'+agendaStatusBadge(i.status)+'</td><td class="agenda-action-cell"><button type="button" class="agenda-view-button" onclick="openAgendaKesamaptaanModal('+Number(i.event_id)+')">View</button></td></tr>').join(""):'<tr><td colspan="5" class="agenda-empty-row">Belum ada kegiatan Kesamaptaan pada bulan ini.</td></tr>';}
+function renderAgendaDisposisi(r){const l=document.getElementById("agendaDisposisiList"),c=document.getElementById("agendaDisposisiCount"),f=(r||[]).filter(i=>String(i.event_type||"").toUpperCase()==="DISPOSISI");c.textContent=f.length+" disposisi";l.innerHTML=f.length?f.map(i=>'<div class="agenda-disposisi-item"><div><strong>'+escapeHtml(i.title||"-")+'</strong><span>'+agendaFormatDate(i.start_date)+'</span><small>'+escapeHtml(i.location||i.description||"")+'</small></div>'+agendaStatusBadge(i.status)+'</div>').join(""):'<div class="agenda-empty-card">Belum ada disposisi pada bulan ini.</div>';}
+function refreshAgendaCurrentMonth(){updateAgendaMonthTitle();{% if agenda_tab == "rapat" %}renderAgendaRapatRows(agendaRowsForCurrentMonth(agendaRapatRows));{% elif agenda_tab == "disposisi" %}renderAgendaDisposisi(agendaRowsForCurrentMonth(agendaDisposisiRows));{% else %}renderAgendaKesamaptaanRows(agendaRowsForCurrentMonth(agendaKesamaptaanRows));{% endif %}}
+function changeAgendaMonth(n){agendaCurrentDate=new Date(agendaCurrentDate.getFullYear(),agendaCurrentDate.getMonth()+n,1);refreshAgendaCurrentMonth();}
+function openAgendaRapatModal(id){const i=agendaRapatRows.find(x=>Number(x.event_id)===Number(id));if(!i)return;document.getElementById("agendaRapatModalTitle").textContent=i.title||"-";const a=Array.isArray(i.attendance)?i.attendance:[];const ah=a.length?'<div class="agenda-detail-attendance">'+a.map((p,n)=>'<div class="agenda-attendance-row"><span>'+(n+1)+'.</span><strong>'+escapeHtml(p.nama||p.nip||"-")+'<small>'+escapeHtml(String(p.attendee_type||"").toUpperCase()==="NON_PEGAWAI"?"Non Pegawai":"Pegawai")+'</small></strong><small>'+escapeHtml(p.nip||"-")+'</small></div>').join("")+'</div>':'<div class="agenda-detail-empty">Belum ada peserta yang tercatat hadir.</div>';const nh=i.notulen_available?'<a class="agenda-notulen-button" href="/api/agenda/rapat/'+Number(i.event_id)+'/notulen" target="_blank">Buka / Download Notulen PDF</a>':'<div class="agenda-detail-empty">Notulen belum tersedia.</div>';const attendanceLinkHtml=i.attendance_url?'<div class="agenda-detail-section"><div class="agenda-detail-section-title">Tautan Absensi Rapat</div><a class="agenda-notulen-button agenda-attendance-button" href="'+escapeHtml(i.attendance_url)+'" target="_blank" rel="noopener">🔗 Buka Halaman Absensi Rapat</a></div>':'';
+document.getElementById("agendaRapatModalBody").innerHTML=attendanceLinkHtml+'<div class="agenda-detail-grid"><div class="agenda-detail-field"><span>Tanggal / Waktu</span><strong>'+agendaFormatDate(i.start)+' · '+agendaFormatTime(i.start)+' - '+agendaFormatTime(i.end)+' WIB</strong></div><div class="agenda-detail-field"><span>Tempat</span><strong>'+escapeHtml(i.location||"-")+'</strong></div><div class="agenda-detail-field"><span>Pimpinan Rapat</span><strong>'+escapeHtml(i.organizer_name||"-")+'</strong></div><div class="agenda-detail-field"><span>Status</span>'+agendaStatusBadge(i.status)+'</div></div><div class="agenda-detail-section"><div class="agenda-detail-section-title">Kehadiran · '+Number(i.attendance_count||0)+' orang</div>'+ah+'</div><div class="agenda-detail-section"><div class="agenda-detail-section-title">Notulen Rapat</div>'+nh+'</div>';document.getElementById("agendaRapatModal").hidden=false;document.body.classList.add("agenda-modal-open");}
+function closeAgendaRapatModal(){document.getElementById("agendaRapatModal").hidden=true;document.body.classList.remove("agenda-modal-open");}
+function openAgendaKesamaptaanModal(id){const i=agendaKesamaptaanRows.find(x=>Number(x.event_id)===Number(id));if(!i)return;document.getElementById("agendaKesamaptaanModalTitle").textContent=i.title||"Kesamaptaan";document.getElementById("agendaKesamaptaanModalBody").innerHTML='<div class="agenda-detail-grid"><div class="agenda-detail-field"><span>Tanggal / Waktu</span><strong>'+agendaFormatDate(i.start)+' · '+agendaFormatTime(i.start)+' WIB</strong></div><div class="agenda-detail-field"><span>Tempat</span><strong>'+escapeHtml(i.location||"-")+'</strong></div><div class="agenda-detail-field"><span>Status</span>'+agendaStatusBadge(i.status)+'</div></div><div class="agenda-detail-section"><div class="agenda-detail-section-title">Dokumen Kesamaptaan</div><a class="agenda-notulen-button" href="/api/agenda/kesamaptaan/'+Number(i.event_id)+'/pdf" target="_blank">View / Download PDF Absensi Kehadiran</a></div>';document.getElementById("agendaKesamaptaanModal").hidden=false;document.body.classList.add("agenda-modal-open");}
+function closeAgendaKesamaptaanModal(){document.getElementById("agendaKesamaptaanModal").hidden=true;document.body.classList.remove("agenda-modal-open");}
+
+{% if agenda_tab == "overview" %}
+(async function(){
+ const l=document.getElementById("agendaOverviewLoading"),e=document.getElementById("agendaOverviewError"),cards=document.getElementById("agendaOverviewCards"),now=new Date(),year=now.getFullYear(),month=now.getMonth()+1,startKey=year+"-01",endKey=year+"-"+String(month).padStart(2,"0");
+ document.getElementById("agendaOverviewPeriod").textContent="Januari - "+AGENDA_MONTH_NAMES[now.getMonth()]+" "+year;
+ function countToCurrent(rows){return(rows||[]).filter(function(i){const k=agendaRowDate(i);return k>=startKey&&k<=endKey;}).length;}
+ function setCard(kind,n,msg){document.getElementById("agendaOverview"+kind+"Count").textContent=n;document.getElementById("agendaOverview"+kind+"Message").textContent=msg;}
+ function rapatMsg(n){return n>10?"Rapat teruuuus!!!":"Ayolah kumpul kita";}
+ function disposisiMsg(n){return n>20?"Kamu lagi kamu lagi":"Sepi job ya?";}
+ function kesamaptaanMsg(n){if(n<10)return"Ingat lemak, olahraga donk";if(n>50)return"Situ atlit, rajin amat";return"Gas terus, jangan kendor!";}
+ async function load(endpoint,kind,msgFn){
+   try{
+     const q=await fetch(endpoint,{credentials:"same-origin"}),p=await q.json();
+     if(!q.ok||p.status!=="success")throw Error(p.message||"Data tidak tersedia.");
+     let rows=Array.isArray(p.data)?p.data:[];
+     if(kind==="Disposisi")rows=rows.filter(function(i){return String(i.event_type||"").toUpperCase()==="DISPOSISI";});
+     const n=countToCurrent(rows);
+     setCard(kind,n,msgFn(n));
+   }catch(x){
+     setCard(kind,"—","Data belum tersedia");
+     const note=document.getElementById("agendaOverviewError");
+     note.textContent=(note.textContent?note.textContent+" ":"")+kind+": "+(x.message||"Gagal mengambil data.");
+     note.hidden=false;
+   }
+ }
+ cards.hidden=false;l.hidden=true;
+ await Promise.all([load("/api/agenda/rapat","Rapat",rapatMsg),load("/api/calendar/my-agenda","Disposisi",disposisiMsg),load("/api/agenda/kesamaptaan","Kesamaptaan",kesamaptaanMsg)]);
+})();
+{% else %}
+document.getElementById("agendaPrevMonth").addEventListener("click",function(){changeAgendaMonth(-1);});
+document.getElementById("agendaNextMonth").addEventListener("click",function(){changeAgendaMonth(1);});
+{% if agenda_tab == "rapat" %}(async function(){const l=document.getElementById("agendaRapatLoading"),e=document.getElementById("agendaRapatError");try{const q=await fetch("/api/agenda/rapat",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Agenda Rapat.");agendaRapatRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();
+{% elif agenda_tab == "disposisi" %}(async function(){const l=document.getElementById("agendaDisposisiLoading"),e=document.getElementById("agendaDisposisiError");try{const q=await fetch("/api/calendar/my-agenda",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Disposisi.");agendaDisposisiRows=Array.isArray(p.data)?p.data:[];refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();
+{% else %}(async function(){const l=document.getElementById("agendaKesamaptaanLoading"),e=document.getElementById("agendaKesamaptaanError");try{const q=await fetch("/api/agenda/kesamaptaan",{credentials:"same-origin"}),p=await q.json();if(!q.ok||p.status!=="success")throw Error(p.message||"Gagal mengambil Agenda Kesamaptaan.");agendaKesamaptaanRows=Array.isArray(p.data)?p.data:[];if(agendaKesamaptaanRows.length&&!agendaRowsForCurrentMonth(agendaKesamaptaanRows).length){const latest=agendaKesamaptaanRows.slice().sort((a,b)=>String(b.start||"").localeCompare(String(a.start||"")))[0];const ds=String(latest.start||"").substring(0,10);if(ds){const parts=ds.split("-").map(Number);if(parts.length>=2&&parts[0]&&parts[1])agendaCurrentDate=new Date(parts[0],parts[1]-1,1);}}refreshAgendaCurrentMonth();}catch(x){e.textContent=x.message;e.hidden=false;}finally{l.hidden=true;}})();{% endif %}
+{% endif %}
+
+{% elif active_menu == "rekam_medisku" %}
+const medicalHistoryLoading = document.getElementById("medicalHistoryLoading");
+const medicalHistoryError = document.getElementById("medicalHistoryError");
+const medicalHistoryEmpty = document.getElementById("medicalHistoryEmpty");
+const medicalHistoryTableWrap = document.getElementById("medicalHistoryTableWrap");
+const medicalHistoryBody = document.getElementById("medicalHistoryBody");
+const medicalHistoryTotal = document.getElementById("medicalHistoryTotal");
+const medicalDetailModal = document.getElementById("medicalDetailModal");
+
+let medicalHistory = [];
+let medicalCurrentDate = new Date();
+const MEDICAL_MONTH_NAMES = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+function medicalEscape(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function medicalWibDateTime(value) {
+    if (!value) return "-";
+    const raw = String(value);
+    const iso = /[zZ]|[+-]\d{2}:?\d{2}$/.test(raw) ? raw : raw + "+07:00";
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return "-";
+    return new Intl.DateTimeFormat("id-ID", {
+        timeZone: "Asia/Jakarta",
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    }).format(date) + " WIB";
+}
+
+function medicalDate(value) {
+    if (!value) return "-";
+    const parts = String(value).split("-");
+    if (parts.length !== 3) return value;
+    const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    return new Intl.DateTimeFormat("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+    }).format(date);
+}
+
+function medicalResultBadge(value) {
+    const result = String(value || "").toUpperCase();
+    if (result === "FIT") return '<span class="medical-result-badge medical-result-fit">FIT</span>';
+    if (result === "UNFIT") return '<span class="medical-result-badge medical-result-unfit">UNFIT</span>';
+    return '<span class="medical-result-badge medical-result-empty">-</span>';
+}
+
+function medicalSetText(id, value) {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value || "-";
+}
+
+function medicalRowMonth(item) {
+    return String(item.tanggal || item.pemeriksaan_at || "").substring(0, 7);
+}
+
+function medicalMonthKey(date) {
+    return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0");
+}
+
+function medicalRowsForCurrentMonth() {
+    const key = medicalMonthKey(medicalCurrentDate);
+    return medicalHistory.filter((item) => medicalRowMonth(item) === key);
+}
+
+function updateMedicalMonthTitle() {
+    const title = document.getElementById("medicalMonthTitle");
+    if (title) {
+        title.textContent = MEDICAL_MONTH_NAMES[medicalCurrentDate.getMonth()] + " " + medicalCurrentDate.getFullYear();
+    }
+}
+
+function renderMedicalHistory() {
+    updateMedicalMonthTitle();
+
+    const rows = medicalRowsForCurrentMonth();
+    medicalHistoryTotal.textContent = rows.length + " pemeriksaan";
+    medicalHistoryBody.innerHTML = "";
+
+    if (!rows.length) {
+        medicalHistoryTableWrap.hidden = true;
+        medicalHistoryEmpty.hidden = false;
+        const emptyText = document.getElementById("medicalHistoryEmptyText");
+        if (emptyText) {
+            emptyText.textContent = "Belum ada pemeriksaan Rekam Medis pada " +
+                MEDICAL_MONTH_NAMES[medicalCurrentDate.getMonth()] + " " +
+                medicalCurrentDate.getFullYear() + ".";
+        }
+        return;
+    }
+
+    medicalHistoryEmpty.hidden = true;
+    medicalHistoryTableWrap.hidden = false;
+
+    medicalHistoryBody.innerHTML = rows.map((item, index) => {
+        const originalIndex = medicalHistory.indexOf(item);
+        return '<tr>' +
+            '<td>' + (index + 1) + '</td>' +
+            '<td><strong>' + medicalEscape(medicalDate(item.tanggal)) + '</strong></td>' +
+            '<td>' + medicalEscape(item.jam || "-") + ' WIB</td>' +
+            '<td><strong class="medical-history-title">' + medicalEscape(item.judul || "-") + '</strong><small>' + medicalEscape(item.status_pemeriksaan || "SELESAI") + '</small></td>' +
+            '<td>' + medicalEscape(item.lokasi || "-") + '</td>' +
+            '<td>' + medicalResultBadge(item.hasil_kebugaran) + '</td>' +
+            '<td><button type="button" class="medical-detail-button" data-medical-detail="' + originalIndex + '">Detail</button></td>' +
+            '</tr>';
+    }).join("");
+
+    medicalHistoryBody.querySelectorAll("[data-medical-detail]").forEach((button) => {
+        button.addEventListener("click", () => {
+            openMedicalDetail(Number(button.dataset.medicalDetail));
+        });
+    });
+}
+
+function changeMedicalMonth(offset) {
+    medicalCurrentDate = new Date(
+        medicalCurrentDate.getFullYear(),
+        medicalCurrentDate.getMonth() + offset,
+        1
+    );
+    renderMedicalHistory();
+}
+
+function openMedicalDetail(index) {
+    const item = medicalHistory[index];
+    if (!item) return;
+    medicalSetText("medicalDetailTitle", item.judul || "Rekam Medis");
+    medicalSetText("medicalDetailActivity", item.judul);
+    medicalSetText("medicalDetailLocation", item.lokasi || "Kantor SAR Surabaya");
+    medicalSetText("medicalDetailSchedule", medicalDate(item.tanggal) + " • " + (item.jam || "-") + " WIB");
+    medicalSetText("medicalDetailExamAt", medicalWibDateTime(item.pemeriksaan_at));
+    medicalSetText("medicalDetailBloodPressure", item.tekanan_darah);
+    medicalSetText("medicalDetailPulse", item.nadi ? item.nadi + " / menit" : "-");
+    medicalSetText("medicalDetailRespiration", item.frekuensi_nafas ? item.frekuensi_nafas + " / menit" : "-");
+    medicalSetText("medicalDetailTemperature", item.suhu !== null && item.suhu !== undefined ? item.suhu + " °C" : "-");
+    medicalSetText("medicalDetailSpo2", item.spo2 !== null && item.spo2 !== undefined ? item.spo2 + " %" : "-");
+    medicalSetText("medicalDetailFitness", item.hasil_kebugaran || "-");
+    medicalSetText("medicalDetailComplaint", item.keluhan || "-");
+    medicalSetText("medicalDetailAction", item.tindakan || "-");
+    medicalSetText("medicalDetailExaminer", item.pemeriksa || "-");
+    medicalDetailModal.hidden = false;
+    document.body.classList.add("medical-modal-open");
+}
+
+function closeMedicalDetail() {
+    medicalDetailModal.hidden = true;
+    document.body.classList.remove("medical-modal-open");
+}
+
+document.querySelectorAll("[data-medical-close]").forEach((element) => {
+    element.addEventListener("click", closeMedicalDetail);
+});
+
+document.getElementById("medicalPrevMonth").addEventListener("click", () => changeMedicalMonth(-1));
+document.getElementById("medicalNextMonth").addEventListener("click", () => changeMedicalMonth(1));
+
+async function loadMedicalHistory() {
+    medicalHistoryLoading.hidden = false;
+    medicalHistoryError.hidden = true;
+    medicalHistoryEmpty.hidden = true;
+    medicalHistoryTableWrap.hidden = true;
+
+    try {
+        const response = await fetch("/api/rekam-medisku", { credentials: "same-origin" });
+        const payload = await response.json();
+
+        if (!response.ok || payload.status !== "success") {
+            throw new Error(payload.message || "Gagal mengambil riwayat Rekam Medis.");
+        }
+
+        medicalHistory = Array.isArray(payload.data) ? payload.data : [];
+
+        // Seperti Kesamaptaan: jika bulan berjalan kosong, buka bulan pemeriksaan terbaru.
+        if (medicalHistory.length && !medicalRowsForCurrentMonth().length) {
+            const latest = medicalHistory
+                .slice()
+                .sort((a, b) => String(b.tanggal || b.pemeriksaan_at || "").localeCompare(String(a.tanggal || a.pemeriksaan_at || "")))[0];
+            const latestDate = String(latest.tanggal || latest.pemeriksaan_at || "").substring(0, 10);
+            const parts = latestDate.split("-").map(Number);
+            if (parts.length >= 2 && parts[0] && parts[1]) {
+                medicalCurrentDate = new Date(parts[0], parts[1] - 1, 1);
+            }
+        }
+
+        renderMedicalHistory();
+    } catch (errorObject) {
+        medicalHistoryError.textContent = errorObject.message || "Gagal mengambil riwayat Rekam Medis.";
+        medicalHistoryError.hidden = false;
+    } finally {
+        medicalHistoryLoading.hidden = true;
+    }
+}
+
+loadMedicalHistory();
+
+{% endif %}
+{% endif %}
+{% endif %}
+
+const mobileMenuToggle =
+    document.getElementById("mobileMenuToggle");
+
+const mobileMenuOverlay =
+    document.getElementById("mobileMenuOverlay");
+
+function setMobileMenuState(open) {
+
+    document.body.classList.toggle(
+        "mobile-menu-open",
+        open
+    );
+
+    if (mobileMenuToggle) {
+        mobileMenuToggle.setAttribute(
+            "aria-label",
+            open ? "Tutup menu" : "Buka menu"
+        );
+
+        mobileMenuToggle.textContent =
+            open ? "×" : "☰";
+    }
+}
+
+if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener(
+        "click",
+        function () {
+            setMobileMenuState(
+                !document.body.classList.contains(
+                    "mobile-menu-open"
+                )
+            );
+        }
+    );
+}
+
+if (mobileMenuOverlay) {
+    mobileMenuOverlay.addEventListener(
+        "click",
+        function () {
+            setMobileMenuState(false);
+        }
+    );
+}
+
+document.querySelectorAll(".sidebar-menu a").forEach(
+    function (link) {
+        link.addEventListener("click", function () {
+            setMobileMenuState(false);
+        });
+    }
+);
+
+const sidebarToggle = document.getElementById("sidebarToggle");
+
+function setSidebarState(minimized) {
+
+    if (!sidebarToggle) {
+        return;
+    }
+
+    document.body.classList.toggle(
+        "sidebar-minimized",
+        minimized
+    );
+
+    sidebarToggle.textContent =
+        minimized ? "›" : "‹";
+
+    sidebarToggle.title =
+        minimized
+            ? "Expand sidebar"
+            : "Minimize sidebar";
+
+    sidebarToggle.setAttribute(
+        "aria-label",
+        minimized
+            ? "Expand sidebar"
+            : "Minimize sidebar"
+    );
+
+    localStorage.setItem(
+        "calendarSidebarMinimized",
+        minimized ? "1" : "0"
+    );
+}
+
+if (sidebarToggle) {
+    sidebarToggle.addEventListener("click", () => {
+        setSidebarState(
+            !document.body.classList.contains(
+                "sidebar-minimized"
+            )
+        );
+    });
+
+    setSidebarState(
+        localStorage.getItem(
+            "calendarSidebarMinimized"
+        ) === "1"
+    );
+}
+
+async function logout() {
+    try {
+        const response = await fetch("/api/logout", {
+            method: "POST",
+            credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+            throw new Error("Logout gagal.");
+        }
+    } catch (error) {
+        console.error("Logout error:", error);
+    } finally {
+        window.location.href = "/";
+    }
+}
+
+const notificationToggle =
+    document.getElementById("notificationToggle");
+const notificationDropdown =
+    document.getElementById("notificationDropdown");
+const notificationBadge =
+    document.getElementById("notificationBadge");
+const notificationList =
+    document.getElementById("notificationList");
+const notificationReadAll =
+    document.getElementById("notificationReadAll");
+const notificationSummary =
+    document.getElementById("notificationSummary");
+
+let calendarNotifications = [];
+
+function notificationEscape(value) {
+    return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function notificationTime(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+
+    const diff = Math.max(0, Date.now() - date.getTime());
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return "baru saja";
+    if (minutes < 60) return minutes + " menit lalu";
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return hours + " jam lalu";
+
+    const days = Math.floor(hours / 24);
+    if (days < 7) return days + " hari lalu";
+
+    return date.toLocaleDateString("id-ID", {
+        day: "2-digit", month: "2-digit", year: "numeric"
+    });
+}
+
+function notificationIcon(type) {
+    const map = {
+        AGENDA_RAPAT: "📅",
+        DISPOSISI: "📄",
+        DINAS_LUAR: "✈️",
+        KESAMAPTAAN: "🏃"
+    };
+    return map[String(type || "").toUpperCase()] || "🔔";
+}
+
+function renderNotifications() {
+    if (!notificationList) return;
+
+    const unread = calendarNotifications.filter(function (item) {
+        return !item.read;
+    }).length;
+
+    if (!calendarNotifications.length) {
+        notificationList.innerHTML =
+            '<div class="notification-empty">Tidak ada notifikasi baru.</div>';
+    } else {
+        notificationList.innerHTML = calendarNotifications.map(function (item) {
+            return '<button type="button" class="notification-item ' +
+                (item.read ? "" : "unread") +
+                '" data-notification-id="' + Number(item.id) + '">' +
+                '<span class="notification-item-icon">' +
+                    notificationIcon(item.source_type) +
+                '</span>' +
+                '<span class="notification-item-body">' +
+                    '<strong>' + notificationEscape(item.title) + '</strong>' +
+                    '<span>' + notificationEscape(item.message) + '</span>' +
+                    '<small>' + notificationTime(item.created_at) + '</small>' +
+                '</span>' +
+                (item.read ? "" : '<span class="notification-unread-dot"></span>') +
+                '</button>';
+        }).join("");
+    }
+
+    if (notificationBadge) {
+        notificationBadge.textContent = unread > 99 ? "99+" : String(unread);
+        notificationBadge.hidden = unread === 0;
+    }
+
+    if (notificationSummary) {
+        notificationSummary.textContent =
+            unread === 0
+                ? "Tidak ada notifikasi baru"
+                : unread + " notifikasi belum dibaca";
+    }
+
+    notificationList.querySelectorAll(".notification-item").forEach(function (item) {
+        item.addEventListener("click", async function () {
+            const id = Number(item.dataset.notificationId);
+            const notification = calendarNotifications.find(function (x) {
+                return Number(x.id) === id;
+            });
+
+            try {
+                await fetch("/api/notifications/" + id + "/read", {
+                    method: "POST",
+                    credentials: "same-origin"
+                });
+            } catch (error) {
+                console.error("Gagal menandai notifikasi:", error);
+            }
+
+            if (notification) {
+                calendarNotifications = calendarNotifications.filter(function (x) {
+                    return Number(x.id) !== id;
+                });
+            }
+            renderNotifications();
+
+            if (notification && notification.url) {
+                window.location.href = notification.url;
+            }
+        });
+    });
+}
+
+async function loadNotifications(openDropdown) {
+    try {
+        const response = await fetch("/api/notifications?limit=30", {
+            credentials: "same-origin",
+            cache: "no-store"
+        });
+        if (!response.ok) throw new Error("Gagal mengambil notifikasi.");
+
+        const payload = await response.json();
+        if (payload.status !== "success") {
+            throw new Error(payload.message || "Gagal mengambil notifikasi.");
+        }
+
+        calendarNotifications = Array.isArray(payload.data)
+            ? payload.data
+            : [];
+
+        renderNotifications();
+
+        if (openDropdown && notificationDropdown) {
+            notificationDropdown.hidden = false;
+            notificationToggle.setAttribute("aria-expanded", "true");
+        }
+    } catch (error) {
+        console.error("Notification Center:", error);
+        if (notificationList) {
+            notificationList.innerHTML =
+                '<div class="notification-empty">Notifikasi belum dapat dimuat.</div>';
+        }
+    }
+}
+
+if (notificationToggle && notificationDropdown) {
+    notificationToggle.addEventListener("click", function (event) {
+        event.stopPropagation();
+
+        const willOpen = notificationDropdown.hidden;
+        notificationDropdown.hidden = !willOpen;
+        notificationToggle.setAttribute(
+            "aria-expanded",
+            willOpen ? "true" : "false"
+        );
+
+        if (willOpen) loadNotifications(true);
+    });
+
+    notificationDropdown.addEventListener("click", function (event) {
+        event.stopPropagation();
+    });
+
+    document.addEventListener("click", function () {
+        notificationDropdown.hidden = true;
+        notificationToggle.setAttribute("aria-expanded", "false");
+    });
+
+    if (notificationReadAll) {
+        notificationReadAll.addEventListener("click", async function () {
+            try {
+                const response = await fetch("/api/notifications/read-all", {
+                    method: "POST",
+                    credentials: "same-origin"
+                });
+                if (!response.ok) throw new Error("Gagal menandai semua notifikasi.");
+
+                calendarNotifications = [];
+                renderNotifications();
+            } catch (error) {
+                console.error("Gagal menandai semua notifikasi:", error);
+            }
+        });
+    }
+
+    loadNotifications(false);
+    window.setInterval(function () {
+        loadNotifications(false);
+    }, 45000);
+}
+
+const accountMenuToggle =
+    document.getElementById("accountMenuToggle");
+
+const accountMenuDropdown =
+    document.getElementById("accountMenuDropdown");
+
+if (accountMenuToggle && accountMenuDropdown) {
+    accountMenuToggle.addEventListener("click", function (event) {
+        event.stopPropagation();
+
+        const open =
+            accountMenuDropdown.classList.toggle("open");
+
+        accountMenuToggle.setAttribute(
+            "aria-expanded",
+            open ? "true" : "false"
+        );
+    });
+
+    accountMenuDropdown.addEventListener("click", function (event) {
+        event.stopPropagation();
+    });
+
+    document.addEventListener("click", function () {
+        accountMenuDropdown.classList.remove("open");
+
+        accountMenuToggle.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+    });
+}
+</script>
+
+
+{% if active_menu == "profilku" %}
+<script>
+(function () {
+    const $ = id => document.getElementById(id);
+    const alertBox = $("calendarProfileAlert");
+    let sigCtx = null, drawing = false;
+
+    function alertMsg(msg, ok=true) {
+        alertBox.textContent = msg;
+        alertBox.className = "calendar-profile-alert show " + (ok ? "success" : "error");
+        setTimeout(() => alertBox.className = "calendar-profile-alert", 4000);
+    }
+    function text(id,v){ $(id).textContent = v || "-"; }
+
+    function profileDate(value) {
+        if (!value) return "-";
+
+        const raw = String(value).trim();
+        if (!raw || raw.startsWith("0000-00-00")) return "-";
+
+        const parts = raw.substring(0, 10).split("-");
+        if (parts.length !== 3) return raw;
+
+        const [year, month, day] = parts;
+        if (!year || !month || !day) return raw;
+
+        return day + "-" + month + "-" + year;
+    }
+
+    function dateText(id, value) {
+        $(id).textContent = profileDate(value);
+    }
+
+    function modal(id,open){ $(id).classList.toggle("open",open); }
+    window.closeCalendarModal = id => modal(id,false);
+    window.openCalendarPhotoModal = () => modal("calendarPhotoModal",true);
+    window.openCalendarPasswordModal = () => modal("calendarPasswordModal",true);
+    window.openCalendarSignatureModal = () => { modal("calendarSignatureModal",true); initSig(); };
+
+    async function loadProfile() {
+        const r=await fetch("/api/profilku");
+        const p=await r.json();
+        if(!r.ok||!p.success) throw new Error(p.message||"Gagal memuat profil.");
+        const d=p.data;
+        text("cpNama",d.nama); text("cpNip",d.nip); text("cpFinger",d.finger_id); text("cpPangkat",d.pangkat);
+        text("cpGol",d.gol); text("cpJabatan",d.jabatan); text("cpUnit",d.unit_kerja); text("cpEselon",d.eselon);
+        text("cpTempatLahir",d.tempat_lahir); dateText("cpTglLahir",d.tgl_lahir); text("cpJenisKel",d.jenis_kel); text("cpStatusKawin",d.status_perkawinan);
+        text("cpAgama",d.agama); text("cpKtp",d.no_ktp); text("cpNpwp",d.no_npwp); text("cpHobi",d.hobi); dateText("cpTglMasuk",d.tgl_masuk);
+        dateText("cpTmtPangkat",d.tmt_pangkat); dateText("cpTmtJabatan",d.tmt_jabatan); dateText("cpTmtClass",d.tmt_class); text("cpGolRecruit",d.gol_recruit); text("cpStatusPeg",d.status_peg); text("cpIsKeluar",d.is_keluar); dateText("cpTglKeluar",d.tgl_keluar); text("cpAlasanKeluar",d.alasan_keluar); text("cpIsVip",d.is_vip);
+        dateText("cpTmtCpns",d.tmt_cpns); dateText("cpTmtPns",d.tmt_pns);
+        $("cpNoTelp").value=d.no_telp||""; $("cpEmail").value=d.email||""; $("cpAlamat").value=d.alamat||"";
+        $("cpKelurahan").value=d.kelurahan||""; $("cpKecamatan").value=d.kecamatan||""; $("cpKota").value=d.kota||"";
+        if(d.photo_url){ const u="/api/profilku/photo?v="+Date.now(); $("calendarProfileAvatar").src=u; $("calendarProfileAvatar").style.display="block"; $("calendarProfileFallback").style.display="none"; $("calendarPhotoPreview").src=u; }
+        const signatureUrl="/api/profilku/signature?v="+Date.now();
+        if(d.signature_exists){
+            $("calendarSignaturePreview").src=signatureUrl;
+            $("calendarSignaturePreview").style.display="block";
+            $("calendarSignatureEmpty").style.display="none";
+        } else {
+            $("calendarSignaturePreview").style.display="none";
+            $("calendarSignatureEmpty").style.display="block";
+        }
+    }
+    window.saveCalendarProfile=async function(){
+        const r=await fetch("/api/profilku",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+            no_telp:$("cpNoTelp").value,email:$("cpEmail").value,alamat:$("cpAlamat").value,kelurahan:$("cpKelurahan").value,kecamatan:$("cpKecamatan").value,kota:$("cpKota").value
+        })});
+        const p=await r.json(); if(!r.ok||!p.success)return alertMsg(p.message||"Gagal menyimpan.",false); alertMsg("Profil berhasil disimpan.");
+    };
+    async function upload(file){
+        if(!file)return; const fd=new FormData(); fd.append("photo",file);
+        const r=await fetch("/api/profilku/photo",{method:"POST",body:fd}); const p=await r.json();
+        if(!r.ok||!p.success)return alertMsg(p.message||"Gagal menyimpan foto.",false);
+        modal("calendarPhotoModal",false); alertMsg("Foto profil berhasil disimpan."); loadProfile();
+    }
+    $("calendarGalleryInput").addEventListener("change",e=>upload(e.target.files[0]));
+    $("calendarCameraInput").addEventListener("change",e=>upload(e.target.files[0]));
+    window.saveCalendarPassword=async function(){
+        const r=await fetch("/api/profilku/password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({new_password:$("calendarNewPassword").value,confirm_password:$("calendarConfirmPassword").value})});
+        const p=await r.json(); if(!r.ok||!p.success)return alertMsg(p.message||"Gagal mengubah password.",false);
+        $("calendarNewPassword").value=""; $("calendarConfirmPassword").value=""; modal("calendarPasswordModal",false); alertMsg("Password berhasil diubah.");
+    };
+    function initSig(){
+        if(sigCtx)return; const c=$("calendarSignatureCanvas"); sigCtx=c.getContext("2d"); sigCtx.lineWidth=3; sigCtx.lineCap="round"; sigCtx.lineJoin="round";
+        const pt=e=>{const r=c.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return{x:(s.clientX-r.left)*(c.width/r.width),y:(s.clientY-r.top)*(c.height/r.height)};};
+        const down=e=>{e.preventDefault();drawing=true;const p=pt(e);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);};
+        const move=e=>{if(!drawing)return;e.preventDefault();const p=pt(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();};
+        c.addEventListener("pointerdown",down);c.addEventListener("pointermove",move);window.addEventListener("pointerup",()=>drawing=false);
+    }
+    window.clearCalendarSignature=()=>{const c=$("calendarSignatureCanvas");c.getContext("2d").clearRect(0,0,c.width,c.height);};
+    window.saveCalendarSignature=async function(){
+        const canvas = $("calendarSignatureCanvas");
+        if (!canvas) return alertMsg("Canvas tanda tangan tidak ditemukan.", false);
+
+        const ctx = canvas.getContext("2d");
+        const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let hasInk = false;
+        for (let i = 3; i < pixels.length; i += 4) {
+            if (pixels[i] > 0) {
+                hasInk = true;
+                break;
+            }
+        }
+        if (!hasInk) return alertMsg("Tanda tangan belum dibuat.", false);
+
+        try {
+            const signature = canvas.toDataURL("image/png");
+            const response = await fetch("/api/profilku/signature", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({signature})
+            });
+
+            let payload = {};
+            try {
+                payload = await response.json();
+            } catch (parseError) {
+                throw new Error("Respons server tanda tangan tidak valid.");
+            }
+
+            if (!response.ok || !payload.success) {
+                throw new Error(payload.message || "Perubahan tanda tangan tidak valid.");
+            }
+
+            // Tutup modal hanya setelah server benar-benar mengonfirmasi berhasil.
+            modal("calendarSignatureModal", false);
+
+            const signatureUrl = "/api/profilku/signature?v=" + Date.now();
+            $("calendarSignaturePreview").src = signatureUrl;
+            $("calendarSignaturePreview").style.display = "block";
+            $("calendarSignatureEmpty").style.display = "none";
+
+            alertMsg("Perubahan tanda tangan berhasil disimpan.", true);
+        } catch (errorObject) {
+            console.error("Gagal menyimpan tanda tangan:", errorObject);
+            alertMsg(errorObject.message || "Gagal menyimpan perubahan tanda tangan.", false);
+        }
+    };
+
+    loadProfile().catch(e=>alertMsg(e.message,false));
+})();
+</script>
+{% endif %}
+</body>
+</html>
