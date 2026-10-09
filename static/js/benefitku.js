@@ -13,12 +13,32 @@
   const money = new Intl.NumberFormat("id-ID", {style:"currency",currency:"IDR",maximumFractionDigits:0});
   const today = new Date();
   const monthInput = document.getElementById("benefitMonth");
+  const monthLabel = document.getElementById("benefitMonthLabel");
+  const monthPrev = document.getElementById("benefitMonthPrev");
+  const monthNext = document.getElementById("benefitMonthNext");
   const startInput = document.getElementById("benefitStart");
   const endInput = document.getElementById("benefitEnd");
   const dateValue = [today.getFullYear(),String(today.getMonth()+1).padStart(2,"0"),String(today.getDate()).padStart(2,"0")];
   if (monthInput) monthInput.value = dateValue.slice(0,2).join("-");
   if (startInput) startInput.value = dateValue.join("-");
   if (endInput) endInput.value = dateValue.join("-");
+  const monthFormatter = new Intl.DateTimeFormat("id-ID", {month:"long",year:"numeric"});
+  function updateMonthLabel() {
+    if (!monthInput || !monthLabel || !monthInput.value) return;
+    const [year,month] = monthInput.value.split("-").map(Number);
+    monthLabel.textContent = monthFormatter.format(new Date(year,month-1,1));
+  }
+  if (monthInput) updateMonthLabel();
+  if (monthPrev) monthPrev.addEventListener("click", () => moveMonth(-1));
+  if (monthNext) monthNext.addEventListener("click", () => moveMonth(1));
+  function moveMonth(delta) {
+    if (!monthInput || !monthInput.value) return;
+    const [year,month] = monthInput.value.split("-").map(Number);
+    const next = new Date(year,month-1+delta,1);
+    monthInput.value = [next.getFullYear(),String(next.getMonth()+1).padStart(2,"0")].join("-");
+    updateMonthLabel();
+    form.requestSubmit();
+  }
 
   const labels = {
     nama:"Nama Pegawai", nip:"NIP", class_id:"Kelas Jabatan", gol:"Golongan",
