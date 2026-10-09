@@ -1240,6 +1240,80 @@ def api_agenda_dinas_luar_pdf():
     )
 
 
+
+@app.route("/benefitku/<jenis>")
+@login_required
+def benefitku(jenis):
+    menu_map = {
+        "tunjangan-kinerja": "benefit_tunkin",
+        "uang-makan": "benefit_uang_makan",
+        "uang-siaga": "benefit_uang_siaga",
+    }
+    active_menu = menu_map.get(str(jenis or "").strip().lower())
+    if not active_menu:
+        return redirect(url_for("dashboard"))
+
+    return render_template(
+        "dashboard.html",
+        nama=session.get("nama"),
+        nip=session.get("nip"),
+        active_menu=active_menu,
+    )
+
+
+def _proxy_benefit_endpoint(endpoint):
+    try:
+        response = requests.get(
+            f"{Config.HRIS_INTERNAL_API_URL.rstrip('/')}{endpoint}",
+            params=request.args,
+            headers=hris_internal_headers(),
+            timeout=20,
+            verify="/etc/ssl/certs/ca-certificates.crt",
+        )
+    except requests.RequestException:
+        app.logger.exception("Benefit HRIS API unavailable: %s", endpoint)
+        return jsonify({
+            "status": "error",
+            "message": "Layanan Benefit HRIS tidak tersedia. Silakan coba kembali.",
+        }), 502
+
+    try:
+        payload = response.json()
+    except ValueError:
+        app.logger.error("Invalid JSON from HRIS Benefit API: %s", endpoint)
+        return jsonify({
+            "status": "error",
+            "message": "Respons Benefit HRIS tidak valid.",
+        }), 502
+
+    return jsonify(payload), response.status_code
+
+
+@app.route("/api/benefitku/tunjangan-kinerja")
+@login_required
+def api_benefitku_tunjangan_kinerja():
+    return _proxy_benefit_endpoint(
+        "/api/internal/calendar/benefit/tunjangan-kinerja"
+    )
+
+
+@app.route("/api/benefitku/uang-makan")
+@login_required
+def api_benefitku_uang_makan():
+    return _proxy_benefit_endpoint(
+        "/api/internal/calendar/benefit/uang-makan"
+    )
+
+
+@app.route("/api/benefitku/uang-siaga")
+@login_required
+def api_benefitku_uang_siaga():
+    # Gunakan kalkulasi Uang Siaga V2 yang menjadi sumber aktif HRIS.
+    return _proxy_benefit_endpoint(
+        "/api/internal/calendar/benefit/uang-siaga-v2"
+    )
+
+
 @app.route("/api/calendar/<token>.ics")
 def api_calendar_feed_proxy(token):
 
