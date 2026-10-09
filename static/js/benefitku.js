@@ -51,6 +51,11 @@
   function label(key) {
     return labels[key] || key.replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());
   }
+  function formatDate(value) {
+    if (typeof value !== "string") return value;
+    const match = value.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+    return match ? `${match[3]}-${match[2]}-${match[1]}` : value;
+  }
   function textValue(value, key) {
     if (value === null || value === undefined || value === "") return "-";
     if (typeof value === "boolean") return value ? "Ya" : "Tidak";
@@ -113,7 +118,7 @@
       table.append(thead,tbody); detailBox.append(table);
     }
     const period = data.effective_period;
-    const periodText = period?.start && period?.end ? ` Periode efektif: ${period.start} s.d. ${period.end}.` : "";
+    const periodText = period?.start && period?.end ? ` Periode efektif: ${formatDate(period.start)} s.d. ${formatDate(period.end)}.` : "";
     statusBox.textContent = details.length ? `Data berhasil dimuat. ${details.length} rincian.${periodText}` : `Data berhasil dimuat. Tidak ada rincian untuk periode ini.${periodText}`;
   }
   form.addEventListener("submit", async event => {
