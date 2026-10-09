@@ -69,6 +69,17 @@
                 <span>REKAM MEDISKU</span>
             </a>
 
+            <div class="sidebar-menu-group {{ 'open' if active_menu in ['benefit_tunkin', 'benefit_uang_makan', 'benefit_uang_siaga'] else '' }}">
+                <a href="/benefitku/tunjangan-kinerja" class="sidebar-menu-parent {{ 'active' if active_menu in ['benefit_tunkin', 'benefit_uang_makan', 'benefit_uang_siaga'] else '' }}">
+                    <span class="menu-icon">▤</span><span>BENEFITKU</span><span class="menu-chevron">›</span>
+                </a>
+                <div class="sidebar-submenu">
+                    <a href="/benefitku/tunjangan-kinerja" class="{{ 'active' if active_menu == 'benefit_tunkin' else '' }}"><span class="submenu-dot"></span><span>Tunjangan Kinerja</span></a>
+                    <a href="/benefitku/uang-makan" class="{{ 'active' if active_menu == 'benefit_uang_makan' else '' }}"><span class="submenu-dot"></span><span>Rekap Uang Makan</span></a>
+                    <a href="/benefitku/uang-siaga" class="{{ 'active' if active_menu == 'benefit_uang_siaga' else '' }}"><span class="submenu-dot"></span><span>Uang Siaga</span></a>
+                </div>
+            </div>
+
             <div class="sidebar-menu-group {{ 'open' if active_menu in ['plans', 'cuti', 'sakit', 'ijin'] else '' }}">
             <a href="/plans"
                    class="sidebar-menu-parent {{ 'active' if active_menu in ['plans', 'cuti', 'sakit', 'ijin'] else '' }}">
@@ -188,7 +199,28 @@
 
         <section class="dashboard-content">
 
-            {% if active_menu == "profilku" %}
+            {% if active_menu in ["benefit_tunkin", "benefit_uang_makan", "benefit_uang_siaga"] %}
+            {% set benefit_title = "Tunjangan Kinerja" if active_menu == "benefit_tunkin" else ("Rekap Uang Makan" if active_menu == "benefit_uang_makan" else "Uang Siaga") %}
+            <div class="breadcrumb-card"><strong>Benefitku / {{ benefit_title }}</strong></div>
+            <section class="profile-card" style="padding:24px;">
+                <div class="submission-kicker">BENEFIT PEGAWAI</div>
+                <h2 style="margin:8px 0 6px;">{{ benefit_title }}</h2>
+                <p style="color:#64748b;margin:0 0 22px;">Data perhitungan untuk {{ nama or "Pegawai" }}. Pilih periode lalu tekan Tampilkan.</p>
+                <form id="benefitFilter" style="display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-bottom:22px;">
+                    {% if active_menu == "benefit_tunkin" %}
+                    <label style="display:grid;gap:6px;font-size:13px;font-weight:600;">Tanggal Mulai<input id="benefitStart" type="date" required style="padding:10px;border:1px solid #cbd5e1;border-radius:8px;"></label>
+                    <label style="display:grid;gap:6px;font-size:13px;font-weight:600;">Tanggal Selesai<input id="benefitEnd" type="date" required style="padding:10px;border:1px solid #cbd5e1;border-radius:8px;"></label>
+                    {% else %}
+                    <label style="display:grid;gap:6px;font-size:13px;font-weight:600;">Periode<input id="benefitMonth" type="month" required style="padding:10px;border:1px solid #cbd5e1;border-radius:8px;"></label>
+                    {% endif %}
+                    <button type="submit" class="calendar-action-button primary">Tampilkan</button>
+                </form>
+                <div id="benefitStatus" role="status" style="padding:12px 14px;border-radius:8px;background:#f8fafc;color:#475569;margin-bottom:16px;">Memuat data benefit…</div>
+                <div id="benefitSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px;"></div>
+                <div id="benefitDetail" style="overflow:auto;"></div>
+            </section>
+            <script src="{{ url_for('static', filename='js/benefitku.js') }}" defer></script>
+            {% elif active_menu == "profilku" %}
             <div class="breadcrumb-card"><strong>Profilku</strong></div>
 
             <section class="profile-card">
